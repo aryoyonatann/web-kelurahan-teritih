@@ -376,15 +376,24 @@
                     $approvalStatus = optional($d->approval)->status;
                     $rowStatus = $approvalStatus ?? 'pending';
                     $persyaratan = $d->persyaratan ?? collect();
+                    $namaPemohon = $d->nama_pemohon ?? $d->user->nama ?? '-';
+                    $nikPemohon  = $d->nik_pemohon  ?? $d->user->nik  ?? '-';
+                    $isWakil     = !empty($d->nama_pemohon) && $d->nama_pemohon !== ($d->user->nama ?? '');
                 @endphp
                 <tr data-status="{{ $rowStatus }}"
-                    data-name="{{ strtolower($d->user->nama ?? '') }}"
+                    data-name="{{ strtolower($namaPemohon) }}"
                     data-surat="{{ strtolower($d->jenisSurat->nama_surat ?? '') }}">
                     <td class="td-no">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
                     <td>
                         <div class="td-name">
-                            {{ $d->user->nama ?? '-' }}
-                            <small>NIK: {{ $d->user->nik ?? '-' }}</small>
+                            {{ $namaPemohon }}
+                            @if($isWakil)
+                                <span style="font-size:9px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:600">WAKIL</span>
+                            @endif
+                            <small>NIK: {{ $nikPemohon }}</small>
+                            @if($isWakil)
+                                <small style="color:#94a3b8">Pengaju: {{ $d->user->nama ?? '-' }}</small>
+                            @endif
                         </div>
                     </td>
                     <td class="td-surat">{{ $d->jenisSurat->nama_surat ?? '-' }}</td>
@@ -417,7 +426,7 @@
                             @php
                                 $jumlahDok = $persyaratan->count();
                                 $dokData = json_encode([
-                                    'nama'  => $d->user->nama ?? '-',
+                                    'nama'  => $namaPemohon,
                                     'jenis' => $d->jenisSurat->nama_surat ?? '-',
                                     'files' => $persyaratan->map(function($p) {
                                         return [
@@ -454,7 +463,7 @@
                                 <form action="{{ route('permohonan.approve', $d->id_permohonan) }}" method="POST" style="display:inline;">
                                     @csrf @method('PUT')
                                     <button type="submit" class="btn-act btn-approve"
-                                            onclick="return confirm('Setujui permohonan dari {{ addslashes($d->user->nama ?? '') }}?')">
+                                            onclick="return confirm('Setujui permohonan dari {{ addslashes($namaPemohon) }}?')">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <polyline points="20 6 9 17 4 12"/>
                                         </svg>
@@ -464,7 +473,7 @@
                                 <form action="{{ route('permohonan.reject', $d->id_permohonan) }}" method="POST" style="display:inline;">
                                     @csrf @method('PUT')
                                     <button type="submit" class="btn-act btn-reject"
-                                            onclick="return confirm('Tolak permohonan dari {{ addslashes($d->user->nama ?? '') }}?')">
+                                            onclick="return confirm('Tolak permohonan dari {{ addslashes($namaPemohon) }}?')">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                                         </svg>

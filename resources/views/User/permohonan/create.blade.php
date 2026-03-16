@@ -1,8 +1,12 @@
-@extends('layouts.user')
-
-@section('title', 'Buat Permohonan Surat')
-
-@push('styles')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Permohonan Surat – Kelurahan Teritih</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
     --blue:   #1c64f2;
@@ -213,9 +217,10 @@ select.field-input { cursor: pointer; }
 .wa-text { font-size: 12px; color: #166534; }
 .wa-num  { font-size: 14px; font-weight: 700; color: #14532d; }
 </style>
-@endpush
+</head>
+<body>
 
-@section('content')
+@include('partials.navbar')
 
 <div style="background:white;border-bottom:1px solid #e2e8f0;padding:12px 16px;font-size:12px;color:#64748b">
     <a href="{{ url('/') }}" style="color:#64748b;text-decoration:none">Beranda</a>
@@ -377,16 +382,87 @@ select.field-input { cursor: pointer; }
                 </div>
             </div>
             <div class="form-card-body">
-                <div class="file-zone" onclick="document.getElementById('dokumenInput').click()" id="dropZone">
-                    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;margin:0 auto">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                    <p><strong>Klik untuk upload</strong> atau seret file ke sini</p>
-                    <small>PDF, JPG, JPEG, PNG — Maks. 10MB per file, maks. 5 file</small>
-                    <input type="file" id="dokumenInput" name="dokumen[]" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="handleFiles(this.files)">
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+
+                    {{-- SLOT KTP --}}
+                    <div>
+                        <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#374151;margin-bottom:8px">
+                            Foto / Scan KTP <span style="color:#dc2626">*</span>
+                        </div>
+                        <div class="file-slot" id="slot-ktp" onclick="document.getElementById('input-ktp').click()"
+                             style="border:2px dashed #e2e8f0;border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;background:#fafafa;transition:all .2s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+                            <div id="ktp-preview-wrap" style="display:none;width:100%">
+                                <img id="ktp-img-preview" style="max-height:80px;object-fit:cover;border-radius:6px;width:100%;display:none">
+                                <div id="ktp-file-info" style="display:none;background:#eff6ff;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#1c64f2" stroke-width="2" style="width:16px;height:16px;flex-shrink:0">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                                    </svg>
+                                    <span id="ktp-file-name" style="font-size:12px;font-weight:600;color:#1c64f2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1"></span>
+                                    <button type="button" onclick="clearSlot('ktp');event.stopPropagation()"
+                                        style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:16px;line-height:1;padding:0;flex-shrink:0">&times;</button>
+                                </div>
+                            </div>
+                            <div id="ktp-placeholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="width:28px;height:28px;margin:0 auto">
+                                    <rect x="2" y="5" width="20" height="14" rx="2"/>
+                                    <circle cx="8" cy="12" r="2.5"/>
+                                    <path d="M13 10h5M13 14h3"/>
+                                </svg>
+                                <div style="font-size:12px;font-weight:600;color:#64748b;margin-top:4px">Upload KTP</div>
+                                <div style="font-size:10px;color:#94a3b8">JPG, PNG, PDF</div>
+                            </div>
+                        </div>
+                        <input type="file" id="input-ktp" name="dokumen_ktp"
+                               accept=".pdf,.jpg,.jpeg,.png" style="display:none"
+                               onchange="handleSlot('ktp', this)">
+                        @error('dokumen_ktp')
+                            <div style="font-size:12px;color:#dc2626;margin-top:5px">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- SLOT KK --}}
+                    <div>
+                        <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#374151;margin-bottom:8px">
+                            Foto / Scan Kartu Keluarga <span style="color:#dc2626">*</span>
+                        </div>
+                        <div class="file-slot" id="slot-kk" onclick="document.getElementById('input-kk').click()"
+                             style="border:2px dashed #e2e8f0;border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;background:#fafafa;transition:all .2s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+                            <div id="kk-preview-wrap" style="display:none;width:100%">
+                                <img id="kk-img-preview" style="max-height:80px;object-fit:cover;border-radius:6px;width:100%;display:none">
+                                <div id="kk-file-info" style="display:none;background:#f0fdf4;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" style="width:16px;height:16px;flex-shrink:0">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                                    </svg>
+                                    <span id="kk-file-name" style="font-size:12px;font-weight:600;color:#059669;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1"></span>
+                                    <button type="button" onclick="clearSlot('kk');event.stopPropagation()"
+                                        style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:16px;line-height:1;padding:0;flex-shrink:0">&times;</button>
+                                </div>
+                            </div>
+                            <div id="kk-placeholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="width:28px;height:28px;margin:0 auto">
+                                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                                </svg>
+                                <div style="font-size:12px;font-weight:600;color:#64748b;margin-top:4px">Upload KK</div>
+                                <div style="font-size:10px;color:#94a3b8">JPG, PNG, PDF</div>
+                            </div>
+                        </div>
+                        <input type="file" id="input-kk" name="dokumen_kk"
+                               accept=".pdf,.jpg,.jpeg,.png" style="display:none"
+                               onchange="handleSlot('kk', this)">
+                        @error('dokumen_kk')
+                            <div style="font-size:12px;color:#dc2626;margin-top:5px">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                 </div>
-                <div class="file-list" id="fileList"></div>
-                <div class="field-hint" style="margin-top:8px">Opsional. Upload dokumen pendukung yang diperlukan.</div>
+
+                <div style="font-size:11px;color:#94a3b8;margin-top:10px">
+                    Format: JPG, PNG, atau PDF — Maks. 10MB per file
+                </div>
+
             </div>
 
             <div class="form-footer">
@@ -471,9 +547,6 @@ select.field-input { cursor: pointer; }
 </div>{{-- /perm-wrap --}}
 </form>
 
-@endsection
-
-@push('scripts')
 <script>
 // Autofill data akun sendiri
 function autofillData() {
@@ -483,7 +556,6 @@ function autofillData() {
     checkWakil();
 }
 
-// Cek apakah NIK berbeda dengan akun (berarti mewakili orang lain)
 function checkWakil() {
     const myNik    = document.getElementById('my_nik').value;
     const inputNik = document.getElementById('nik_pemohon').value;
@@ -495,57 +567,62 @@ function checkWakil() {
     }
 }
 
-// File upload management
-let selectedFiles = [];
+// ── Upload slot handler ────────────────────────────────────
+function handleSlot(jenis, input) {
+    const file = input.files[0];
+    if (!file) return;
 
-function handleFiles(files) {
-    const maxFiles = 5;
-    for (let f of files) {
-        if (selectedFiles.length >= maxFiles) break;
-        selectedFiles.push(f);
+    const slot        = document.getElementById('slot-' + jenis);
+    const placeholder = document.getElementById(jenis + '-placeholder');
+    const previewWrap = document.getElementById(jenis + '-preview-wrap');
+    const imgPreview  = document.getElementById(jenis + '-img-preview');
+    const fileInfo    = document.getElementById(jenis + '-file-info');
+    const fileName    = document.getElementById(jenis + '-file-name');
+
+    // Tampilkan nama file
+    fileName.textContent = file.name;
+    placeholder.style.display  = 'none';
+    previewWrap.style.display  = 'block';
+    fileInfo.style.display     = 'flex';
+    imgPreview.style.display   = 'none';
+
+    // Kalau gambar, tampilkan preview
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            imgPreview.src           = e.target.result;
+            imgPreview.style.display = 'block';
+            fileInfo.style.display   = 'none';
+        };
+        reader.readAsDataURL(file);
     }
-    renderFileList();
-    syncFileInput();
+
+    // Border jadi hijau/biru saat terisi
+    slot.style.borderColor = jenis === 'ktp' ? '#1c64f2' : '#059669';
+    slot.style.background  = jenis === 'ktp' ? '#eff6ff' : '#f0fdf4';
 }
 
-function removeFile(idx) {
-    selectedFiles.splice(idx, 1);
-    renderFileList();
-    syncFileInput();
+function clearSlot(jenis) {
+    document.getElementById('input-' + jenis).value = '';
+    document.getElementById(jenis + '-placeholder').style.display  = '';
+    document.getElementById(jenis + '-preview-wrap').style.display = 'none';
+    const slot = document.getElementById('slot-' + jenis);
+    slot.style.borderColor = '';
+    slot.style.background  = '';
 }
 
-function renderFileList() {
-    const list = document.getElementById('fileList');
-    if (selectedFiles.length === 0) { list.innerHTML = ''; return; }
-    list.innerHTML = selectedFiles.map((f, i) => `
-        <div class="file-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;flex-shrink:0;color:#1c64f2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
-            </svg>
-            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(f.name)}</span>
-            <span style="color:#94a3b8;font-size:11px;white-space:nowrap">${(f.size/1024).toFixed(0)} KB</span>
-            <button type="button" onclick="removeFile(${i})" title="Hapus">&times;</button>
-        </div>
-    `).join('');
-}
-
-function syncFileInput() {
-    const dt = new DataTransfer();
-    selectedFiles.forEach(f => dt.items.add(f));
-    document.getElementById('dokumenInput').files = dt.files;
-}
-
-function escHtml(s) {
-    return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-}
-
-// Drag & drop
-const dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor='#1c64f2'; });
-dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor=''; });
-dropZone.addEventListener('drop', e => {
-    e.preventDefault(); dropZone.style.borderColor='';
-    handleFiles(e.dataTransfer.files);
+// Hover effect pada slot
+document.querySelectorAll('.file-slot').forEach(slot => {
+    slot.addEventListener('mouseenter', () => {
+        if (!slot.style.borderColor) slot.style.borderColor = '#94a3b8';
+    });
+    slot.addEventListener('mouseleave', () => {
+        if (slot.style.borderColor === 'rgb(148, 163, 184)') slot.style.borderColor = '';
+    });
 });
 </script>
-@endpush
+
+@include('partials.footer')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

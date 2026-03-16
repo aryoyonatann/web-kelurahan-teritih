@@ -9,17 +9,20 @@ use App\Http\Controllers\Admin\InformasiKelurahanController;
 use App\Http\Controllers\Admin\KependudukanController;
 use App\Http\Controllers\User\PermohonanUserController;
 use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\Admin\StatistikController;
+use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
 
 // =========================================================
 // PUBLIC ROUTES — tidak perlu login
 // =========================================================
-Route::get('/',                 fn () => view('home'))             ->name('home');
-Route::get('/profil',           fn () => view('profil'))           ->name('profil');
-Route::get('/layanan',          fn () => view('layanan'))          ->name('layanan');
-Route::get('/informasi',        fn () => view('informasi'))        ->name('informasi');
-Route::get('/informasi/berita', fn () => view('informasi-berita')) ->name('informasi.berita');
-Route::get('/kontak',           fn () => view('kontak'))           ->name('kontak');
+Route::get('/',                 [PublicController::class, 'home'])        ->name('home');
+Route::get('/profil',           fn () => view('profil'))                  ->name('profil');
+Route::get('/layanan',          fn () => view('layanan'))                 ->name('layanan');
+Route::get('/informasi',        [PublicController::class, 'informasi'])   ->name('informasi');
+Route::get('/informasi/berita', [PublicController::class, 'berita'])      ->name('informasi.berita');
+Route::get('/informasi/berita/{slug}', [PublicController::class, 'detailBerita'])->name('informasi.berita.detail');
+Route::get('/kontak',           fn () => view('kontak'))                  ->name('kontak');
 
 // =========================================================
 // ADMIN AREA
@@ -34,6 +37,10 @@ Route::prefix('admin')->group(function () {
         // Notifikasi (polling API)
         Route::get('notifikasi',            [NotifikasiController::class, 'index'])   ->name('admin.notifikasi');
         Route::post('notifikasi/mark-read', [NotifikasiController::class, 'markRead'])->name('admin.notifikasi.read');
+
+        // Statistik Demografi
+        Route::get('statistik-demografi',  [StatistikController::class, 'edit'])  ->name('admin.statistik.edit');
+        Route::put('statistik-demografi',  [StatistikController::class, 'update'])->name('admin.statistik.update');
 
         // ✅ Dashboard sekarang pakai controller agar bisa kirim data ke view
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');

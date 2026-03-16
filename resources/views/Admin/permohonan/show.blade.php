@@ -287,7 +287,7 @@
             <div class="id-badge">ID #{{ $data->id_permohonan }}</div>
             <h2>{{ $data->jenisSurat->nama_surat ?? 'Permohonan Surat' }}</h2>
             <p>
-                Diajukan oleh <strong style="color:#fff">{{ $data->user->nama ?? '-' }}</strong>
+                Diajukan oleh <strong style="color:#fff">{{ $data->nama_pemohon ?? $data->user->nama ?? '-' }}</strong>
                 &middot; {{ \Carbon\Carbon::parse($data->tanggal_pengajuan)->format('d M Y') }}
             </p>
         </div>
@@ -336,29 +336,38 @@
                     <h3>Data Pemohon</h3>
                 </div>
                 <div class="section-body">
+                    @php
+                        $isPerwakilan = !empty($data->nama_pemohon) && $data->nama_pemohon !== $data->user->nama;
+                    @endphp
+                    @if($isPerwakilan)
+                    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#92400e;display:flex;align-items:center;gap:8px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Permohonan ini diajukan oleh <strong>{{ $data->user->nama }}</strong> mewakili orang lain.
+                    </div>
+                    @endif
                     <div class="field-grid">
                         <div class="field">
-                            <label>Nama Lengkap</label>
-                            <span>{{ $data->user->nama ?? '-' }}</span>
+                            <label>Nama Lengkap Pemohon</label>
+                            <span>{{ $data->nama_pemohon ?? $data->user->nama ?? '-' }}</span>
                         </div>
                         <div class="field">
-                            <label>NIK</label>
-                            <span class="mono">{{ $data->user->nik ?? '-' }}</span>
+                            <label>NIK Pemohon</label>
+                            <span class="mono">{{ $data->nik_pemohon ?? $data->user->nik ?? '-' }}</span>
                         </div>
                     </div>
                     <div class="field-grid one">
                         <div class="field">
-                            <label>Alamat Lengkap</label>
-                            <span>{{ $data->user->alamat ?? '-' }}</span>
+                            <label>Alamat Pemohon</label>
+                            <span>{{ $data->alamat_pemohon ?? $data->user->alamat ?? '-' }}</span>
                         </div>
                     </div>
                     <div class="field-grid" style="margin-bottom:0">
                         <div class="field">
-                            <label>No. HP</label>
+                            <label>No. HP (Pengaju)</label>
                             <span class="mono">{{ $data->user->no_hp ?? $data->user->no_telp ?? '-' }}</span>
                         </div>
                         <div class="field">
-                            <label>Email</label>
+                            <label>Email (Pengaju)</label>
                             <span>{{ $data->user->email ?? '-' }}</span>
                         </div>
                     </div>
@@ -403,8 +412,7 @@
                 </div>
             </div>
 
-            <!-- DOKUMEN -->
-            @if($data->dokumen)
+            <!-- DOKUMEN PERSYARATAN -->
             <div class="section-card">
                 <div class="section-head">
                     <div class="section-head-icon purple">
@@ -412,29 +420,58 @@
                             <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                         </svg>
                     </div>
-                    <h3>Dokumen Pendukung</h3>
+                    <h3>Dokumen Persyaratan</h3>
+                    @if($data->persyaratan && $data->persyaratan->count())
+                        <span style="margin-left:auto;font-size:11px;font-weight:600;background:var(--primary-light);color:var(--primary);border-radius:20px;padding:2px 10px;">
+                            {{ $data->persyaratan->count() }} file
+                        </span>
+                    @endif
                 </div>
-                <div class="section-body">
-                    <div class="doc-row">
-                        <div class="doc-icon">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
+                <div class="section-body" style="padding:0">
+                    @forelse($data->persyaratan ?? [] as $dok)
+                    @php
+                        $ext  = strtolower(pathinfo($dok->nama_file ?? '', PATHINFO_EXTENSION));
+                        $isPdf = $ext === 'pdf';
+                        $isImg = in_array($ext, ['jpg','jpeg','png','gif','webp']);
+                    @endphp
+                    <div class="doc-row" style="border-radius:0;border:none;border-bottom:1px solid var(--gray-100);margin:0;gap:12px;padding:14px 20px;">
+                        <div class="doc-icon" style="{{ $isPdf ? 'background:#fee2e2' : 'background:var(--primary-light)' }}">
+                            @if($isPdf)
+                            <svg viewBox="0 0 24 24" fill="currentColor" style="color:#dc2626">
                                 <path d="M7 18H17V16H7v2zm0-4h10v-2H7v2zm-2 8a2 2 0 01-2-2V4a2 2 0 012-2h8l6 6v14a2 2 0 01-2 2H5z"/>
                             </svg>
+                            @elseif($isImg)
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                            @else
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
+                                <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/>
+                            </svg>
+                            @endif
                         </div>
-                        <div class="doc-info">
-                            <strong>{{ basename($data->dokumen) }}</strong>
-                            <small>Dokumen permohonan pendukung</small>
+                        <div class="doc-info" style="flex:1;min-width:0">
+                            <strong style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $dok->nama_file }}</strong>
+                            <small>{{ strtoupper($ext) }} · Diunggah {{ $dok->uploaded_at ? \Carbon\Carbon::parse($dok->uploaded_at)->format('d M Y, H:i') : '-' }}</small>
                         </div>
-                        <a href="{{ asset('storage/' . $data->dokumen) }}" target="_blank" class="btn-view no-print">
+                        <a href="{{ asset('storage/' . $dok->path_file) }}" target="_blank" class="btn-view no-print">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                             </svg>
                             Lihat
                         </a>
                     </div>
+                    @empty
+                    <div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;margin:0 auto 8px;display:block;color:var(--gray-200)">
+                            <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/>
+                        </svg>
+                        Tidak ada dokumen yang dilampirkan
+                    </div>
+                    @endforelse
                 </div>
             </div>
-            @endif
 
             <!-- TANDA TANGAN (tampil di layar dan saat print) -->
             <div class="section-card">
@@ -652,7 +689,7 @@
                 <div class="section-body">
                     <div class="field" style="margin-bottom:14px">
                         <label>Nama Pemohon</label>
-                        <span>{{ $data->user->nama ?? '-' }}</span>
+                        <span>{{ $data->nama_pemohon ?? $data->user->nama ?? '-' }}</span>
                     </div>
                     <div class="field" style="margin-bottom:14px">
                         <label>No. HP</label>

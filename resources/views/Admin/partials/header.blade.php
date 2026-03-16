@@ -141,6 +141,10 @@
            class="nav-pill {{ request()->routeIs('kependudukan.*') ? 'active' : '' }}">
             <i class="bi bi-people"></i> Kependudukan
         </a>
+        <a href="{{ route('admin.statistik.edit') }}"
+           class="nav-pill {{ request()->routeIs('admin.statistik.*') ? 'active' : '' }}">
+            <i class="bi bi-bar-chart-fill"></i> Statistik
+        </a>
     </nav>
 
     <div class="d-flex align-items-center gap-2">
