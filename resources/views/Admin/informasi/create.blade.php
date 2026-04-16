@@ -3,6 +3,7 @@
 @section('title', 'Tulis Berita Baru')
 
 @push('styles')
+<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>
@@ -49,7 +50,11 @@
     @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
 
     /* select */
-    select.field-input { cursor: pointer; }
+    select.field-input { cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+    /* input kategori custom (tampil/sembunyi) */
+    #kategori-custom-wrap { margin-top: 8px; display: none; }
+    #kategori-custom-wrap.show { display: block; }
 
     /* file upload */
     .file-upload-area {
@@ -127,14 +132,41 @@
                     </div>
 
                     <div class="field-row">
+
+                        {{-- ✅ KATEGORI: dropdown select --}}
                         <div class="field-group" style="margin-bottom:0">
                             <label class="field-label">Kategori <span>*</span></label>
-                            <input type="text" name="kategori"
+
+                            {{-- Select dropdown --}}
+                            <select id="kategori-select"
                                 class="field-input {{ $errors->has('kategori') ? 'is-error' : '' }}"
-                                placeholder="Contoh: Pengumuman, Kegiatan, Info..."
-                                value="{{ old('kategori') }}" required>
+                                onchange="handleKategori(this.value)">
+                                <option value="" disabled {{ !old('kategori') ? 'selected' : '' }}>-- Pilih Kategori --</option>
+                                <option value="Pengumuman"  {{ old('kategori') == 'Pengumuman'  ? 'selected' : '' }}>📢 Pengumuman</option>
+                                <option value="Kegiatan"   {{ old('kategori') == 'Kegiatan'    ? 'selected' : '' }}>🎯 Kegiatan</option>
+                                <option value="Kesehatan"  {{ old('kategori') == 'Kesehatan'   ? 'selected' : '' }}>🏥 Kesehatan</option>
+                                <option value="Lingkungan" {{ old('kategori') == 'Lingkungan'  ? 'selected' : '' }}>🌿 Lingkungan</option>
+                                <option value="Pelayanan"  {{ old('kategori') == 'Pelayanan'   ? 'selected' : '' }}>🏛️ Pelayanan</option>
+                                <option value="Sosial"     {{ old('kategori') == 'Sosial'      ? 'selected' : '' }}>🤝 Sosial</option>
+                                <option value="Pendidikan" {{ old('kategori') == 'Pendidikan'  ? 'selected' : '' }}>📚 Pendidikan</option>
+                                <option value="Lainnya"    {{ old('kategori') == 'Lainnya' || (!in_array(old('kategori'), ['', 'Pengumuman','Kegiatan','Kesehatan','Lingkungan','Pelayanan','Sosial','Pendidikan']) && old('kategori')) ? 'selected' : '' }}>✏️ Lainnya...</option>
+                            </select>
+
+                            {{-- Input custom muncul jika pilih "Lainnya" --}}
+                            <div id="kategori-custom-wrap" class="{{ (!in_array(old('kategori'), ['', 'Pengumuman','Kegiatan','Kesehatan','Lingkungan','Pelayanan','Sosial','Pendidikan']) && old('kategori')) ? 'show' : '' }}">
+                                <input type="text" id="kategori-custom"
+                                    placeholder="Tulis kategori sendiri..."
+                                    class="field-input"
+                                    value="{{ (!in_array(old('kategori'), ['', 'Pengumuman','Kegiatan','Kesehatan','Lingkungan','Pelayanan','Sosial','Pendidikan'])) ? old('kategori') : '' }}">
+                            </div>
+
+                            {{-- Input hidden yang dikirim ke server --}}
+                            <input type="hidden" name="kategori" id="kategori-value" value="{{ old('kategori') }}">
+
                             @error('kategori')<div class="field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
                         </div>
+
+                        {{-- Status Publikasi --}}
                         <div class="field-group" style="margin-bottom:0">
                             <label class="field-label">Status Publikasi <span>*</span></label>
                             <select name="status" class="field-input">
@@ -142,6 +174,7 @@
                                 <option value="publish" {{ old('status') == 'publish' ? 'selected' : '' }}>🟢 Publish</option>
                             </select>
                         </div>
+
                     </div>
 
                 </div>
@@ -198,6 +231,39 @@
 
 @push('scripts')
 <script>
+// ── Kategori dropdown handler ──────────────────────────────
+function handleKategori(val) {
+    var customWrap  = document.getElementById('kategori-custom-wrap');
+    var customInput = document.getElementById('kategori-custom');
+    var hiddenInput = document.getElementById('kategori-value');
+
+    if (val === 'Lainnya') {
+        // Tampilkan input custom, kosongkan hidden value
+        customWrap.classList.add('show');
+        customInput.focus();
+        hiddenInput.value = '';
+    } else {
+        // Sembunyikan input custom, isi hidden value langsung dari select
+        customWrap.classList.remove('show');
+        customInput.value  = '';
+        hiddenInput.value  = val;
+    }
+}
+
+// Update hidden value saat user mengetik kategori custom
+document.getElementById('kategori-custom').addEventListener('input', function () {
+    document.getElementById('kategori-value').value = this.value;
+});
+
+// Pastikan hidden value terisi saat halaman pertama load (untuk old() setelah error)
+(function () {
+    var select = document.getElementById('kategori-select');
+    if (select.value && select.value !== 'Lainnya') {
+        document.getElementById('kategori-value').value = select.value;
+    }
+})();
+
+// ── Gambar preview ─────────────────────────────────────────
 function previewGambar(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();

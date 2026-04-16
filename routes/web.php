@@ -22,7 +22,7 @@ Route::get('/layanan',          fn () => view('layanan'))                 ->name
 Route::get('/informasi',        [PublicController::class, 'informasi'])   ->name('informasi');
 Route::get('/informasi/berita', [PublicController::class, 'berita'])      ->name('informasi.berita');
 Route::get('/informasi/berita/{slug}', [PublicController::class, 'detailBerita'])->name('informasi.berita.detail');
-Route::get('/kontak',           fn () => view('kontak'))                  ->name('kontak');
+// ✅ Route /kontak DIHAPUS — diganti dengan floating chatbot FAQ di semua halaman
 
 // =========================================================
 // ADMIN AREA
@@ -42,7 +42,7 @@ Route::prefix('admin')->group(function () {
         Route::get('statistik-demografi',  [StatistikController::class, 'edit'])  ->name('admin.statistik.edit');
         Route::put('statistik-demografi',  [StatistikController::class, 'update'])->name('admin.statistik.update');
 
-        // ✅ Dashboard sekarang pakai controller agar bisa kirim data ke view
+        // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::post('/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 

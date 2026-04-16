@@ -36,9 +36,12 @@ class InformasiKelurahanController extends Controller
             $gambar = $request->file('gambar')->store('berita', 'public');
         }
 
+        // ✅ FIX: slug dijamin tidak pernah null atau kosong
+        $slug = $this->generateUniqueSlug($request->judul);
+
         InformasiKelurahan::create([
             'judul'           => $request->judul,
-            'slug'            => Str::slug($request->judul) . '-' . time(),
+            'slug'            => $slug,
             'kategori'        => $request->kategori,
             'isi'             => $request->isi,
             'ringkasan'       => $request->ringkasan ?? Str::limit(strip_tags($request->isi), 150),
@@ -49,7 +52,6 @@ class InformasiKelurahanController extends Controller
             'views'           => 0,
         ]);
 
-        // ✅ Fix: route name yang benar adalah 'informasi-admin.index'
         return redirect()->route('informasi-admin.index')
             ->with('success', 'Berita berhasil ditambahkan.');
     }
@@ -74,7 +76,6 @@ class InformasiKelurahanController extends Controller
 
         // Ganti gambar lama jika ada upload baru
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama dari storage
             if ($data->gambar) {
                 Storage::disk('public')->delete($data->gambar);
             }
@@ -89,9 +90,17 @@ class InformasiKelurahanController extends Controller
             $tanggalPublish = null;
         }
 
+        // ✅ FIX: Jika slug lama masih null/kosong → generate slug baru sekarang
+        // Jika sudah ada slug → tetap pakai yang lama agar URL tidak berubah
+        if (empty($data->slug)) {
+            $newSlug = $this->generateUniqueSlug($request->judul, $data->id_informasi);
+        } else {
+            $newSlug = $data->slug;
+        }
+
         $data->update([
             'judul'           => $request->judul,
-            'slug'            => Str::slug($request->judul) . '-' . $data->id_informasi,
+            'slug'            => $newSlug,
             'kategori'        => $request->kategori,
             'isi'             => $request->isi,
             'ringkasan'       => $request->ringkasan ?? Str::limit(strip_tags($request->isi), 150),
@@ -100,7 +109,6 @@ class InformasiKelurahanController extends Controller
             'gambar'          => $data->gambar,
         ]);
 
-        // ✅ Fix: route name yang benar
         return redirect()->route('informasi-admin.index')
             ->with('success', 'Berita berhasil diperbarui.');
     }
@@ -109,7 +117,6 @@ class InformasiKelurahanController extends Controller
     {
         $data = InformasiKelurahan::findOrFail($id);
 
-        // Hapus gambar dari storage jika ada
         if ($data->gambar) {
             Storage::disk('public')->delete($data->gambar);
         }
@@ -117,5 +124,43 @@ class InformasiKelurahanController extends Controller
         $data->delete();
 
         return back()->with('success', 'Berita berhasil dihapus.');
+    }
+
+    /**
+     * ✅ Helper: Generate slug unik yang dijamin tidak null dan tidak kosong.
+     *
+     * @param string   $judul     Judul berita
+     * @param int|null $excludeId ID berita yang dikecualikan saat cek unik (untuk update)
+     * @return string
+     */
+    private function generateUniqueSlug(string $judul, $excludeId = null): string
+    {
+        // Buat slug dari judul menggunakan helper Laravel
+        $slugBase = Str::slug($judul);
+
+        // Fallback: jika judul hanya berisi karakter khusus/arab/emoji
+        // sehingga Str::slug() menghasilkan string kosong
+        if (empty($slugBase)) {
+            $slugBase = 'berita';
+        }
+
+        // Gabungkan dengan timestamp agar slug bersifat unik secara default
+        $slug = $slugBase . '-' . time();
+
+        // Jika ternyata masih ada duplikat di database, tambahkan counter
+        $counter = 1;
+        while (true) {
+            $query = InformasiKelurahan::where('slug', $slug);
+            if ($excludeId) {
+                $query->where('id_informasi', '!=', $excludeId);
+            }
+            if (!$query->exists()) {
+                break; // slug sudah unik, keluar dari loop
+            }
+            $slug = $slugBase . '-' . time() . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

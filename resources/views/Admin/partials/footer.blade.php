@@ -91,7 +91,7 @@
                 <h6 class="footer-heading">Lokasi Kantor</h6>
                 <div class="footer-map rounded overflow-hidden border border-secondary border-opacity-25">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15866.25!2d106.1543!3d-6.1227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e418a2a78a50e07%3A0x74c78c4f5c5eed87!2sSerang%2C%20Kota%20Serang%2C%20Banten!5e0!3m2!1sen!2sid!4v1700000000000"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
                         width="100%" height="120" style="border:0" allowfullscreen="" loading="lazy">
                     </iframe>
                 </div>

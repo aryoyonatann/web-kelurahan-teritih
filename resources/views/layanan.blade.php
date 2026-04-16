@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Layanan Administrasi – Kelurahan Teritih</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -103,6 +104,15 @@
     .jam-day  { font-weight: 600; color: var(--navy); }
     .jam-time { color: var(--slate); font-size: 12.5px; }
     .jam-tutup { display: inline-flex; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #fef2f2; color: var(--red); }
+
+    /* ── STATUS BADGE REAL-TIME ── */
+    .status-buka  { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #dcfce7; color: #16a34a; }
+    .status-tutup { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #fef2f2; color: #dc2626; }
+    .status-dot   { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .status-dot-buka  { background: #16a34a; animation: pulse-green 1.5s ease-in-out infinite; }
+    .status-dot-tutup { background: #dc2626; }
+    @keyframes pulse-green { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(0.85)} }
+
     .info-body { padding: 16px 18px; }
     .info-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--orange); margin-bottom: 10px; }
     .info-title i { font-size: 16px; }
@@ -141,7 +151,6 @@
         <p class="hero-desc">
             Kelurahan Teritih menyediakan berbagai layanan administrasi kependudukan untuk memudahkan masyarakat. Ajukan surat keterangan dan dokumen penting lainnya secara online dengan mudah dan cepat.
         </p>
-        {{-- ✅ FIX: cek login sebelum arahkan ke create --}}
         @auth
             <a href="{{ route('user.permohonan.create') }}" class="btn-hero-ajukan">
                 <i class="bi bi-file-earmark-arrow-up-fill"></i> Ajukan Permohonan Surat
@@ -274,7 +283,6 @@
                     </div>
                 </div>
 
-                {{-- ✅ FIX: CTA Bottom — cek login --}}
                 <div class="layanan-cta">
                     <div class="layanan-cta-text">
                         <div class="layanan-cta-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
@@ -316,11 +324,16 @@
                     </div>
                     <div class="jam-row">
                         <span class="jam-day">Jumat</span>
-                        <span class="jam-time">08:00 – 16:30</span>
+                        <span class="jam-time">08:00 – 15:30</span>
                     </div>
                     <div class="jam-row">
                         <span class="jam-day">Sabtu–Minggu</span>
                         <span class="jam-tutup">Tutup</span>
+                    </div>
+                    {{-- STATUS REAL-TIME --}}
+                    <div class="jam-row" style="border-bottom:none;padding-top:10px;margin-top:2px;border-top:1px dashed var(--border)">
+                        <span class="jam-day" style="font-size:12px;font-weight:600">Status Sekarang</span>
+                        <span id="jam-status-layanan"></span>
                     </div>
                 </div>
             </div>
@@ -364,6 +377,30 @@
 </div>
 
 @include('partials.footer')
+
+{{-- ═══ SCRIPT: STATUS JAM OPERASIONAL REAL-TIME (WIB) ═══ --}}
+<script>
+(function () {
+    var now  = new Date();
+    var wib  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+    var day  = wib.getDay();
+    var tot  = wib.getHours() * 60 + wib.getMinutes();
+
+    var isOpen = false;
+
+    if (day >= 1 && day <= 4) {
+        isOpen = tot >= 480 && tot < 960;
+    } else if (day === 5) {
+        isOpen = tot >= 480 && tot < 930;
+    }
+
+    var htmlBuka  = '<span class="status-buka"><span class="status-dot status-dot-buka"></span>Sedang Buka</span>';
+    var htmlTutup = '<span class="status-tutup"><span class="status-dot status-dot-tutup"></span>Sedang Tutup</span>';
+
+    var el = document.getElementById('jam-status-layanan');
+    if (el) el.innerHTML = isOpen ? htmlBuka : htmlTutup;
+})();
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

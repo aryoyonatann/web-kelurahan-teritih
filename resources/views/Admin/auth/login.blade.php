@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Administrator – Kelurahan Teritih</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -60,13 +61,20 @@
         display: flex; align-items: center; gap: 10px;
         text-decoration: none;
     }
+
+    /* ✅ Logo gambar seperti navbar.blade.php */
     .admin-nav-icon {
         width: 40px; height: 40px;
-        background: linear-gradient(135deg, #1e3a5f, #0f172a);
-        border-radius: 10px;
+        border-radius: 8px;
         display: flex; align-items: center; justify-content: center;
-        color: white; font-size: 18px;
+        flex-shrink: 0; overflow: hidden;
+        background: transparent;
     }
+    .admin-nav-icon img {
+        width: 100%; height: 100%;
+        object-fit: contain;
+    }
+
     .admin-nav-text { display: flex; flex-direction: column; line-height: 1.15; }
     .admin-nav-sub  { font-size: 9px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
     .admin-nav-name { font-size: 16px; font-weight: 800; color: var(--navy); }
@@ -248,7 +256,7 @@
     }
 
     /* =====================================================
-       FOOTER — Admin style (dark, tautan internal)
+       FOOTER — Admin style
     ===================================================== */
     .main-footer { background: #0f172a; flex-shrink: 0; padding: 48px 32px 0; }
 
@@ -310,13 +318,12 @@
 </head>
 <body>
 
-{{-- =====================================================
-     NAVBAR — Admin Portal
-===================================================== --}}
+{{-- NAVBAR --}}
 <nav class="admin-nav">
     <a href="{{ route('home') }}" class="admin-nav-brand">
+        {{-- ✅ Logo Kota Serang (sama seperti navbar.blade.php) --}}
         <div class="admin-nav-icon">
-            <i class="bi bi-shield-fill"></i>
+            <img src="{{ asset('images/lambang_kota_serang.jpg') }}" alt="Logo Kota Serang">
         </div>
         <div class="admin-nav-text">
             <span class="admin-nav-sub">Admin Portal</span>
@@ -335,10 +342,7 @@
     </div>
 </nav>
 
-
-{{-- =====================================================
-     PAGE BODY
-===================================================== --}}
+{{-- PAGE BODY --}}
 <div class="page-body">
     <div class="login-card">
 
@@ -439,15 +443,11 @@
     </div>
 </div>
 
-
-{{-- =====================================================
-     FOOTER — Admin version
-===================================================== --}}
+{{-- FOOTER --}}
 <footer class="main-footer">
     <div class="container-fluid px-0">
         <div class="row g-4 pb-2">
 
-            {{-- Brand --}}
             <div class="col-lg-3 col-md-6">
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <div class="footer-logo"><i class="bi bi-shield-fill"></i></div>
@@ -466,7 +466,6 @@
                 </div>
             </div>
 
-            {{-- Tautan Internal --}}
             <div class="col-lg-2 col-md-6">
                 <div class="footer-heading">Tautan Internal</div>
                 <ul class="footer-links">
@@ -477,7 +476,6 @@
                 </ul>
             </div>
 
-            {{-- Kontak Dukungan --}}
             <div class="col-lg-4 col-md-6">
                 <div class="footer-heading">Kontak Dukungan</div>
                 <ul class="footer-contact">
@@ -490,7 +488,6 @@
                 </ul>
             </div>
 
-            {{-- Peta --}}
             <div class="col-lg-3 col-md-6">
                 <div class="footer-heading">Lokasi Kantor</div>
                 <div class="footer-map">

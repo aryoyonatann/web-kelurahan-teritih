@@ -9,10 +9,13 @@ class PublicController extends Controller
 {
     public function home()
     {
+        // ✅ Tampilkan 4 berita terbaru di homepage
+        // whereNotNull('slug') tetap dipakai agar tidak error saat generate URL
         $beritaTerbaru = InformasiKelurahan::where('status', 'publish')
             ->whereNotNull('slug')
+            ->where('slug', '!=', '')
             ->orderBy('tanggal_publish', 'desc')
-            ->take(2)
+            ->take(4)
             ->get();
 
         return view('home', compact('beritaTerbaru'));
@@ -22,6 +25,7 @@ class PublicController extends Controller
     {
         $beritaTerbaru = InformasiKelurahan::where('status', 'publish')
             ->whereNotNull('slug')
+            ->where('slug', '!=', '')
             ->orderBy('tanggal_publish', 'desc')
             ->take(3)
             ->get();
@@ -33,20 +37,33 @@ class PublicController extends Controller
 
     public function berita(Request $request)
     {
+        // ✅ Query dasar: hanya berita yang slugnya tidak null dan tidak kosong
+        //    agar route('informasi.berita.detail', $b->slug) tidak error
+        //    Berita tanpa slug (misal judul "tes" yang slugnya null) tidak tampil
+        //    di frontend tapi tetap ada di admin — fix slugnya dari admin
         $query = InformasiKelurahan::where('status', 'publish')
             ->whereNotNull('slug')
+            ->where('slug', '!=', '')
             ->orderBy('tanggal_publish', 'desc');
 
+        // Filter kategori jika ada
         if ($request->filled('kategori')) {
             $query->where('kategori', $request->kategori);
         }
 
-        $beritaFeatured = (clone $query)->first();
-        $beritaSamping  = (clone $query)->skip(1)->take(4)->get();
-        $beritaGrid     = (clone $query)->skip(5)->paginate(6);
+        // ✅ Total semua berita publish yang punya slug (untuk counter)
+        $totalBerita = (clone $query)->count();
 
-        $totalBerita = InformasiKelurahan::where('status', 'publish')
-            ->whereNotNull('slug')->count();
+        // ✅ Featured: 1 berita paling atas
+        $beritaFeatured = (clone $query)->first();
+
+        // ✅ Samping: 3 berita setelah featured
+        $beritaSamping  = (clone $query)->skip(1)->take(3)->get();
+
+        // ✅ Grid: semua sisa berita (skip 4 = 1 featured + 3 samping)
+        //    Dengan 6 berita valid → grid dapat 2 berita
+        //    paginate(9) agar bisa tampung banyak & ada navigasi halaman
+        $beritaGrid = (clone $query)->skip(4)->paginate(9);
 
         return view('informasi-berita', compact(
             'beritaFeatured',
@@ -66,6 +83,7 @@ class PublicController extends Controller
 
         $beritaLainnya = InformasiKelurahan::where('status', 'publish')
             ->whereNotNull('slug')
+            ->where('slug', '!=', '')
             ->where('id_informasi', '!=', $berita->id_informasi)
             ->orderBy('tanggal_publish', 'desc')
             ->take(4)

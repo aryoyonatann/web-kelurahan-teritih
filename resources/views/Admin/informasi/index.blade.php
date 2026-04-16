@@ -3,6 +3,7 @@
 @section('title', 'Manajemen Berita')
 
 @push('styles')
+<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>
@@ -11,7 +12,7 @@
 
     /* ── HERO ── */
     .inf-hero {
-        background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
         padding: 32px 32px 28px; position: relative; overflow: hidden;
     }
     .inf-hero::before {
@@ -24,12 +25,12 @@
     .btn-tulis {
         display: inline-flex; align-items: center; gap: 8px;
         padding: 10px 20px; border-radius: 10px;
-        background: white; color: #0d9488;
+        background: white; color: #2563eb;
         font-size: 13px; font-weight: 700;
         text-decoration: none; transition: all .2s;
         box-shadow: 0 4px 12px rgba(0,0,0,.15); white-space: nowrap;
     }
-    .btn-tulis:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.2); color: #0f766e; }
+    .btn-tulis:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.2); color: #1d4ed8; }
 
     /* ── STATS BAR ── */
     .stats-bar { display: grid; grid-template-columns: repeat(3,1fr); background: white; border-bottom: 1px solid #e2e8f0; }
@@ -51,21 +52,6 @@
     }
     @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
 
-    /* ── FILTER BAR ── */
-    .filter-bar {
-        display: flex; align-items: center; gap: 12px;
-        margin-bottom: 16px; flex-wrap: wrap;
-    }
-    .filter-btn {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 6px 14px; border-radius: 8px;
-        font-size: 12px; font-weight: 600;
-        border: 1.5px solid #e2e8f0; background: white;
-        color: #64748b; cursor: pointer; text-decoration: none; transition: all .15s;
-    }
-    .filter-btn.active, .filter-btn:hover { border-color: #0d9488; color: #0d9488; background: #f0fdfa; }
-    .filter-btn.active { background: #f0fdfa; }
-
     /* ── TABLE CARD ── */
     .table-card { background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
     .table-card-header {
@@ -73,7 +59,7 @@
         padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;
     }
     .table-card-title { font-size: 14px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-    .table-card-title i { color: #0d9488; }
+    .table-card-title i { color: #2563eb; }
 
     /* ── TABLE ── */
     .inf-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -87,7 +73,7 @@
     .inf-tbl tbody tr { transition: background .15s; }
     .inf-tbl tbody tr:hover td { background: #f8fafc; }
 
-    .row-num { width: 28px; height: 28px; border-radius: 7px; background: #f0fdfa; color: #0d9488; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+    .row-num { width: 28px; height: 28px; border-radius: 7px; background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
 
     /* thumb */
     .berita-thumb {
@@ -110,8 +96,8 @@
 
     /* action buttons */
     .act-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; transition: all .15s; }
-    .act-edit  { background: #f0fdfa; color: #0d9488; }
-    .act-edit:hover  { background: #ccfbf1; color: #0f766e; }
+    .act-edit  { background: #eff6ff; color: #2563eb; }
+    .act-edit:hover  { background: #dbeafe; color: #1d4ed8; }
     .act-del   { background: #fef2f2; color: #dc2626; }
     .act-del:hover   { background: #fee2e2; color: #b91c1c; }
 

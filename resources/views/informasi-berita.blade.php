@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arsip Berita &amp; Pengumuman – Kelurahan Teritih</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,7 +13,7 @@
     :root{--blue:#1c64f2;--blue-dk:#1a56db;--blue-lt:#eff6ff;--navy:#0d1b3e;--navy2:#1e3a5f;--slate:#334155;--muted:#64748b;--border:#e2e8f0;--bg:#f1f5f9;--green:#10b981;--orange:#f59e0b;--red:#ef4444}
     *,*::before,*::after{box-sizing:border-box}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--slate);font-size:14px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
-    .page-header{background:white;border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+    .page-header{background:white;border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
     .breadcrumb-custom{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin:0}
     .breadcrumb-custom a{color:var(--muted);text-decoration:none;transition:color .18s}
     .breadcrumb-custom a:hover{color:var(--blue)}
@@ -22,17 +24,17 @@
     .filter-label{font-size:12px;font-weight:600;color:var(--muted);margin-right:4px}
     .filter-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:white;color:var(--slate);cursor:pointer;transition:all .18s;text-decoration:none;display:inline-block}
     .filter-btn:hover,.filter-btn.active{background:var(--blue);border-color:var(--blue);color:white}
-    .featured-wrap{background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;display:block;transition:box-shadow .2s}
+    .featured-wrap{background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:box-shadow .2s;height:100%}
     .featured-wrap:hover{box-shadow:0 8px 28px rgba(0,0,0,.1)}
-    .featured-img{height:320px;overflow:hidden;position:relative;background:var(--navy);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:64px}
-    .featured-img img{width:100%;height:100%;object-fit:cover}
+    .featured-img{overflow:hidden;position:relative;background:var(--navy);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:64px;min-height:280px;flex:1}
+    .featured-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
     .featured-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,20,50,.88) 0%,rgba(10,20,50,.2) 60%,transparent 100%);padding:28px;display:flex;flex-direction:column;justify-content:flex-end}
     .featured-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
     .featured-title{font-size:22px;font-weight:800;color:white;line-height:1.3;margin-bottom:10px}
     .featured-desc{font-size:13px;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:14px}
-    .btn-baca-full{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 16px;font-size:12.5px;font-weight:700;color:white;text-decoration:none;transition:all .18s}
+    .btn-baca-full{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 16px;font-size:12.5px;font-weight:700;color:white;text-decoration:none;transition:all .18s;width:fit-content}
     .btn-baca-full:hover{background:rgba(255,255,255,.28);color:white}
-    .berita-side{background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;display:flex;gap:0;transition:box-shadow .18s;margin-bottom:12px}
+    .berita-side{background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;display:flex;transition:box-shadow .18s;margin-bottom:12px}
     .berita-side:last-child{margin-bottom:0}
     .berita-side:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
     .berita-side-img{width:90px;height:90px;flex-shrink:0;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:24px}
@@ -48,12 +50,20 @@
     .berita-grid-body{padding:14px;flex:1;display:flex;flex-direction:column}
     .berita-grid-title{font-size:13px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .link-baca{font-size:12.5px;font-weight:600;color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-top:auto}
-    .pagination-wrap{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:36px}
     .cat{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:#eff6ff;color:#1c64f2}
     .sec-title{font-size:18px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:9px;margin-bottom:3px}
     .sec-sub{font-size:12.5px;color:var(--muted);margin-bottom:20px}
     .empty-state{background:white;border:1px solid var(--border);border-radius:14px;padding:60px 20px;text-align:center;color:var(--muted)}
-    @media(max-width:991px){.page-header{padding:12px 16px;flex-wrap:wrap;gap:8px}.content-area{padding:20px 16px 36px}.featured-img{height:220px}.featured-title{font-size:17px}}
+
+    /* ── PAGINATION ── */
+    .pagination-wrap{display:flex;justify-content:center;margin-top:36px}
+    .pagination-wrap .pagination{gap:4px}
+    .pagination-wrap .page-link{border-radius:8px !important;border:1.5px solid var(--border);color:var(--navy);font-size:13px;font-weight:600;padding:6px 12px;transition:all .18s}
+    .pagination-wrap .page-link:hover{background:var(--blue-lt);border-color:#bfdbfe;color:var(--blue)}
+    .pagination-wrap .page-item.active .page-link{background:var(--blue);border-color:var(--blue);color:white}
+    .pagination-wrap .page-item.disabled .page-link{opacity:.4}
+
+    @media(max-width:991px){.page-header{padding:12px 16px}.content-area{padding:20px 16px 36px}.featured-img{min-height:220px}.featured-title{font-size:17px}}
     </style>
 </head>
 <body>
@@ -72,7 +82,7 @@
         <h1 class="page-title">Berita &amp; Pengumuman</h1>
     </div>
     <div style="font-size:12px;color:var(--muted)">
-        Menampilkan <strong style="color:var(--navy)">{{ $beritaGrid->count() }}</strong> dari <strong style="color:var(--navy)">{{ $totalBerita }}</strong> artikel
+        Total <strong style="color:var(--navy)">{{ $totalBerita }}</strong> artikel tersedia
     </div>
 </div>
 
@@ -81,7 +91,9 @@
     {{-- FILTER BAR --}}
     @php
         $kategoriList = \App\Models\InformasiKelurahan::where('status','publish')
-            ->whereNotNull('kategori')->distinct()->pluck('kategori');
+            ->whereNotNull('kategori')
+            ->distinct()
+            ->pluck('kategori');
         $aktifKategori = request('kategori');
     @endphp
     <div class="filter-bar">
@@ -93,8 +105,10 @@
         @endforeach
     </div>
 
-    <div class="sec-title mb-1"><i class="bi bi-newspaper" style="color:var(--blue)"></i> Semua Berita &amp; Pengumuman</div>
-    <div class="sec-sub">Update terkini kegiatan dan informasi penting.</div>
+    <div class="sec-title mb-1">
+        <i class="bi bi-newspaper" style="color:var(--blue)"></i> Semua Berita &amp; Pengumuman
+    </div>
+    <div class="sec-sub">Update terkini kegiatan dan informasi penting dari Kelurahan Teritih.</div>
 
     @if(!$beritaFeatured)
     <div class="empty-state">
@@ -104,11 +118,13 @@
     </div>
     @else
 
-    {{-- FEATURED + SIDEBAR --}}
+    {{-- ══ FEATURED + SIDEBAR ══ --}}
     <div class="row g-3 mb-3">
+
+        {{-- Featured --}}
         <div class="col-lg-6">
-            <a href="{{ route('informasi.berita.detail', $beritaFeatured->slug) }}" class="featured-wrap h-100" style="display:flex;flex-direction:column;">
-                <div class="featured-img" style="flex:1;min-height:280px;">
+            <a href="{{ route('informasi.berita.detail', $beritaFeatured->slug) }}" class="featured-wrap">
+                <div class="featured-img">
                     @if($beritaFeatured->gambar)
                         <img src="{{ asset('storage/'.$beritaFeatured->gambar) }}" alt="{{ $beritaFeatured->judul }}">
                     @else
@@ -132,6 +148,7 @@
             </a>
         </div>
 
+        {{-- Samping --}}
         <div class="col-lg-6">
             @forelse($beritaSamping as $b)
             <a href="{{ route('informasi.berita.detail', $b->slug) }}" class="berita-side">
@@ -157,9 +174,10 @@
             <div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Tidak ada berita lainnya.</div>
             @endforelse
         </div>
+
     </div>
 
-    {{-- GRID --}}
+    {{-- ══ GRID ══ --}}
     @if($beritaGrid->count() > 0)
     <div class="row g-3">
         @foreach($beritaGrid as $b)
@@ -187,15 +205,15 @@
         @endforeach
     </div>
 
-    {{-- PAGINATION --}}
+    {{-- ✅ FIX PAGINATION: pakai bootstrap-5 bawaan Laravel, bukan simple-bootstrap yang tidak ada --}}
     @if($beritaGrid->hasPages())
     <div class="pagination-wrap">
-        {{ $beritaGrid->appends(request()->query())->links('vendor.pagination.simple-bootstrap') }}
+        {{ $beritaGrid->appends(request()->query())->links('pagination::bootstrap-5') }}
     </div>
     @endif
     @endif
 
-    @endif {{-- end if $beritaFeatured --}}
+    @endif
 
 </div>
 

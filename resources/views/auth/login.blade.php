@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Masyarakat – Kelurahan Teritih</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -36,9 +37,6 @@
         flex-direction: column;
     }
 
-    /* =====================================================
-       NAVBAR
-    ===================================================== */
     .login-nav {
         background: white;
         border-bottom: 1px solid var(--border);
@@ -58,13 +56,20 @@
         display: flex; align-items: center; gap: 10px;
         text-decoration: none;
     }
-    .login-nav-icon {
+
+    /* ✅ FIXED: nav-brand-icon mengikuti navbar.blade.php */
+    .nav-brand-icon {
         width: 40px; height: 40px;
-        background: linear-gradient(135deg, var(--blue), var(--navy2));
-        border-radius: 10px;
+        border-radius: 8px;
         display: flex; align-items: center; justify-content: center;
-        color: white; font-size: 20px;
+        flex-shrink: 0; overflow: hidden;
+        background: transparent;
     }
+    .nav-brand-icon img {
+        width: 100%; height: 100%;
+        object-fit: contain;
+    }
+
     .login-nav-text { display: flex; flex-direction: column; line-height: 1.15; }
     .login-nav-sub  { font-size: 9px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
     .login-nav-name { font-size: 16px; font-weight: 800; color: var(--navy); }
@@ -100,9 +105,6 @@
     }
     .btn-daftar:hover { background: var(--navy2); color: white; }
 
-    /* =====================================================
-       PAGE BODY
-    ===================================================== */
     .page-body {
         flex: 1;
         display: flex;
@@ -111,9 +113,6 @@
         padding: 36px 20px;
     }
 
-    /* =====================================================
-       LOGIN CARD
-    ===================================================== */
     .login-card {
         width: 100%;
         max-width: 980px;
@@ -125,7 +124,6 @@
         min-height: 560px;
     }
 
-    /* LEFT PANEL */
     .left-panel {
         flex: 0 0 44%;
         position: relative;
@@ -177,7 +175,6 @@
         border-top: 1px solid rgba(255,255,255,.12); padding-top: 12px;
     }
 
-    /* RIGHT PANEL */
     .right-panel {
         flex: 1;
         padding: 44px 48px;
@@ -270,9 +267,7 @@
         display: flex; align-items: center; justify-content: center; gap: 5px;
     }
 
-    /* =====================================================
-       FOOTER
-    ===================================================== */
+    /* FOOTER */
     .main-footer { background: #0f172a; flex-shrink: 0; padding: 48px 32px 0; }
 
     .footer-logo {
@@ -316,9 +311,6 @@
     .footer-bottom a { color: #64748b; text-decoration: none; transition: color .18s; }
     .footer-bottom a:hover { color: #94a3b8; }
 
-    /* =====================================================
-       RESPONSIVE
-    ===================================================== */
     @media (max-width: 767px) {
         .left-panel      { display: none; }
         .right-panel     { padding: 32px 24px; }
@@ -331,12 +323,12 @@
 </head>
 <body>
 
-{{-- =====================================================
-     NAVBAR
-===================================================== --}}
 <nav class="login-nav">
     <a href="{{ route('home') }}" class="login-nav-brand">
-        <div class="login-nav-icon"><i class="bi bi-bank2"></i></div>
+        {{-- ✅ FIXED: menggunakan nav-brand-icon & img seperti navbar.blade.php --}}
+        <div class="nav-brand-icon">
+            <img src="{{ asset('images/lambang_kota_serang.jpg') }}" alt="Logo Kota Serang">
+        </div>
         <div class="login-nav-text">
             <span class="login-nav-sub">Kota Serang</span>
             <span class="login-nav-name">Kelurahan Teritih</span>
@@ -348,7 +340,6 @@
         <li><a href="{{ route('profil') }}">Profil</a></li>
         <li><a href="{{ route('layanan') }}">Layanan</a></li>
         <li><a href="{{ route('informasi') }}">Informasi</a></li>
-        <li><a href="{{ route('kontak') }}">Kontak</a></li>
     </ul>
 
     <div class="login-nav-cta">
@@ -358,10 +349,6 @@
     </div>
 </nav>
 
-
-{{-- =====================================================
-     LOGIN CARD
-===================================================== --}}
 <div class="page-body">
     <div class="login-card">
 
@@ -397,7 +384,6 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
-                {{-- Email / NIK --}}
                 <div class="mb-3">
                     <label class="field-label">Email atau NIK</label>
                     <div class="input-wrap">
@@ -414,7 +400,6 @@
                     @enderror
                 </div>
 
-                {{-- Password --}}
                 <div class="mb-3">
                     <div class="label-row">
                         <label>Kata Sandi</label>
@@ -435,7 +420,6 @@
                     @enderror
                 </div>
 
-                {{-- Remember --}}
                 <div class="form-check mb-4">
                     <input class="form-check-input" type="checkbox" name="remember" id="remember">
                     <label class="form-check-label" for="remember" style="font-size:13px">
@@ -470,15 +454,10 @@
     </div>
 </div>
 
-
-{{-- =====================================================
-     FOOTER
-===================================================== --}}
 <footer class="main-footer">
     <div class="container-fluid px-0">
         <div class="row g-4 pb-2">
 
-            {{-- Brand --}}
             <div class="col-lg-3 col-md-6">
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <div class="footer-logo"><i class="bi bi-bank2"></i></div>
@@ -497,7 +476,6 @@
                 </div>
             </div>
 
-            {{-- Tautan Cepat --}}
             <div class="col-lg-2 col-md-6">
                 <div class="footer-heading">Tautan Cepat</div>
                 <ul class="footer-links">
@@ -509,7 +487,6 @@
                 </ul>
             </div>
 
-            {{-- Kontak --}}
             <div class="col-lg-4 col-md-6">
                 <div class="footer-heading">Kontak Kami</div>
                 <ul class="footer-contact">
@@ -523,7 +500,6 @@
                 </ul>
             </div>
 
-            {{-- Peta --}}
             <div class="col-lg-3 col-md-6">
                 <div class="footer-heading">Lokasi Kantor</div>
                 <div class="footer-map">
