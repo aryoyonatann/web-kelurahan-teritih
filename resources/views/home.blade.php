@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelurahan Teritih – Portal Pelayanan Publik</title>
     <link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
@@ -192,7 +192,7 @@
                     </div>
                     <div class="col-md-4 col-6">
                         @auth
-                            <a href="{{ route('user.permohonan.create') }}" class="akses-card">
+                            <a href="{{ route('layanan') }}" class="akses-card">
                         @else
                             <a href="{{ route('login') }}" class="akses-card">
                         @endauth

@@ -22,7 +22,6 @@ Route::get('/layanan',          fn () => view('layanan'))                 ->name
 Route::get('/informasi',        [PublicController::class, 'informasi'])   ->name('informasi');
 Route::get('/informasi/berita', [PublicController::class, 'berita'])      ->name('informasi.berita');
 Route::get('/informasi/berita/{slug}', [PublicController::class, 'detailBerita'])->name('informasi.berita.detail');
-// ✅ Route /kontak DIHAPUS — diganti dengan floating chatbot FAQ di semua halaman
 
 // =========================================================
 // ADMIN AREA
@@ -34,7 +33,7 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware('auth:admin')->group(function () {
 
-        // Notifikasi (polling API)
+        // Notifikasi
         Route::get('notifikasi',            [NotifikasiController::class, 'index'])   ->name('admin.notifikasi');
         Route::post('notifikasi/mark-read', [NotifikasiController::class, 'markRead'])->name('admin.notifikasi.read');
 
@@ -44,39 +43,47 @@ Route::prefix('admin')->group(function () {
 
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        Route::post('/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
+        Route::post('/logout',   [AdminLoginController::class, 'logout'])->name('admin.logout');
 
         Route::resource('jenis-surat', JenisSuratController::class);
 
-        Route::get('permohonan',              [PermohonanController::class, 'index'])  ->name('permohonan.index');
-        Route::get('permohonan/{id}',         [PermohonanController::class, 'show'])   ->name('permohonan.show');
-        Route::put('permohonan/{id}/approve', [PermohonanController::class, 'approve'])->name('permohonan.approve');
-        Route::put('permohonan/{id}/reject',  [PermohonanController::class, 'reject']) ->name('permohonan.reject');
-        Route::get('/permohonan/{id}/print',  [PermohonanController::class, 'print'])  ->name('permohonan.print');
-        Route::post('/upload-ttd',            [PermohonanController::class, 'uploadTtd'])->name('admin.upload-ttd');
+        // Permohonan Admin
+        Route::get( 'permohonan',                 [PermohonanController::class, 'index'])           ->name('permohonan.index');
+        Route::get( 'permohonan/{id}',            [PermohonanController::class, 'show'])            ->name('permohonan.show');
+        Route::put( 'permohonan/{id}/approve',    [PermohonanController::class, 'approve'])         ->name('permohonan.approve');
+        Route::put( 'permohonan/{id}/reject',     [PermohonanController::class, 'reject'])          ->name('permohonan.reject');
+        Route::put( 'permohonan/{id}/keterangan', [PermohonanController::class, 'updateKeterangan'])->name('permohonan.keterangan');
+        Route::get( 'permohonan/{id}/print',      [PermohonanController::class, 'print'])           ->name('permohonan.print');
 
         Route::resource('informasi-admin', InformasiKelurahanController::class);
 
         // Kependudukan
-        Route::get('kependudukan',                 [KependudukanController::class, 'index'])       ->name('kependudukan.index');
-        Route::post('kependudukan',                [KependudukanController::class, 'store'])       ->name('kependudukan.store');
-        Route::get('kependudukan/{id}',            [KependudukanController::class, 'show'])        ->name('kependudukan.show');
-        Route::patch('kependudukan/{id}/toggle',   [KependudukanController::class, 'toggleStatus'])->name('kependudukan.toggle');
-        Route::delete('kependudukan/{id}',         [KependudukanController::class, 'destroy'])     ->name('kependudukan.destroy');
+        Route::get(   'kependudukan',               [KependudukanController::class, 'index'])       ->name('kependudukan.index');
+        Route::post(  'kependudukan',               [KependudukanController::class, 'store'])       ->name('kependudukan.store');
+        Route::get(   'kependudukan/{id}',          [KependudukanController::class, 'show'])        ->name('kependudukan.show');
+        Route::patch( 'kependudukan/{id}/toggle',   [KependudukanController::class, 'toggleStatus'])->name('kependudukan.toggle');
+        Route::delete('kependudukan/{id}',          [KependudukanController::class, 'destroy'])     ->name('kependudukan.destroy');
     });
 });
 
 // =========================================================
-// USER AREA — wajib login (permohonan & profil)
+// USER AREA — wajib login
 // =========================================================
 Route::middleware('auth')->group(function () {
 
     Route::prefix('user')->name('user.')->group(function () {
-        Route::resource('permohonan', PermohonanUserController::class);
+
+        // PENTING: route form/{slug} harus di atas route {id}
+        Route::get( 'permohonan/form/{slug}', [PermohonanUserController::class, 'form'])       ->name('permohonan.form');
+        Route::post('permohonan/form/{slug}', [PermohonanUserController::class, 'storeSurat']) ->name('permohonan.store.surat');
+
+        Route::get(   'permohonan',      [PermohonanUserController::class, 'index'])   ->name('permohonan.index');
+        Route::get(   'permohonan/{id}', [PermohonanUserController::class, 'show'])    ->name('permohonan.show');
+        Route::delete('permohonan/{id}', [PermohonanUserController::class, 'destroy']) ->name('permohonan.destroy');
     });
 
-    Route::get('/profile',  [ProfileController::class, 'edit'])  ->name('profile.edit');
-    Route::put('/profile',  [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile', [ProfileController::class, 'edit'])  ->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 require __DIR__.'/auth.php';

@@ -449,7 +449,7 @@
                             </button>
 
                             @if($rowStatus === 'disetujui')
-                                <a href="{{ route('permohonan.show', $d->id_permohonan) }}?print=1"
+                                <a href="{{ route('permohonan.print', $d->id_permohonan) }}"
                                    target="_blank" class="btn-act btn-print">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="6 9 6 2 18 2 18 9"/>

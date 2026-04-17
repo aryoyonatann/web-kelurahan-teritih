@@ -6,37 +6,49 @@ use Illuminate\Database\Eloquent\Model;
 
 class PermohonanSurat extends Model
 {
-    protected $table = 'permohonan_surat';
-protected $primaryKey = 'id_permohonan';
-public $timestamps = false;
+    protected $table      = 'permohonan_surat';
+    protected $primaryKey = 'id_permohonan';
+    public    $timestamps = false;
 
-protected $fillable = [
-    'id_user', 'id_jenis_surat',
-    'nama_pemohon', 'nik_pemohon', 'alamat_pemohon',
-    'keperluan', 'tanggal_pengajuan',
-];
+    protected $fillable = [
+        'id_user',
+        'id_jenis_surat',
+        'nama_pemohon',
+        'nik_pemohon',
+        'alamat_pemohon',
+        'keperluan',
+        'tanggal_pengajuan',
+        'data_tambahan',      // ← kolom JSON data per jenis surat
+        'keterangan_admin',   // ← catatan admin saat proses
+        'nomor_surat',        // ← nomor surat setelah disetujui
+    ];
 
-// relasi ke user
-public function user()
-{
-    return $this->belongsTo(User::class, 'id_user', 'id_user');
-}
+    protected $casts = [
+        'data_tambahan'     => 'array',    // ← otomatis encode/decode JSON
+        'tanggal_pengajuan' => 'datetime',
+    ];
 
-// relasi ke jenis surat
-public function jenisSurat()
-{
-    return $this->belongsTo(JenisSurat::class, 'id_jenis_surat', 'id_jenis_surat');
-}
+    // Relasi ke user
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
 
-// relasi ke persyaratan
-public function persyaratan()
-{
-    return $this->hasMany(Persyaratan::class, 'id_permohonan');
-}
+    // Relasi ke jenis surat
+    public function jenisSurat()
+    {
+        return $this->belongsTo(JenisSurat::class, 'id_jenis_surat', 'id_jenis_surat');
+    }
 
-// relasi ke approval
-public function approval()
-{
-    return $this->hasOne(Approval::class, 'id_permohonan');
-}
+    // Relasi ke persyaratan (dokumen)
+    public function persyaratan()
+    {
+        return $this->hasMany(Persyaratan::class, 'id_permohonan');
+    }
+
+    // Relasi ke approval
+    public function approval()
+    {
+        return $this->hasOne(Approval::class, 'id_permohonan');
+    }
 }

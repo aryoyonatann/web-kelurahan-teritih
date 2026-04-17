@@ -8,7 +8,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>
 :root {
-    --blue:    #1c64f2; --blue-dk: #1a56db; --blue-lt: #eff6ff;
+    --blue:    #2563eb; --blue-dk: #1d4ed8; --blue-lt: #eff6ff;
     --navy:    #0f172a; --slate:   #334155;  --muted:   #64748b;
     --border:  #e2e8f0; --bg:      #f1f5f9;
     --green:   #10b981; --orange:  #f59e0b;
@@ -16,9 +16,25 @@
 }
 body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--navy); font-size:14px; }
 
-.page-wrapper  { padding:28px; }
-.page-title    { font-size:22px; font-weight:800; color:var(--navy); }
-.page-subtitle { font-size:13px; color:var(--muted); margin-top:2px; }
+/* ── HERO ── */
+.kp-hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+    padding: 32px 32px 28px;
+    position: relative; overflow: hidden;
+}
+.kp-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.kp-hero-content {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+}
+.kp-hero h1 { font-size: 24px; font-weight: 800; color: white; margin: 0 0 4px; }
+.kp-hero p  { font-size: 13px; color: rgba(255,255,255,.75); margin: 0; }
+
+.page-wrapper  { padding: 28px; }
 
 .breadcrumb-bar { font-size:12px; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
 .breadcrumb-bar a { color:var(--muted); text-decoration:none; }
@@ -44,10 +60,10 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .select-filter:focus { border-color:var(--blue); }
 .btn-filter { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid var(--blue); background:var(--blue-lt); color:var(--blue); cursor:pointer; transition:all .18s; }
 .btn-filter:hover { background:var(--blue); color:white; }
-.btn-import { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid var(--border); background:white; color:var(--slate); cursor:pointer; text-decoration:none; transition:all .18s; }
-.btn-import:hover { border-color:var(--blue); color:var(--blue); }
-.btn-tambah { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; background:var(--blue); color:white; cursor:pointer; text-decoration:none; transition:background .18s; white-space:nowrap; }
-.btn-tambah:hover { background:var(--blue-dk); color:white; }
+.btn-tambah { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px; background:white; color:var(--blue); font-size:13px; font-weight:700; text-decoration:none; border:none; cursor:pointer; transition:all .2s; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+.btn-tambah:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(0,0,0,.2); color:var(--blue-dk); }
+.btn-tambah-inner { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; background:var(--blue); color:white; cursor:pointer; text-decoration:none; transition:background .18s; white-space:nowrap; }
+.btn-tambah-inner:hover { background:var(--blue-dk); color:white; }
 
 /* Table */
 .table-card { background:white; border-radius:12px; border:1px solid var(--border); overflow:hidden; }
@@ -60,7 +76,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor:pointer; }
 
 .av { width:36px; height:36px; border-radius:9px; font-size:12px; font-weight:700; color:white; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.av-blue   { background:linear-gradient(135deg,#1c64f2,#60a5fa); }
+.av-blue   { background:linear-gradient(135deg,#2563eb,#60a5fa); }
 .av-green  { background:linear-gradient(135deg,#10b981,#6ee7b7); }
 .av-purple { background:linear-gradient(135deg,#8b5cf6,#c4b5fd); }
 .av-orange { background:linear-gradient(135deg,#f59e0b,#fcd34d); }
@@ -136,22 +152,24 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 .btn-primary:hover { background:var(--blue-dk); }
 .btn-danger  { padding:8px 18px; border-radius:8px; border:none; background:var(--red); color:white; font-size:13px; font-weight:600; cursor:pointer; }
 .btn-danger:hover { background:#dc2626; }
-
-/* Upload area */
-.upload-area { border:2px dashed var(--border); border-radius:10px; padding:24px; text-align:center; cursor:pointer; transition:border-color .18s; }
-.upload-area:hover { border-color:var(--blue); }
-.upload-area i { font-size:28px; color:var(--muted); display:block; margin-bottom:8px; }
-.upload-area p { font-size:13px; color:var(--muted); margin:0; }
-.upload-area strong { color:var(--blue); }
-
-/* CSV template note */
-.csv-note { background:#f8fafc; border-radius:8px; padding:12px 14px; font-size:12px; color:var(--slate); margin-top:12px; }
-.csv-note code { background:white; border:1px solid var(--border); border-radius:4px; padding:1px 5px; font-size:11px; color:var(--blue); }
 </style>
 @endpush
 
 @section('content')
 @include('admin.partials.header')
+
+{{-- ── HERO BANNER ── --}}
+<div class="kp-hero">
+    <div class="kp-hero-content">
+        <div>
+            <h1><i class="bi bi-people-fill me-2"></i>Data Kependudukan</h1>
+            <p>Kelola data akun warga dan status kependudukan Kelurahan Teritih</p>
+        </div>
+        <button class="btn-tambah" onclick="openModal('modalTambah')">
+            <i class="bi bi-person-plus-fill"></i> Tambah Warga
+        </button>
+    </div>
+</div>
 
 <div class="page-wrapper">
 
@@ -160,19 +178,6 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
         <a href="{{ route('admin.dashboard') }}">Portal Admin</a>
         <i class="bi bi-chevron-right" style="font-size:10px"></i>
         <span class="active">Kependudukan</span>
-    </div>
-
-    {{-- Page Header --}}
-    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
-        <div>
-            <div class="page-title">Data Kependudukan</div>
-            <div class="page-subtitle">Kelola data akun warga dan status kependudukan.</div>
-        </div>
-        <div class="d-flex gap-2">
-            <button class="btn-tambah" onclick="openModal('modalTambah')">
-                <i class="bi bi-person-plus-fill"></i> Tambah Warga
-            </button>
-        </div>
     </div>
 
     {{-- Alert --}}
@@ -470,7 +475,6 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 
 @push('scripts')
 <script>
-// ── Modal ──────────────────────────────────────────
 function openModal(id) {
     document.getElementById(id).classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -479,28 +483,23 @@ function closeModal(id) {
     document.getElementById(id).classList.remove('show');
     document.body.style.overflow = '';
 }
-// Tutup modal klik backdrop
 document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
 });
 
-// Buka modal hapus
 function openModalHapus(id, nama) {
     document.getElementById('modalNama').textContent = nama;
     document.getElementById('formHapus').action = `/admin/kependudukan/${id}`;
     openModal('modalHapus');
 }
 
-// ── Dropdown aksi ──────────────────────────────────
 let activeBtn = null;
 
 function toggleDropdown(btn) {
     const menu = btn.nextElementSibling;
     const isOpen = menu.classList.contains('show');
-
     document.querySelectorAll('.dropdown-menu-custom.show').forEach(el => el.classList.remove('show'));
     activeBtn = null;
-
     if (!isOpen) {
         activeBtn = btn;
         positionDropdown(btn, menu);
@@ -514,13 +513,10 @@ function positionDropdown(btn, menu) {
     menu.style.left = (rect.right - 160) + 'px';
 }
 
-// Update posisi saat scroll agar tidak lari
 window.addEventListener('scroll', () => {
     if (activeBtn) {
         const menu = activeBtn.nextElementSibling;
-        if (menu && menu.classList.contains('show')) {
-            positionDropdown(activeBtn, menu);
-        }
+        if (menu && menu.classList.contains('show')) positionDropdown(activeBtn, menu);
     }
 }, true);
 
@@ -531,16 +527,10 @@ document.addEventListener('click', e => {
     }
 });
 
-// ── Check all ──────────────────────────────────────
 document.getElementById('checkAll').addEventListener('change', function () {
     document.querySelectorAll('input[name="ids[]"]').forEach(cb => cb.checked = this.checked);
 });
 
-// ── Debounce search — dihapus, submit manual via tombol Filter ──
-
-// ── Upload CSV — dihapus ──
-
-// ── Buka modal tambah jika ada error validasi ──────
 @if($errors->any())
     document.addEventListener('DOMContentLoaded', () => openModal('modalTambah'));
 @endif

@@ -11,13 +11,18 @@ class PermohonanController extends Controller
 {
     public function index()
     {
-        $data = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])->latest('tanggal_pengajuan')->get();
+        $data = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])
+            ->latest('tanggal_pengajuan')
+            ->get();
+
         return view('admin.permohonan.index', compact('data'));
     }
 
     public function show($id)
     {
-        $data = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])->findOrFail($id);
+        $data = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])
+            ->findOrFail($id);
+
         return view('admin.permohonan.show', compact('data'));
     }
 
@@ -49,20 +54,29 @@ class PermohonanController extends Controller
         return redirect()->back()->with('success', 'Permohonan berhasil ditolak.');
     }
 
+    // ── Halaman cetak surat resmi ────────────────────────────────────
     public function print($id)
     {
-        $data = PermohonanSurat::with(['user', 'jenisSurat', 'approval'])->findOrFail($id);
-        return view('admin.permohonan.show', compact('data'));
+        $permohonan = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])
+            ->findOrFail($id);
+
+        return view('admin.permohonan.print', compact('permohonan'));
     }
 
-    public function uploadTtd(Request $request)
+    // ── Input keterangan & nomor surat oleh admin ────────────────────
+    public function updateKeterangan(Request $request, $id)
     {
         $request->validate([
-            'ttd' => 'required|image|mimes:png,jpeg,jpg|max:2048',
+            'keterangan_admin' => 'nullable|string|max:1000',
+            'nomor_surat'      => 'nullable|string|max:100',
         ]);
 
-        $request->file('ttd')->storeAs('ttd', 'ttd_lurah.png', 'public');
+        $permohonan = PermohonanSurat::findOrFail($id);
+        $permohonan->update([
+            'keterangan_admin' => $request->keterangan_admin,
+            'nomor_surat'      => $request->nomor_surat,
+        ]);
 
-        return redirect()->back()->with('success', 'Tanda tangan berhasil diupload.');
+        return redirect()->back()->with('success', 'Keterangan surat berhasil disimpan.');
     }
 }

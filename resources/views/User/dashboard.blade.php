@@ -226,7 +226,7 @@
             Selamat datang di portal resmi pelayanan publik. Dapatkan akses mudah ke informasi terkini, layanan administrasi kependudukan, dan pengajuan surat secara online.
         </p>
         <div class="hero-actions">
-            <a href="{{ route('user.permohonan.create') }}" class="btn-hero-primary">
+            <a href="{{ route('layanan') }}" class="btn-hero-primary">
                 <i class="bi bi-file-earmark-text"></i> Ajukan Surat
             </a>
             <a href="#layanan" class="btn-hero-outline">
@@ -267,7 +267,7 @@
                         </a>
                     </div>
                     <div class="col-md-4 col-6">
-                        <a href="{{ route('user.permohonan.create') }}" class="akses-card">
+                        <a href="{{ route('layanan') }}" class="akses-card">
                             <div class="akses-icon" style="background:#eff6ff;color:var(--blue)">
                                 <i class="bi bi-file-earmark-text-fill"></i>
                             </div>
