@@ -28,6 +28,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Catat waktu terakhir login
+        $user = Auth::user();
+        if ($user) {
+            $user->update(['last_login_at' => now()]);
+        }
+
         // Setelah login → ke halaman home (/)
         return redirect()->intended(route('home', false));
     }

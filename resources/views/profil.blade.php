@@ -130,7 +130,7 @@
         .visi-text{font-size:var(--fs-base)}
         .misi-grid{grid-template-columns:1fr}
         .org-children{flex-direction:column;align-items:center}
-        [style*="grid-template-columns:repeat(5"]{grid-template-columns:repeat(2,1fr) !important}
+        .ds-grid{grid-template-columns:repeat(2,1fr) !important}
     }
     @media(max-width:768px){
         .timeline-container::before{left:0}
@@ -140,7 +140,7 @@
     }
     @media(max-width:576px){
         .about-hero-img{aspect-ratio:4/3}
-        [style*="grid-template-columns:repeat(5"]{grid-template-columns:1fr !important}
+        .ds-grid{grid-template-columns:1fr !important}
         .sejarah-header-card{padding:28px 16px}
         .sejarah-header-title{font-size:var(--fs-2xl)}
     }
@@ -189,9 +189,59 @@
                 <p>Ke depan, Kelurahan Teritih berkomitmen untuk terus melakukan inovasi dalam tata kelola pemerintahan, meningkatkan kualitas sumber daya manusia, serta memperkuat sinergi antara pemerintah dan masyarakat guna mewujudkan lingkungan yang tertib, nyaman, dan sejahtera.</p>
             </div>
         </div>
-    </div>{{-- /about-section --}}
+    </div>
 
-    <!-- ══ DATA SINGKAT ══ -->
+    <!-- ══ DATA SINGKAT (DINAMIS dari DB) ══ -->
+    @php
+        // Ambil nilai dari $dataSingkat yang dikirim controller
+        // Fallback ke nilai default jika belum diset
+        $ds = $dataSingkat ?? [];
+        $dsItems = [
+            [
+                'icon'  => 'bi-mailbox2',
+                'color' => '#d97706', 'bg' => '#fef3c7',
+                'label' => 'Kode Pos',
+                'value' => $ds['kode_pos'] ?? '42183',
+                'unit'  => '',
+            ],
+            [
+                'icon'  => 'bi-map-fill',
+                'color' => '#10b981', 'bg' => '#ecfdf5',
+                'label' => 'Luas Wilayah',
+                'value' => $ds['luas_wilayah'] ?? '2.54',
+                'unit'  => 'km²',
+            ],
+            [
+                'icon'  => 'bi-people-fill',
+                'color' => '#1c64f2', 'bg' => '#eff6ff',
+                'label' => 'Jumlah Penduduk',
+                'value' => $ds['jumlah_penduduk'] ?? '4.520',
+                'unit'  => 'Jiwa',
+            ],
+            [
+                'icon'  => 'bi-diagram-3-fill',
+                'color' => '#a855f7', 'bg' => '#fdf4ff',
+                'label' => 'Kecamatan',
+                'value' => $ds['kecamatan'] ?? 'Walantaka',
+                'unit'  => '',
+            ],
+            [
+                'icon'  => 'bi-geo-alt-fill',
+                'color' => '#f43f5e', 'bg' => '#fff1f2',
+                'label' => 'Kota',
+                'value' => $ds['kota'] ?? 'Serang',
+                'unit'  => '',
+            ],
+            [
+                'icon'  => 'bi-globe2',
+                'color' => '#16a34a', 'bg' => '#f0fdf4',
+                'label' => 'Provinsi',
+                'value' => $ds['provinsi'] ?? 'Banten',
+                'unit'  => '',
+            ],
+        ];
+    @endphp
+
     <div style="background:white;border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:28px">
         <div style="padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
             <div style="width:40px;height:40px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:18px;flex-shrink:0">
@@ -202,44 +252,26 @@
                 <div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px">Informasi administratif Kelurahan Teritih</div>
             </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr)">
-            <div style="padding:24px 28px;border-right:1px solid var(--border)">
+        {{-- Grid otomatis sesuai jumlah item --}}
+        <div class="ds-grid" style="display:grid;grid-template-columns:repeat({{ count($dsItems) }},1fr)">
+            @foreach($dsItems as $i => $item)
+            <div style="padding:24px 28px;{{ $i < count($dsItems)-1 ? 'border-right:1px solid var(--border)' : '' }}">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                    <div style="width:32px;height:32px;border-radius:8px;background:#fef3c7;display:flex;align-items:center;justify-content:center;color:#d97706;font-size:15px"><i class="bi bi-mailbox2"></i></div>
-                    <span style="font-size:var(--fs-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Kode Pos</span>
+                    <div style="width:32px;height:32px;border-radius:8px;background:{{ $item['bg'] }};display:flex;align-items:center;justify-content:center;color:{{ $item['color'] }};font-size:15px">
+                        <i class="bi {{ $item['icon'] }}"></i>
+                    </div>
+                    <span style="font-size:var(--fs-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">{{ $item['label'] }}</span>
                 </div>
-                <div style="font-size:var(--fs-2xl);font-weight:800;color:var(--navy)">42183</div>
-            </div>
-            <div style="padding:24px 28px;border-right:1px solid var(--border)">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                    <div style="width:32px;height:32px;border-radius:8px;background:#ecfdf5;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:15px"><i class="bi bi-map-fill"></i></div>
-                    <span style="font-size:var(--fs-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Luas Wilayah</span>
+                <div style="font-size:var(--fs-2xl);font-weight:800;color:var(--navy)">
+                    {{ $item['value'] }}
+                    @if($item['unit'])
+                    <span style="font-size:var(--fs-lg)">{{ $item['unit'] }}</span>
+                    @endif
                 </div>
-                <div style="font-size:var(--fs-2xl);font-weight:800;color:var(--navy)">2.54 <span style="font-size:var(--fs-lg)">km²</span></div>
             </div>
-            <div style="padding:24px 28px;border-right:1px solid var(--border)">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                    <div style="width:32px;height:32px;border-radius:8px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:15px"><i class="bi bi-people-fill"></i></div>
-                    <span style="font-size:var(--fs-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Jumlah Penduduk</span>
-                </div>
-                <div style="font-size:var(--fs-2xl);font-weight:800;color:var(--navy)">4.520 <span style="font-size:var(--fs-lg)">Jiwa</span></div>
-            </div>
-            <div style="padding:24px 28px;border-right:1px solid var(--border)">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                    <div style="width:32px;height:32px;border-radius:8px;background:#fdf4ff;display:flex;align-items:center;justify-content:center;color:#a855f7;font-size:15px"><i class="bi bi-diagram-3-fill"></i></div>
-                    <span style="font-size:var(--fs-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Kecamatan</span>
-                </div>
-                <div style="font-size:var(--fs-2xl);font-weight:800;color:var(--navy)">Walantaka</div>
-            </div>
-            <div style="padding:24px 28px">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                    <div style="width:32px;height:32px;border-radius:8px;background:#fff1f2;display:flex;align-items:center;justify-content:center;color:#f43f5e;font-size:15px"><i class="bi bi-geo-alt-fill"></i></div>
-                    <span style="font-size:var(--fs-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Kota</span>
-                </div>
-                <div style="font-size:var(--fs-2xl);font-weight:800;color:var(--navy)">Serang</div>
-            </div>
+            @endforeach
         </div>
-    </div>{{-- /data-singkat --}}
+    </div>
 
     <!-- ══ SEJARAH KELURAHAN ══ -->
     <div class="sejarah-section">
@@ -253,10 +285,9 @@
                     Mengenal lebih dekat perjalanan panjang Kelurahan Teritih dari masa awal pembentukan hingga menjadi kelurahan modern yang dinamis dan berprestasi di Kota Serang.
                 </p>
             </div>
-        </div>{{-- /sejarah-header-card --}}
+        </div>
 
         <div class="timeline-container">
-
             <div class="timeline-item">
                 <div class="timeline-dot">1</div>
                 <div class="timeline-content">
@@ -267,7 +298,6 @@
                     </p>
                 </div>
             </div>
-
             <div class="timeline-item">
                 <div class="timeline-dot">2</div>
                 <div class="timeline-content">
@@ -278,7 +308,6 @@
                     </p>
                 </div>
             </div>
-
             <div class="timeline-item">
                 <div class="timeline-dot">3</div>
                 <div class="timeline-content">
@@ -289,7 +318,6 @@
                     </p>
                 </div>
             </div>
-
             <div class="timeline-item">
                 <div class="timeline-dot">4</div>
                 <div class="timeline-content">
@@ -300,13 +328,11 @@
                     </p>
                 </div>
             </div>
-
-        </div>{{-- /timeline-container --}}
-    </div>{{-- /sejarah-section --}}
+        </div>
+    </div>
 
     <!-- ══ VISI MISI ══ -->
     <div class="visimisi-section">
-
         <div class="visi-full-card">
             <div class="visi-label">Visi</div>
             <div class="visi-icon-wrap"><i class="bi bi-eye-fill"></i></div>
@@ -314,7 +340,7 @@
             <div class="visi-text">
                 "Terwujudnya Kelurahan Teritih yang Maju, Sejahtera, dan Berkeadaban Melalui Pelayanan Publik yang Prima dan Inovatif."
             </div>
-        </div>{{-- /visi-full-card --}}
+        </div>
 
         <div class="misi-full-card">
             <div class="misi-card-header">
@@ -329,9 +355,8 @@
                 <div class="misi-item"><div class="misi-num">5</div><span>Meningkatkan kualitas pelayanan administrasi kependudukan yang cepat, mudah, dan berbasis teknologi informasi.</span></div>
                 <div class="misi-item"><div class="misi-num">6</div><span>Memperkuat kerukunan warga dan semangat gotong royong sebagai modal sosial pembangunan kelurahan.</span></div>
             </div>
-        </div>{{-- /misi-full-card --}}
-
-    </div>{{-- /visimisi-section --}}
+        </div>
+    </div>
 
     <!-- ══ STRUKTUR ORGANISASI ══ -->
     <div class="struktur-section">
@@ -347,9 +372,7 @@
                     <div class="org-role">Lurah</div>
                 </div>
             </div>
-
             <div class="org-line-v"></div>
-
             <div class="org-node-wrap">
                 <div class="org-node">
                     <div class="org-avatar"><i class="bi bi-person-fill"></i></div>
@@ -357,11 +380,9 @@
                     <div class="org-role sekre">Sekretaris Kelurahan</div>
                 </div>
             </div>
-
             <div class="org-line-v" style="position:relative">
                 <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:520px;height:2px;background:var(--border);max-width:90vw"></div>
             </div>
-
             <div class="org-children">
                 <div class="org-child-wrap">
                     <div class="org-child-line"></div>
@@ -388,8 +409,8 @@
                     </div>
                 </div>
             </div>
-        </div>{{-- /org-chart --}}
-    </div>{{-- /struktur-section --}}
+        </div>
+    </div>
 
 </div>{{-- /content-area --}}
 

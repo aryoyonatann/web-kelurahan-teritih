@@ -13,7 +13,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 .back-btn:hover{background:#f1f5f9;color:#2563eb}
 .bc-sep{color:#cbd5e1}.bc-cur{color:#0f172a;font-weight:600}
 
-/* ── HERO — unified blue ── */
 .stat-hero{
     background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
     padding:28px 32px;
@@ -29,23 +28,31 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
 .stat-content{padding:28px 32px}
 .alert-success{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;margin-bottom:20px;background:#ecfdf5;border:1px solid #6ee7b7;font-size:13px;color:#065f46;font-weight:500}
+
 .group-card{background:white;border-radius:14px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:20px}
 .group-header{padding:14px 20px;border-bottom:1px solid #e2e8f0;background:#f8fafc;display:flex;align-items:center;gap:10px}
 .group-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .group-title{font-size:14px;font-weight:700;color:#0f172a}
 .group-body{padding:20px;display:flex;flex-direction:column;gap:14px}
+
 .stat-row{display:block;padding:14px 16px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0}
 .stat-row-label{font-size:11.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 .stat-input{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;color:#0f172a;background:white;outline:none;transition:all .18s;box-sizing:border-box}
 .stat-input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.pct-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:13px;font-weight:700;background:#ecfdf5;color:#065f46;margin-top:6px}
 .pct-note{font-size:11px;color:#94a3b8;margin-top:4px}
+
+/* Grid untuk data singkat — 3 kolom */
+.data-singkat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ds-item{padding:14px 16px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0}
+.ds-item-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ds-item-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+
 .form-footer{padding:16px 20px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:flex-end;gap:10px}
 .btn-batal{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;border:1.5px solid #e2e8f0;background:white;font-size:13px;font-weight:600;color:#64748b;text-decoration:none;cursor:pointer;transition:all .15s}
 .btn-batal:hover{background:#f8fafc}
-.btn-simpan{display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:9px;border:none;background:#2563eb;font-size:13px;font-weight:700;color:white;cursor:pointer;transition:all .15s}
+.btn-simpan{display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:9px;border:none;background:#2563eb;font-size:13px;font-weight:700;color:white;cursor:pointer;transition:all .15s;font-family:inherit}
 .btn-simpan:hover{background:#1d4ed8}
-.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 16px;font-size:12px;color:#1e40af;display:flex;align-items:center;gap:8px}
+.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 16px;font-size:12px;color:#1e40af;display:flex;align-items:flex-start;gap:8px}
 
 /* Kelompok umur */
 .umur-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -54,9 +61,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 .umur-sub{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .umur-sub label{font-size:11px;color:#64748b;font-weight:600;margin-bottom:3px;display:block}
 
+/* Agama */
+.agama-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+@media(max-width:900px){
+    .data-singkat-grid{grid-template-columns:1fr 1fr}
+    .agama-grid{grid-template-columns:1fr}
+}
 @media(max-width:640px){
     .stat-content{padding:20px 16px}
-    .stat-row{grid-template-columns:1fr}
+    .data-singkat-grid{grid-template-columns:1fr}
     .umur-grid{grid-template-columns:1fr}
 }
 </style>
@@ -68,13 +82,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 <div>
     <div class="back-bar">
         <a href="{{ route('admin.dashboard') }}" class="back-btn"><i class="bi bi-arrow-left"></i> Kembali</a>
-        <span class="bc-sep">/</span><span class="bc-cur">Statistik Demografi</span>
+        <span class="bc-sep">/</span><span class="bc-cur">Statistik & Data Kelurahan</span>
     </div>
 
     <div class="stat-hero">
         <div class="stat-hero-content">
-            <h1><i class="bi bi-bar-chart-fill me-2"></i>Edit Statistik Demografi</h1>
-            <p>Isi jumlah jiwa — persentase dihitung otomatis oleh sistem</p>
+            <h1><i class="bi bi-bar-chart-fill me-2"></i>Edit Statistik & Data Kelurahan</h1>
+            <p>Data singkat kelurahan, demografi, dan statistik penduduk — semua dikelola dari sini</p>
         </div>
     </div>
 
@@ -87,7 +101,103 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         <form action="{{ route('admin.statistik.update') }}" method="POST">
         @csrf @method('PUT')
 
-        {{-- ① KEPENDUDUKAN UTAMA --}}
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ① DATA SINGKAT KELURAHAN (tampil di profil) --}}
+        {{-- ══════════════════════════════════════════ --}}
+        <div class="group-card">
+            <div class="group-header">
+                <div class="group-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-info-circle-fill"></i></div>
+                <div class="group-title">Data Singkat Kelurahan</div>
+                <span style="margin-left:auto;font-size:11px;font-weight:700;background:#dbeafe;color:#1d4ed8;border-radius:20px;padding:3px 10px">
+                    Tampil di halaman Profil
+                </span>
+            </div>
+            <div class="group-body">
+                <div class="info-box">
+                    <i class="bi bi-eye-fill" style="flex-shrink:0;margin-top:1px"></i>
+                    <div>Data ini ditampilkan di bagian <strong>"Data Singkat Kelurahan"</strong> pada halaman Profil yang dapat dilihat oleh masyarakat.</div>
+                </div>
+                <div class="data-singkat-grid">
+                    {{-- Kode Pos --}}
+                    <div class="ds-item">
+                        <div class="ds-item-label">
+                            <div class="ds-item-icon" style="background:#fef3c7;color:#d97706"><i class="bi bi-mailbox2"></i></div>
+                            Kode Pos
+                        </div>
+                        <input type="hidden" name="singkat[kode_pos][label]" value="Kode Pos">
+                        <input type="text" name="singkat[kode_pos][nilai]"
+                            class="stat-input"
+                            value="{{ $dataSingkat['kode_pos'] ?? '42183' }}"
+                            placeholder="Contoh: 42183" maxlength="10">
+                    </div>
+                    {{-- Luas Wilayah --}}
+                    <div class="ds-item">
+                        <div class="ds-item-label">
+                            <div class="ds-item-icon" style="background:#ecfdf5;color:#10b981"><i class="bi bi-map-fill"></i></div>
+                            Luas Wilayah (km²)
+                        </div>
+                        <input type="hidden" name="singkat[luas_wilayah][label]" value="Luas Wilayah">
+                        <input type="text" name="singkat[luas_wilayah][nilai]"
+                            class="stat-input"
+                            value="{{ $dataSingkat['luas_wilayah'] ?? '2.54' }}"
+                            placeholder="Contoh: 2.54">
+                    </div>
+                    {{-- Jumlah Penduduk --}}
+                    <div class="ds-item">
+                        <div class="ds-item-label">
+                            <div class="ds-item-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-people-fill"></i></div>
+                            Jumlah Penduduk (Jiwa)
+                        </div>
+                        <input type="hidden" name="singkat[jumlah_penduduk][label]" value="Jumlah Penduduk">
+                        <input type="text" name="singkat[jumlah_penduduk][nilai]"
+                            class="stat-input"
+                            value="{{ $dataSingkat['jumlah_penduduk'] ?? '4.520' }}"
+                            placeholder="Contoh: 4.520">
+                        <div class="pct-note">Tampil dengan satuan "Jiwa" di halaman profil</div>
+                    </div>
+                    {{-- Kecamatan --}}
+                    <div class="ds-item">
+                        <div class="ds-item-label">
+                            <div class="ds-item-icon" style="background:#fdf4ff;color:#a855f7"><i class="bi bi-diagram-3-fill"></i></div>
+                            Kecamatan
+                        </div>
+                        <input type="hidden" name="singkat[kecamatan][label]" value="Kecamatan">
+                        <input type="text" name="singkat[kecamatan][nilai]"
+                            class="stat-input"
+                            value="{{ $dataSingkat['kecamatan'] ?? 'Walantaka' }}"
+                            placeholder="Contoh: Walantaka">
+                    </div>
+                    {{-- Kota --}}
+                    <div class="ds-item">
+                        <div class="ds-item-label">
+                            <div class="ds-item-icon" style="background:#fff1f2;color:#f43f5e"><i class="bi bi-geo-alt-fill"></i></div>
+                            Kota / Kabupaten
+                        </div>
+                        <input type="hidden" name="singkat[kota][label]" value="Kota">
+                        <input type="text" name="singkat[kota][nilai]"
+                            class="stat-input"
+                            value="{{ $dataSingkat['kota'] ?? 'Serang' }}"
+                            placeholder="Contoh: Serang">
+                    </div>
+                    {{-- Provinsi --}}
+                    <div class="ds-item">
+                        <div class="ds-item-label">
+                            <div class="ds-item-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-globe2"></i></div>
+                            Provinsi
+                        </div>
+                        <input type="hidden" name="singkat[provinsi][label]" value="Provinsi">
+                        <input type="text" name="singkat[provinsi][nilai]"
+                            class="stat-input"
+                            value="{{ $dataSingkat['provinsi'] ?? 'Banten' }}"
+                            placeholder="Contoh: Banten">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ② KEPENDUDUKAN UTAMA                       --}}
+        {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
                 <div class="group-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-people-fill"></i></div>
@@ -98,18 +208,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 @php $s = $statistik[$kunci] ?? null; @endphp
                 @if($s)
                 <div class="stat-row">
-                    <div>
-                        <div class="stat-row-label">{{ $s->label }}</div>
-                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $s->label }}">
-                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $s->nilai }}" min="0" required>
-                    </div>
+                    <div class="stat-row-label">{{ $s->label }}</div>
+                    <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $s->label }}">
+                    <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $s->nilai }}" min="0" required>
                 </div>
                 @endif
                 @endforeach
             </div>
         </div>
 
-        {{-- ② AGAMA — 7 jenis --}}
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ③ AGAMA                                    --}}
+        {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
                 <div class="group-icon" style="background:#ecfdf5;color:#10b981"><i class="bi bi-stars"></i></div>
@@ -119,43 +229,57 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 @php
                     $agamaKeys = ['jiwa_islam','jiwa_kristen','jiwa_katolik','jiwa_hindu','jiwa_buddha','jiwa_konghucu','jiwa_lainnya'];
                     $totalA    = collect($agamaKeys)->sum(fn($k) => $statistik[$k]->nilai ?? 0);
-                    $agamaColors = ['jiwa_islam'=>'#10b981','jiwa_kristen'=>'#2563eb','jiwa_katolik'=>'#f59e0b',
-                                    'jiwa_hindu'=>'#a855f7','jiwa_buddha'=>'#06b6d4','jiwa_konghucu'=>'#ef4444','jiwa_lainnya'=>'#94a3b8'];
+                    $agamaColors = [
+                        'jiwa_islam'    =>'#10b981','jiwa_kristen'  =>'#2563eb','jiwa_katolik'  =>'#f59e0b',
+                        'jiwa_hindu'    =>'#a855f7','jiwa_buddha'   =>'#06b6d4','jiwa_konghucu' =>'#ef4444',
+                        'jiwa_lainnya'  =>'#94a3b8'
+                    ];
                 @endphp
-                <div class="info-box"><i class="bi bi-info-circle-fill"></i> Isi jumlah jiwa per agama — persentase dihitung otomatis dari total semua agama.</div>
+                <div class="info-box">
+                    <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
+                    <div>Isi jumlah jiwa per agama — persentase dihitung otomatis dari total semua agama.</div>
+                </div>
+                <div class="agama-grid">
                 @foreach($agamaKeys as $kunci)
                 @php
-                    $defaultLabels = ['jiwa_islam'=>'Islam','jiwa_kristen'=>'Kristen','jiwa_katolik'=>'Katolik',
-                                      'jiwa_hindu'=>'Hindu','jiwa_buddha'=>'Buddha','jiwa_konghucu'=>'Konghucu','jiwa_lainnya'=>'Kepercayaan Lainnya'];
-                    $s = $statistik[$kunci] ?? null;
+                    $defaultLabels = [
+                        'jiwa_islam'=>'Islam','jiwa_kristen'=>'Kristen','jiwa_katolik'=>'Katolik',
+                        'jiwa_hindu'=>'Hindu','jiwa_buddha'=>'Buddha','jiwa_konghucu'=>'Konghucu',
+                        'jiwa_lainnya'=>'Kepercayaan Lainnya'
+                    ];
+                    $s      = $statistik[$kunci] ?? null;
                     $sLabel = $s ? $s->label : ($defaultLabels[$kunci] ?? $kunci);
                     $sNilai = $s ? $s->nilai : 0;
                 @endphp
                 <div class="stat-row">
-                    <div>
-                        <div class="stat-row-label" style="color:{{ $agamaColors[$kunci] ?? '#334155' }}">
-                            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:{{ $agamaColors[$kunci] ?? '#94a3b8' }};margin-right:6px;vertical-align:middle"></span>
-                            {{ $sLabel }} (Jiwa)
-                        </div>
-                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $sLabel }}">
-                        <input type="number" name="statistik[{{ $kunci }}][nilai]"
-                               id="input_{{ $kunci }}" class="stat-input agama-input"
-                               value="{{ $sNilai }}" min="0" required oninput="hitungAgama()">
-                        <div class="pct-note">Preview: <span id="pct_{{ $kunci }}">{{ $totalA > 0 ? round($sNilai / $totalA * 100, 1) : 0 }}%</span></div>
+                    <div class="stat-row-label" style="color:{{ $agamaColors[$kunci] ?? '#334155' }}">
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:{{ $agamaColors[$kunci] ?? '#94a3b8' }};margin-right:6px;vertical-align:middle"></span>
+                        {{ $sLabel }} (Jiwa)
                     </div>
+                    <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $sLabel }}">
+                    <input type="number" name="statistik[{{ $kunci }}][nilai]"
+                           id="input_{{ $kunci }}" class="stat-input agama-input"
+                           value="{{ $sNilai }}" min="0" required oninput="hitungAgama()">
+                    <div class="pct-note">Preview: <span id="pct_{{ $kunci }}">{{ $totalA > 0 ? round($sNilai / $totalA * 100, 1) : 0 }}%</span></div>
                 </div>
                 @endforeach
+                </div>
             </div>
         </div>
 
-        {{-- ③ KELOMPOK UMUR --}}
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ④ KELOMPOK UMUR                            --}}
+        {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
                 <div class="group-icon" style="background:#fff7ed;color:#f59e0b"><i class="bi bi-people"></i></div>
                 <div class="group-title">Kelompok Umur (Piramida Penduduk)</div>
             </div>
             <div class="group-body">
-                <div class="info-box"><i class="bi bi-info-circle-fill"></i> Isi jumlah Laki-laki dan Perempuan per kelompok umur untuk grafik piramida.</div>
+                <div class="info-box">
+                    <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
+                    <div>Isi jumlah Laki-laki dan Perempuan per kelompok umur untuk grafik piramida.</div>
+                </div>
                 @php
                 $umurGroups = [
                     'umur_0_4'   =>'0 – 4 Tahun',  'umur_5_9'   =>'5 – 9 Tahun',
@@ -192,7 +316,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             </div>
         </div>
 
-        {{-- ④ UPDATE TERAKHIR --}}
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ⑤ UPDATE TERAKHIR                          --}}
+        {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
                 <div class="group-icon" style="background:#fff7ed;color:#f59e0b"><i class="bi bi-calendar3"></i></div>
@@ -201,8 +327,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             <div class="group-body">
                 @php
                     $s = $statistik['update_terakhir'] ?? null;
-                    $bulanMap = ['Januari'=>'01','Februari'=>'02','Maret'=>'03','April'=>'04','Mei'=>'05','Juni'=>'06',
-                                 'Juli'=>'07','Agustus'=>'08','September'=>'09','Oktober'=>'10','November'=>'11','Desember'=>'12'];
+                    $bulanMap = [
+                        'Januari'=>'01','Februari'=>'02','Maret'=>'03','April'=>'04',
+                        'Mei'=>'05','Juni'=>'06','Juli'=>'07','Agustus'=>'08',
+                        'September'=>'09','Oktober'=>'10','November'=>'11','Desember'=>'12'
+                    ];
                     $nilaiTeks = $s->nilai_teks ?? '';
                     $monthVal  = '';
                     if ($nilaiTeks) {
@@ -214,12 +343,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 @endphp
                 @if($s)
                 <div class="stat-row">
-                    <div>
-                        <div class="stat-row-label">Periode Update Data</div>
-                        <input type="hidden" name="statistik[update_terakhir][label]" value="{{ $s->label }}">
-                        <input type="hidden" name="statistik[update_terakhir][nilai]" value="0">
-                        <input type="month" name="statistik[update_terakhir][nilai_teks]" class="stat-input" value="{{ $monthVal }}" required>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:5px"><i class="bi bi-info-circle me-1"></i>Pilih bulan & tahun — tampil otomatis di halaman publik (misal: Maret 2026)</div>
+                    <div class="stat-row-label">Periode Update Data</div>
+                    <input type="hidden" name="statistik[update_terakhir][label]" value="{{ $s->label }}">
+                    <input type="hidden" name="statistik[update_terakhir][nilai]" value="0">
+                    <input type="month" name="statistik[update_terakhir][nilai_teks]" class="stat-input" value="{{ $monthVal }}" required>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:5px">
+                        <i class="bi bi-info-circle me-1"></i>Pilih bulan & tahun — tampil otomatis di halaman publik (misal: Maret 2026)
                     </div>
                 </div>
                 @endif
@@ -247,9 +376,7 @@ function hitungAgama() {
         const val = parseFloat(document.getElementById('input_'+k)?.value) || 0;
         const pct = Math.round(val / tot * 1000) / 10;
         const pEl = document.getElementById('pct_'+k);
-        const vEl = document.getElementById('badge_val_'+k);
         if (pEl) pEl.textContent = pct + '%';
-        if (vEl) vEl.textContent = pct;
     });
 }
 </script>

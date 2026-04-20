@@ -205,7 +205,9 @@
 
     {{-- BRAND --}}
     <a href="{{ route('admin.dashboard') }}" class="header-brand">
-        <div class="brand-logo"><i class="bi bi-geo-alt-fill"></i></div>
+        <div class="brand-logo" style="background:transparent;padding:2px;">
+            <img src="{{ asset('images/lambang_kota_serang.jpg') }}" alt="Logo Kota Serang" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
+        </div>
         <div class="brand-text">
             <span class="brand-top">ADMIN PORTAL</span>
             <span class="brand-name">Kelurahan Teritih</span>
@@ -328,7 +330,7 @@
     @csrf
 </form>
 
-{{-- MOBILE MENU — ✅ logout button DIHAPUS dari sini --}}
+{{-- MOBILE MENU --}}
 <div class="mobile-menu" id="mobile-menu">
     <a href="{{ route('admin.dashboard') }}"
        class="nav-pill {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -354,8 +356,6 @@
        class="nav-pill {{ request()->routeIs('admin.statistik.*') ? 'active' : '' }}">
         <i class="bi bi-bar-chart-fill"></i> Statistik
     </a>
-    {{-- ✅ Logout button di mobile menu DIHAPUS --}}
-    {{-- Logout hanya tersedia via dropdown profil admin di kanan atas --}}
 </div>
 
 @once

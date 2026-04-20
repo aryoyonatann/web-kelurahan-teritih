@@ -32,8 +32,6 @@
         font-size: 14px; line-height: 1.6;
         min-height: 100vh; display: flex; flex-direction: column;
     }
-
-    /* ── PAGE HEADER ─────────────────────────────── */
     .page-header {
         background: white; border-bottom: 1px solid var(--border);
         padding: 22px 32px;
@@ -45,11 +43,7 @@
     .breadcrumb-custom a { color: var(--muted); text-decoration: none; }
     .breadcrumb-custom a:hover { color: var(--blue); }
     .breadcrumb-custom .current { color: var(--navy); font-weight: 600; }
-
-    /* ── LAYOUT ───────────────────────────────────── */
     .content-area { flex: 1; padding: 28px 32px 48px; }
-
-    /* ── PROFILE SIDEBAR ─────────────────────────── */
     .profile-sidebar-card {
         background: white; border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
     }
@@ -78,7 +72,6 @@
         color: white; font-size: 18px; opacity: 0; transition: opacity .2s;
     }
     .profile-avatar:hover .profile-avatar-overlay { opacity: 1; }
-
     .profile-info { padding: 12px 24px 20px; }
     .profile-name  { font-size: 17px; font-weight: 800; color: var(--navy); margin-bottom: 2px; }
     .profile-email { font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
@@ -91,8 +84,6 @@
         padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
         background: #ecfdf5; color: #059669;
     }
-
-    /* Sidebar menu */
     .sidebar-menu { border-top: 1px solid var(--border); }
     .sidebar-menu-item {
         display: flex; align-items: center; gap: 10px;
@@ -103,8 +94,6 @@
     .sidebar-menu-item:hover { background: var(--bg); color: var(--navy); }
     .sidebar-menu-item.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: var(--blue-lt); }
     .sidebar-menu-item i { font-size: 16px; }
-
-    /* ── FORM CARDS ───────────────────────────────── */
     .form-card {
         background: white; border: 1px solid var(--border); border-radius: 16px;
         overflow: hidden; margin-bottom: 20px;
@@ -121,8 +110,6 @@
     .form-card-title { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 2px; }
     .form-card-sub   { font-size: 12px; color: var(--muted); }
     .form-card-body  { padding: 22px 24px; }
-
-    /* Form elements */
     .form-label-custom {
         font-size: 12.5px; font-weight: 700; color: var(--navy); display: block; margin-bottom: 6px;
     }
@@ -141,8 +128,15 @@
     }
     .form-control-custom::placeholder { color: #cbd5e1; }
     .form-control-custom:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(28,100,242,.1); }
-    .form-control-custom:disabled,
+    .form-control-custom:disabled { background: #f8fafc; color: var(--muted); cursor: not-allowed; }
     .form-control-custom[readonly] { background: #f8fafc; color: var(--muted); cursor: not-allowed; }
+    /* Field password tetap putih meski readonly sementara */
+    #pwCurrent, #pwNew, #pwConfirm {
+        background: white !important;
+        color: var(--slate) !important;
+        cursor: text !important;
+        opacity: 1 !important;
+    }
     .input-icon-wrap { position: relative; }
     .input-icon-wrap > i {
         position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
@@ -155,8 +149,6 @@
         color: var(--muted); cursor: pointer; font-size: 15px;
     }
     .pw-toggle:hover { color: var(--navy); }
-
-    /* Foto upload preview area */
     .foto-upload-area {
         border: 2px dashed var(--border); border-radius: 12px;
         padding: 16px; display: flex; align-items: center; gap: 16px;
@@ -181,8 +173,6 @@
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
     .btn-ganti-foto:hover { border-color: var(--blue); color: var(--blue); }
-
-    /* ── ACTION BAR ───────────────────────────────── */
     .action-bar {
         background: white; border: 1px solid var(--border); border-radius: 12px;
         padding: 16px 24px; margin-top: 0;
@@ -205,8 +195,6 @@
         display: inline-flex; align-items: center; gap: 7px;
     }
     .btn-simpan:hover { background: var(--blue-dk); }
-
-    /* Alert */
     .alert-sukses {
         background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px;
         padding: 12px 16px; display: flex; align-items: center; gap: 10px;
@@ -219,7 +207,6 @@
         font-size: 13px; color: #b91c1c; margin-bottom: 20px;
     }
     .alert-error i { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
-
     @media (max-width: 991px) {
         .page-header   { padding: 16px; }
         .content-area  { padding: 16px 16px 36px; }
@@ -232,14 +219,12 @@
 
 @include('partials.navbar')
 
-{{-- PAGE HEADER --}}
 <div class="page-header">
     <div class="page-header-inner">
         <div>
             <h1 class="page-header-title">Pengaturan Profil</h1>
             <p class="page-header-sub">Kelola informasi pribadi, alamat domisili, dan keamanan akun Anda.</p>
         </div>
-        {{-- BREADCRUMB: Beranda → route('home'), bukan user.dashboard --}}
         <div class="breadcrumb-custom">
             <a href="{{ route('home') }}">Beranda</a>
             <i class="bi bi-chevron-right" style="font-size:10px"></i>
@@ -274,8 +259,6 @@
         <div class="col-lg-3">
             <div class="profile-sidebar-card">
                 <div class="profile-cover"></div>
-
-                {{-- Avatar preview (dikontrol JS) --}}
                 <div class="profile-avatar-wrap">
                     <div class="profile-avatar" id="avatarPreviewLarge">
                         @if(Auth::user()->foto ?? null)
@@ -290,7 +273,6 @@
                         <div class="profile-avatar-overlay"><i class="bi bi-camera-fill"></i></div>
                     </div>
                 </div>
-
                 <div class="profile-info">
                     <div class="profile-name">{{ Auth::user()->nama ?? Auth::user()->name }}</div>
                     <div class="profile-email">{{ Auth::user()->email }}</div>
@@ -308,7 +290,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="sidebar-menu">
                     <a href="#seksi-pribadi" class="sidebar-menu-item active" onclick="setActive(this)">
                         <i class="bi bi-person-fill"></i> Informasi Pribadi
@@ -325,8 +306,6 @@
 
         {{-- FORM KANAN --}}
         <div class="col-lg-9">
-
-            {{-- *** FORM dengan enctype — input foto ADA di dalam form ini *** --}}
             <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" id="profileForm">
                 @csrf
                 @method('PUT')
@@ -345,7 +324,6 @@
                     <div class="form-card-body">
                         <div class="row g-3">
 
-                            {{-- FOTO PROFIL — input file di dalam form --}}
                             <div class="col-12">
                                 <label class="form-label-custom">Foto Profil <span class="optional">(opsional)</span></label>
                                 <div class="foto-upload-area" onclick="document.getElementById('fotoInput').click()">
@@ -368,7 +346,6 @@
                                         <i class="bi bi-upload me-1"></i> Pilih Foto
                                     </button>
                                 </div>
-                                {{-- Input file ADA di dalam form ini --}}
                                 <input type="file" name="foto" id="fotoInput" accept="image/*"
                                        onchange="previewFoto(this)" style="display:none">
                             </div>
@@ -496,7 +473,10 @@
                                 <div style="position:relative;">
                                     <input type="password" name="current_password" id="pwCurrent"
                                         class="form-control-custom" placeholder="••••••••"
-                                        style="padding-right:40px;">
+                                        style="padding-right:40px;"
+                                        autocomplete="new-password"
+                                        readonly
+                                        onfocus="this.removeAttribute('readonly')">
                                     <span class="pw-toggle" onclick="togglePw('pwCurrent', this)">
                                         <i class="bi bi-eye-slash"></i>
                                     </span>
@@ -508,7 +488,10 @@
                                 <div style="position:relative;">
                                     <input type="password" name="password" id="pwNew"
                                         class="form-control-custom" placeholder="Min. 8 karakter"
-                                        style="padding-right:40px;">
+                                        style="padding-right:40px;"
+                                        autocomplete="new-password"
+                                        readonly
+                                        onfocus="this.removeAttribute('readonly')">
                                     <span class="pw-toggle" onclick="togglePw('pwNew', this)">
                                         <i class="bi bi-eye-slash"></i>
                                     </span>
@@ -520,7 +503,10 @@
                                 <div style="position:relative;">
                                     <input type="password" name="password_confirmation" id="pwConfirm"
                                         class="form-control-custom" placeholder="Ulangi kata sandi"
-                                        style="padding-right:40px;">
+                                        style="padding-right:40px;"
+                                        autocomplete="new-password"
+                                        readonly
+                                        onfocus="this.removeAttribute('readonly')">
                                     <span class="pw-toggle" onclick="togglePw('pwConfirm', this)">
                                         <i class="bi bi-eye-slash"></i>
                                     </span>
@@ -540,8 +526,6 @@
                 </div>
 
             </form>
-            {{-- *** Akhir form *** --}}
-
         </div>
     </div>
 </div>
@@ -550,18 +534,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Preview foto — update KEDUA avatar (sidebar besar + thumbnail kecil)
 function previewFoto(input) {
     if (!input.files || !input.files[0]) return;
     const reader = new FileReader();
     reader.onload = function(e) {
         const src = e.target.result;
-
-        // Thumbnail kecil di area upload
         const sm = document.getElementById('fotoPreviewSm');
         sm.innerHTML = '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
-
-        // Avatar besar di sidebar
         const lg = document.getElementById('avatarPreviewLarge');
         lg.innerHTML = '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
                      + '<div class="profile-avatar-overlay"><i class="bi bi-camera-fill"></i></div>';
@@ -569,21 +548,20 @@ function previewFoto(input) {
     reader.readAsDataURL(input.files[0]);
 }
 
-// Toggle password visibility
 function togglePw(id, el) {
     const input = document.getElementById(id);
+    // Pastikan readonly dihapus dulu agar bisa dilihat
+    input.removeAttribute('readonly');
     const isText = input.type === 'text';
     input.type = isText ? 'password' : 'text';
     el.innerHTML = isText ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
 }
 
-// Sidebar active state
 function setActive(el) {
     document.querySelectorAll('.sidebar-menu-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
 }
 
-// Smooth scroll untuk anchor sidebar
 document.querySelectorAll('.sidebar-menu-item[href^="#"]').forEach(link => {
     link.addEventListener('click', function(e) {
         const target = document.querySelector(this.getAttribute('href'));

@@ -34,6 +34,8 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .kp-hero h1 { font-size: 24px; font-weight: 800; color: white; margin: 0 0 4px; }
 .kp-hero p  { font-size: 13px; color: rgba(255,255,255,.75); margin: 0; }
 
+.hero-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+
 .page-wrapper  { padding: 28px; }
 
 .breadcrumb-bar { font-size:12px; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
@@ -47,33 +49,49 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .stat-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px; }
 .stat-value { font-size:32px; font-weight:800; color:var(--navy); line-height:1; }
 .stat-icon  { width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
-.icon-blue { background:#eff6ff; color:var(--blue); }
-.icon-red  { background:#fef2f2; color:var(--red); }
+.icon-blue   { background:#eff6ff; color:var(--blue); }
+.icon-red    { background:#fef2f2; color:var(--red); }
+.icon-green  { background:#ecfdf5; color:var(--green); }
+.icon-orange { background:#fffbeb; color:var(--orange); }
 
 /* Toolbar */
-.toolbar { background:white; border-radius:12px; border:1px solid var(--border); padding:14px 18px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.toolbar { background:white; border-radius:12px; border:1px solid var(--border); padding:14px 18px; }
+.toolbar-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.toolbar-row + .toolbar-row { margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
 .search-wrap { position:relative; flex:1; min-width:220px; }
 .search-wrap i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:14px; }
 .search-input { width:100%; padding:8px 12px 8px 36px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:inherit; outline:none; color:var(--navy); background:#f8fafc; transition:border-color .18s; }
 .search-input:focus { border-color:var(--blue); background:white; }
 .select-filter { padding:8px 32px 8px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:inherit; color:var(--slate); background:white; outline:none; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
 .select-filter:focus { border-color:var(--blue); }
-.btn-filter { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid var(--blue); background:var(--blue-lt); color:var(--blue); cursor:pointer; transition:all .18s; }
+.btn-filter { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid var(--blue); background:var(--blue-lt); color:var(--blue); cursor:pointer; transition:all .18s; text-decoration:none; }
 .btn-filter:hover { background:var(--blue); color:white; }
+.btn-reset  { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid var(--red); background:#fef2f2; color:var(--red); cursor:pointer; transition:all .18s; text-decoration:none; }
+.btn-reset:hover { background:var(--red); color:white; }
 .btn-tambah { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px; background:white; color:var(--blue); font-size:13px; font-weight:700; text-decoration:none; border:none; cursor:pointer; transition:all .2s; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,.15); }
 .btn-tambah:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(0,0,0,.2); color:var(--blue-dk); }
-.btn-tambah-inner { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; background:var(--blue); color:white; cursor:pointer; text-decoration:none; transition:background .18s; white-space:nowrap; }
-.btn-tambah-inner:hover { background:var(--blue-dk); color:white; }
+
+/* Export button */
+.btn-export { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:10px; background:rgba(255,255,255,.15); border:1.5px solid rgba(255,255,255,.3); color:white; font-size:13px; font-weight:600; text-decoration:none; transition:all .18s; backdrop-filter:blur(4px); }
+.btn-export:hover { background:rgba(255,255,255,.25); color:white; }
+
+/* Filter badge */
+.filter-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; background:#dbeafe; color:#1d4ed8; }
 
 /* Table */
 .table-card { background:white; border-radius:12px; border:1px solid var(--border); overflow:hidden; }
 .warga-tbl { width:100%; border-collapse:collapse; font-size:13px; }
-.warga-tbl th { padding:11px 16px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); border-bottom:1px solid var(--border); background:#f8fafc; }
-.warga-tbl td { padding:13px 16px; border-bottom:1px solid var(--border); color:var(--slate); vertical-align:middle; }
+.warga-tbl th { padding:11px 16px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); border-bottom:1px solid var(--border); background:#f8fafc; white-space:nowrap; }
+.warga-tbl td { padding:12px 16px; border-bottom:1px solid var(--border); color:var(--slate); vertical-align:middle; }
 .warga-tbl tbody tr:last-child td { border-bottom:none; }
 .warga-tbl tbody tr:hover td { background:#f8fafc; }
 .warga-tbl th:first-child, .warga-tbl td:first-child { width:40px; padding-right:0; }
 input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor:pointer; }
+
+/* Sortable header */
+.th-sort { cursor:pointer; user-select:none; }
+.th-sort:hover { color:var(--blue); }
+.th-sort i { font-size:10px; margin-left:3px; }
 
 .av { width:36px; height:36px; border-radius:9px; font-size:12px; font-weight:700; color:white; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .av-blue   { background:linear-gradient(135deg,#2563eb,#60a5fa); }
@@ -88,7 +106,16 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 .nik-text   { font-size:12px; font-family:'Courier New',monospace; color:var(--slate); letter-spacing:.03em; }
 .kontak-email { font-size:12px; color:var(--slate); }
 .kontak-telp  { font-size:11px; color:var(--muted); margin-top:2px; }
-.tgl-text { font-size:12px; color:var(--slate); }
+.tgl-text   { font-size:12px; color:var(--slate); }
+.login-text { font-size:12px; color:var(--slate); }
+.login-never { font-size:11px; color:var(--muted); font-style:italic; }
+
+/* Jumlah permohonan badge */
+.permohonan-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:20px; font-size:12px; font-weight:700; }
+.pb-zero    { background:#f1f5f9; color:var(--muted); }
+.pb-low     { background:#eff6ff; color:var(--blue); }
+.pb-medium  { background:#fef9c3; color:#92400e; }
+.pb-high    { background:#fef2f2; color:var(--red); }
 
 .bdg { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
 .bdg::before { content:''; width:6px; height:6px; border-radius:50%; }
@@ -96,22 +123,27 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 .bdg-aktif    { background:#ecfdf5; color:#065f46; }
 .bdg-nonaktif::before { background:var(--muted); }
 .bdg-nonaktif { background:#f1f5f9; color:var(--muted); }
-.bdg-blokir::before   { background:var(--red); }
+.bdg-blokir::before   { background:var(--red); animation:pulse-dot 1.5s infinite; }
 .bdg-blokir   { background:#fef2f2; color:#991b1b; }
+@keyframes pulse-dot { 0%,100%{opacity:1}50%{opacity:.4} }
 
 .aksi-wrap { position:relative; display:inline-block; }
 .btn-aksi { width:30px; height:30px; border-radius:6px; border:1px solid var(--border); background:white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--muted); transition:all .18s; }
 .btn-aksi:hover { background:var(--bg); color:var(--navy); }
-.dropdown-menu-custom { position:fixed; z-index:1000; background:white; border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.12); min-width:160px; padding:6px; display:none; }
+.dropdown-menu-custom { position:fixed; z-index:1000; background:white; border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.12); min-width:170px; padding:6px; display:none; }
 .dropdown-menu-custom.show { display:block; }
 .dd-item { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; font-size:12px; font-weight:500; color:var(--slate); cursor:pointer; text-decoration:none; transition:background .15s; border:none; background:none; width:100%; text-align:left; }
 .dd-item:hover { background:var(--bg); color:var(--navy); }
-.dd-item.danger { color:var(--red); }
-.dd-item.danger:hover { background:#fef2f2; }
+.dd-item.danger  { color:var(--red); }
+.dd-item.danger:hover  { background:#fef2f2; }
+.dd-item.warning { color:#d97706; }
+.dd-item.warning:hover { background:#fffbeb; }
+.dd-item.success { color:var(--green); }
+.dd-item.success:hover { background:#ecfdf5; }
 .dd-item i { font-size:13px; }
 .dd-divider { border:none; border-top:1px solid var(--border); margin:4px 0; }
 
-.tbl-footer { padding:12px 16px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--muted); }
+.tbl-footer { padding:12px 16px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--muted); flex-wrap:wrap; gap:8px; }
 .pagination-wrap { display:flex; align-items:center; gap:4px; }
 .pg-btn { width:32px; height:32px; border-radius:7px; border:1px solid var(--border); background:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:var(--slate); cursor:pointer; text-decoration:none; transition:all .18s; }
 .pg-btn:hover { border-color:var(--blue); color:var(--blue); }
@@ -126,132 +158,187 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 .modal-overlay.show { opacity:1; pointer-events:all; }
 .modal-box { background:white; border-radius:16px; padding:28px; width:100%; max-width:520px; box-shadow:0 20px 60px rgba(0,0,0,.2); transform:translateY(16px); transition:transform .2s; max-height:90vh; overflow-y:auto; }
 .modal-overlay.show .modal-box { transform:translateY(0); }
-.modal-box.sm { max-width:400px; }
+.modal-box.sm { max-width:420px; }
 .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
 .modal-title  { font-size:16px; font-weight:700; color:var(--navy); }
 .modal-close  { width:30px; height:30px; border-radius:7px; border:1px solid var(--border); background:white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--muted); }
 .modal-close:hover { background:var(--bg); }
-.modal-desc   { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:4px; }
+.modal-desc   { font-size:13px; color:var(--muted); line-height:1.6; }
 .modal-actions { display:flex; gap:10px; margin-top:24px; justify-content:flex-end; }
 
 /* Form */
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.form-grid.full { grid-template-columns:1fr; }
 .form-group { display:flex; flex-direction:column; gap:5px; }
 .form-group.span2 { grid-column:span 2; }
 .form-label { font-size:12px; font-weight:600; color:var(--navy); }
 .form-label span { color:var(--red); margin-left:2px; }
 .form-control { padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:inherit; color:var(--navy); outline:none; transition:border-color .18s; }
 .form-control:focus { border-color:var(--blue); }
-.form-hint { font-size:11px; color:var(--muted); }
-.form-error { font-size:11px; color:var(--red); }
 
-.btn-cancel { padding:8px 18px; border-radius:8px; border:1px solid var(--border); background:white; font-size:13px; font-weight:600; color:var(--slate); cursor:pointer; }
-.btn-cancel:hover { background:var(--bg); }
+.btn-cancel  { padding:8px 18px; border-radius:8px; border:1px solid var(--border); background:white; font-size:13px; font-weight:600; color:var(--slate); cursor:pointer; }
+.btn-cancel:hover  { background:var(--bg); }
 .btn-primary { padding:8px 20px; border-radius:8px; border:none; background:var(--blue); color:white; font-size:13px; font-weight:600; cursor:pointer; }
 .btn-primary:hover { background:var(--blue-dk); }
 .btn-danger  { padding:8px 18px; border-radius:8px; border:none; background:var(--red); color:white; font-size:13px; font-weight:600; cursor:pointer; }
-.btn-danger:hover { background:#dc2626; }
+.btn-danger:hover  { background:#dc2626; }
 </style>
 @endpush
 
 @section('content')
 @include('admin.partials.header')
 
-{{-- ── HERO BANNER ── --}}
+{{-- ── HERO ── --}}
 <div class="kp-hero">
     <div class="kp-hero-content">
         <div>
             <h1><i class="bi bi-people-fill me-2"></i>Data Kependudukan</h1>
-            <p>Kelola data akun warga dan status kependudukan Kelurahan Teritih</p>
+            <p>Kelola akun warga dan status kependudukan Kelurahan Teritih</p>
         </div>
-        <button class="btn-tambah" onclick="openModal('modalTambah')">
-            <i class="bi bi-person-plus-fill"></i> Tambah Warga
-        </button>
+        <div class="hero-actions">
+            {{-- Export CSV — bawa filter yang aktif --}}
+            <a href="{{ route('kependudukan.export', request()->query()) }}"
+               class="btn-export">
+                <i class="bi bi-download"></i> Export CSV
+            </a>
+            <button class="btn-tambah" onclick="openModal('modalTambah')">
+                <i class="bi bi-person-plus-fill"></i> Tambah Warga
+            </button>
+        </div>
     </div>
 </div>
 
 <div class="page-wrapper">
 
-    {{-- Breadcrumb --}}
     <div class="breadcrumb-bar">
         <a href="{{ route('admin.dashboard') }}">Portal Admin</a>
         <i class="bi bi-chevron-right" style="font-size:10px"></i>
         <span class="active">Kependudukan</span>
     </div>
 
-    {{-- Alert --}}
     @if(session('success'))
-    <div class="alert-success">
-        <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
-    </div>
+    <div class="alert-success"><i class="bi bi-check-circle-fill"></i> {{ session('success') }}</div>
     @endif
-
     @if($errors->any())
     <div class="alert-error">
         <i class="bi bi-exclamation-circle-fill" style="margin-top:1px;flex-shrink:0"></i>
-        <div>
-            @foreach($errors->all() as $e)
-                <div>{{ $e }}</div>
-            @endforeach
-        </div>
+        <div>@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>
     </div>
     @endif
 
-    {{-- Stat Cards --}}
+    {{-- ── STAT CARDS ── --}}
     <div class="row g-3 mb-4">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="stat-card">
                 <div>
-                    <div class="stat-label">Total Warga Terdaftar</div>
+                    <div class="stat-label">Total Warga</div>
                     <div class="stat-value">{{ number_format($totalUser) }}</div>
                 </div>
                 <div class="stat-icon icon-blue"><i class="bi bi-people-fill"></i></div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="stat-card">
                 <div>
-                    <div class="stat-label">Non-Aktif / Blokir</div>
-                    <div class="stat-value">{{ number_format($nonAktif) }}</div>
+                    <div class="stat-label">Akun Aktif</div>
+                    <div class="stat-value" style="color:var(--green)">{{ number_format($totalUser - $nonAktif) }}</div>
+                </div>
+                <div class="stat-icon icon-green"><i class="bi bi-person-check-fill"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-label">Diblokir</div>
+                    <div class="stat-value" style="color:var(--red)">{{ number_format($nonAktif) }}</div>
                 </div>
                 <div class="stat-icon icon-red"><i class="bi bi-slash-circle-fill"></i></div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-label">Total RT/RW</div>
+                    <div class="stat-value" style="color:var(--orange)">{{ $rtList->count() }}</div>
+                </div>
+                <div class="stat-icon icon-orange"><i class="bi bi-map-fill"></i></div>
+            </div>
+        </div>
     </div>
 
-    {{-- Toolbar / Filter --}}
+    {{-- ── TOOLBAR ── --}}
     <form method="GET" action="{{ route('kependudukan.index') }}" id="filterForm">
         <div class="toolbar mb-3">
-            <div class="search-wrap">
-                <i class="bi bi-search"></i>
-                <input type="text" name="search" class="search-input"
-                    placeholder="Cari Nama, NIK, atau Email..."
-                    value="{{ request('search') }}">
+            {{-- Baris 1: Pencarian + Status + Sort + tombol --}}
+            <div class="toolbar-row">
+                <div class="search-wrap">
+                    <i class="bi bi-search"></i>
+                    <input type="text" name="search" class="search-input"
+                        placeholder="Cari Nama, NIK, atau Email..."
+                        value="{{ request('search') }}">
+                </div>
+                <select name="status" class="select-filter">
+                    <option value="">Semua Status</option>
+                    <option value="aktif"  {{ request('status')=='aktif'  ? 'selected':'' }}>Aktif</option>
+                    <option value="blokir" {{ request('status')=='blokir' ? 'selected':'' }}>Blokir</option>
+                </select>
+                <select name="sort" class="select-filter">
+                    <option value="terbaru"    {{ request('sort','terbaru')=='terbaru'    ? 'selected':'' }}>Terbaru Daftar</option>
+                    <option value="terlama"    {{ request('sort')=='terlama'    ? 'selected':'' }}>Terlama Daftar</option>
+                    <option value="nama"       {{ request('sort')=='nama'       ? 'selected':'' }}>Nama A–Z</option>
+                    <option value="permohonan" {{ request('sort')=='permohonan' ? 'selected':'' }}>Terbanyak Permohonan</option>
+                    <option value="last_login" {{ request('sort')=='last_login' ? 'selected':'' }}>Terakhir Login</option>
+                </select>
+                <button type="submit" class="btn-filter">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                @if(request()->hasAny(['search','status','rt','rw','sort']))
+                <a href="{{ route('kependudukan.index') }}" class="btn-reset">
+                    <i class="bi bi-x-lg"></i> Reset
+                </a>
+                @endif
             </div>
-            <select name="status" class="select-filter">
-                <option value="">Semua Status</option>
-                <option value="aktif"     {{ request('status')=='aktif'     ? 'selected':'' }}>Aktif</option>
-                <option value="non-aktif" {{ request('status')=='non-aktif' ? 'selected':'' }}>Non-Aktif</option>
-                <option value="blokir"    {{ request('status')=='blokir'    ? 'selected':'' }}>Blokir</option>
-            </select>
-            <select name="sort" class="select-filter">
-                <option value="terbaru" {{ request('sort','terbaru')=='terbaru' ? 'selected':'' }}>Terbaru</option>
-                <option value="terlama" {{ request('sort')=='terlama' ? 'selected':'' }}>Terlama</option>
-                <option value="nama"    {{ request('sort')=='nama'    ? 'selected':'' }}>Nama A–Z</option>
-            </select>
-            <button type="submit" class="btn-filter">
-                <i class="bi bi-funnel"></i> Filter
-            </button>
-            @if(request('search') || request('status') || request('sort'))
-            <a href="{{ route('kependudukan.index') }}" class="btn-filter" style="color:var(--red);border-color:var(--red)">
-                <i class="bi bi-x-lg"></i> Reset
-            </a>
-            @endif
+
+            {{-- Baris 2: Filter RT/RW --}}
+            <div class="toolbar-row">
+                <div style="font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:6px">
+                    <i class="bi bi-map"></i> Filter Wilayah:
+                </div>
+                <select name="rt" class="select-filter">
+                    <option value="">Semua RT</option>
+                    @foreach($rtList as $rt)
+                    <option value="{{ $rt }}" {{ request('rt') == $rt ? 'selected':'' }}>RT {{ $rt }}</option>
+                    @endforeach
+                </select>
+                <select name="rw" class="select-filter">
+                    <option value="">Semua RW</option>
+                    @foreach($rwList as $rw)
+                    <option value="{{ $rw }}" {{ request('rw') == $rw ? 'selected':'' }}>RW {{ $rw }}</option>
+                    @endforeach
+                </select>
+
+                {{-- Tampilkan filter aktif sebagai badge --}}
+                @if(request('rt') || request('rw') || request('status') || request('search'))
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:4px">
+                    <span style="font-size:11px;color:var(--muted)">Filter aktif:</span>
+                    @if(request('search'))
+                    <span class="filter-badge"><i class="bi bi-search" style="font-size:9px"></i> "{{ request('search') }}"</span>
+                    @endif
+                    @if(request('status'))
+                    <span class="filter-badge"><i class="bi bi-circle-fill" style="font-size:9px"></i> {{ ucfirst(request('status')) }}</span>
+                    @endif
+                    @if(request('rt'))
+                    <span class="filter-badge">RT {{ request('rt') }}</span>
+                    @endif
+                    @if(request('rw'))
+                    <span class="filter-badge">RW {{ request('rw') }}</span>
+                    @endif
+                </div>
+                @endif
+            </div>
         </div>
     </form>
 
-    {{-- Table --}}
+    {{-- ── TABLE ── --}}
     <div class="table-card">
         <div class="table-responsive">
             <table class="warga-tbl">
@@ -261,7 +348,19 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                         <th>Profil Warga</th>
                         <th>NIK</th>
                         <th>Kontak</th>
-                        <th>Tgl Terdaftar</th>
+                        <th>
+                            <a href="{{ route('kependudukan.index', array_merge(request()->query(), ['sort'=>'permohonan'])) }}"
+                               class="th-sort" style="color:inherit;text-decoration:none">
+                                Permohonan <i class="bi bi-arrow-down-up"></i>
+                            </a>
+                        </th>
+                        <th>Tgl Daftar</th>
+                        <th>
+                            <a href="{{ route('kependudukan.index', array_merge(request()->query(), ['sort'=>'last_login'])) }}"
+                               class="th-sort" style="color:inherit;text-decoration:none">
+                                Terakhir Login <i class="bi bi-arrow-down-up"></i>
+                            </a>
+                        </th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
@@ -273,6 +372,14 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                         $avColors = ['av-blue','av-green','av-purple','av-orange','av-red','av-teal'];
                         $avColor  = $avColors[$loop->index % count($avColors)];
                         $status   = $user->status ?? 'aktif';
+                        $jmlPermohonan = $user->permohonan_count ?? 0;
+                        // Warna badge permohonan
+                        $pbClass = match(true) {
+                            $jmlPermohonan === 0  => 'pb-zero',
+                            $jmlPermohonan <= 3   => 'pb-low',
+                            $jmlPermohonan <= 7   => 'pb-medium',
+                            default               => 'pb-high',
+                        };
                     @endphp
                     <tr>
                         <td><input type="checkbox" name="ids[]" value="{{ $user->id_user }}"></td>
@@ -285,7 +392,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                                         @if($user->rt || $user->rw)
                                             RT {{ $user->rt ?? '-' }} / RW {{ $user->rw ?? '-' }}
                                         @else
-                                            <span style="color:var(--border)">RT/RW belum diisi</span>
+                                            <span style="color:#cbd5e1">RT/RW belum diisi</span>
                                         @endif
                                     </div>
                                 </div>
@@ -295,18 +402,44 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                             @if($user->nik)
                                 <span class="nik-text">{{ $user->nik }}</span>
                             @else
-                                <span style="color:var(--border);font-size:12px">Belum diisi</span>
+                                <span style="color:#cbd5e1;font-size:12px">Belum diisi</span>
                             @endif
                         </td>
                         <td>
                             <div class="kontak-email">{{ $user->email }}</div>
                             <div class="kontak-telp">{{ $user->no_hp ?? '-' }}</div>
                         </td>
+
+                        {{-- Jumlah Permohonan --}}
+                        <td>
+                            <span class="permohonan-badge {{ $pbClass }}">
+                                <i class="bi bi-file-text" style="font-size:10px"></i>
+                                {{ $jmlPermohonan }}x
+                            </span>
+                        </td>
+
+                        {{-- Tgl Daftar --}}
                         <td>
                             <span class="tgl-text">
                                 {{ $user->created_at ? \Carbon\Carbon::parse($user->created_at)->format('d M Y') : '-' }}
                             </span>
                         </td>
+
+                        {{-- Terakhir Login --}}
+                        <td>
+                            @if($user->last_login_at)
+                                <div class="login-text">
+                                    {{ \Carbon\Carbon::parse($user->last_login_at)->format('d M Y') }}
+                                </div>
+                                <div style="font-size:11px;color:var(--muted)">
+                                    {{ \Carbon\Carbon::parse($user->last_login_at)->diffForHumans() }}
+                                </div>
+                            @else
+                                <span class="login-never">Belum pernah</span>
+                            @endif
+                        </td>
+
+                        {{-- Status --}}
                         <td>
                             @if($status === 'aktif')
                                 <span class="bdg bdg-aktif">Aktif</span>
@@ -316,6 +449,8 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                                 <span class="bdg bdg-nonaktif">Non-Aktif</span>
                             @endif
                         </td>
+
+                        {{-- Aksi --}}
                         <td>
                             <div class="aksi-wrap">
                                 <button class="btn-aksi" type="button" onclick="toggleDropdown(this)">
@@ -325,15 +460,18 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                                     <a href="{{ route('kependudukan.show', $user->id_user) }}" class="dd-item">
                                         <i class="bi bi-eye"></i> Lihat Detail
                                     </a>
+                                    <hr class="dd-divider">
                                     <form method="POST" action="{{ route('kependudukan.toggle', $user->id_user) }}">
                                         @csrf @method('PATCH')
-                                        <button type="submit" class="dd-item">
-                                            @if($status === 'aktif')
-                                                <i class="bi bi-slash-circle"></i> Non-Aktifkan
-                                            @else
-                                                <i class="bi bi-check-circle"></i> Aktifkan
-                                            @endif
+                                        @if($status === 'aktif')
+                                        <button type="submit" class="dd-item warning">
+                                            <i class="bi bi-slash-circle"></i> Blokir Akun
                                         </button>
+                                        @else
+                                        <button type="submit" class="dd-item success">
+                                            <i class="bi bi-check-circle"></i> Aktifkan Kembali
+                                        </button>
+                                        @endif
                                     </form>
                                     <hr class="dd-divider">
                                     <button type="button" class="dd-item danger"
@@ -346,8 +484,8 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" style="text-align:center;padding:36px;color:var(--muted);">
-                            <i class="bi bi-people" style="font-size:32px;display:block;margin-bottom:10px;color:var(--border)"></i>
+                        <td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">
+                            <i class="bi bi-people" style="font-size:36px;display:block;margin-bottom:10px;color:#cbd5e1"></i>
                             Tidak ada data warga ditemukan.
                         </td>
                     </tr>
@@ -356,12 +494,11 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
             </table>
         </div>
 
-        {{-- Pagination --}}
         @if($users->total() > 0)
         <div class="tbl-footer">
             <span>
                 Menampilkan <strong>{{ $users->firstItem() }}–{{ $users->lastItem() }}</strong>
-                dari <strong>{{ $users->total() }}</strong> data
+                dari <strong>{{ $users->total() }}</strong> warga
             </span>
             <div class="pagination-wrap">
                 <a href="{{ $users->previousPageUrl() }}" class="pg-btn {{ $users->onFirstPage() ? 'disabled':'' }}">
@@ -384,17 +521,14 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 
 </div>
 
-{{-- ═══════════════════════════════════════
-     MODAL: TAMBAH WARGA
-═══════════════════════════════════════ --}}
+{{-- ═══ MODAL TAMBAH ═══ --}}
 <div class="modal-overlay" id="modalTambah">
     <div class="modal-box">
         <div class="modal-header">
             <div class="modal-title"><i class="bi bi-person-plus-fill me-2" style="color:var(--blue)"></i>Tambah Data Warga</div>
             <button class="modal-close" onclick="closeModal('modalTambah')"><i class="bi bi-x-lg"></i></button>
         </div>
-
-        <form method="POST" action="{{ route('kependudukan.store') }}" id="formTambah">
+        <form method="POST" action="{{ route('kependudukan.store') }}">
             @csrf
             <div class="form-grid">
                 <div class="form-group">
@@ -450,21 +584,22 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════
-     MODAL: HAPUS
-═══════════════════════════════════════ --}}
+{{-- ═══ MODAL HAPUS ═══ --}}
 <div class="modal-overlay" id="modalHapus">
     <div class="modal-box sm">
         <div class="modal-header">
             <div class="modal-title" style="color:var(--red)"><i class="bi bi-exclamation-triangle-fill me-2"></i>Hapus Data Warga</div>
             <button class="modal-close" onclick="closeModal('modalHapus')"><i class="bi bi-x-lg"></i></button>
         </div>
-        <p class="modal-desc">Anda yakin ingin menghapus data <strong id="modalNama"></strong>? Tindakan ini tidak dapat dibatalkan dan akan menghapus semua permohonan terkait.</p>
+        <p class="modal-desc">
+            Anda yakin ingin menghapus akun <strong id="modalNama"></strong>?
+            Tindakan ini tidak dapat dibatalkan dan akan menghapus semua permohonan terkait.
+        </p>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal('modalHapus')">Batal</button>
             <form id="formHapus" method="POST">
                 @csrf @method('DELETE')
-                <button type="submit" class="btn-danger">Ya, Hapus</button>
+                <button type="submit" class="btn-danger"><i class="bi bi-trash me-1"></i>Ya, Hapus</button>
             </form>
         </div>
     </div>
@@ -486,7 +621,6 @@ function closeModal(id) {
 document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
 });
-
 function openModalHapus(id, nama) {
     document.getElementById('modalNama').textContent = nama;
     document.getElementById('formHapus').action = `/admin/kependudukan/${id}`;
@@ -494,7 +628,6 @@ function openModalHapus(id, nama) {
 }
 
 let activeBtn = null;
-
 function toggleDropdown(btn) {
     const menu = btn.nextElementSibling;
     const isOpen = menu.classList.contains('show');
@@ -506,20 +639,17 @@ function toggleDropdown(btn) {
         menu.classList.add('show');
     }
 }
-
 function positionDropdown(btn, menu) {
     const rect = btn.getBoundingClientRect();
     menu.style.top  = (rect.bottom + 6) + 'px';
-    menu.style.left = (rect.right - 160) + 'px';
+    menu.style.left = (rect.right - 170) + 'px';
 }
-
 window.addEventListener('scroll', () => {
     if (activeBtn) {
         const menu = activeBtn.nextElementSibling;
-        if (menu && menu.classList.contains('show')) positionDropdown(activeBtn, menu);
+        if (menu?.classList.contains('show')) positionDropdown(activeBtn, menu);
     }
 }, true);
-
 document.addEventListener('click', e => {
     if (!e.target.closest('.aksi-wrap')) {
         document.querySelectorAll('.dropdown-menu-custom.show').forEach(el => el.classList.remove('show'));

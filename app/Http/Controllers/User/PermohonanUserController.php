@@ -52,12 +52,17 @@ class PermohonanUserController extends Controller
     // =========================================================
     public function form(string $slug)
     {
-        if (!array_key_exists($slug, $this->slugMap)) {
-            abort(404, 'Jenis surat tidak ditemukan.');
+        // Surat bawaan → form khusus masing-masing
+        if (array_key_exists($slug, $this->viewMap)) {
+            return view($this->viewMap[$slug]);
         }
 
-        $view = $this->viewMap[$slug];
-        return view($view);
+        // Surat custom Opsi D → form template dinamis
+        $jenisSurat = \App\Models\JenisSurat::where('slug', $slug)
+            ->where('is_custom', true)
+            ->firstOrFail();
+
+        return view('User.permohonan.form_template', compact('jenisSurat'));
     }
 
     // =========================================================
@@ -65,8 +70,12 @@ class PermohonanUserController extends Controller
     // =========================================================
     public function storeSurat(Request $request, string $slug)
     {
+        // Surat custom Opsi D
         if (!array_key_exists($slug, $this->slugMap)) {
-            abort(404);
+            $jenisSurat = \App\Models\JenisSurat::where('slug', $slug)
+                ->where('is_custom', true)
+                ->firstOrFail();
+            return $this->storeSuratTemplate($request, $jenisSurat);
         }
 
         // Validasi dasar semua surat
@@ -340,5 +349,80 @@ class PermohonanUserController extends Controller
         return redirect()
             ->route('user.permohonan.index')
             ->with('success', 'Permohonan berhasil dihapus.');
+    }
+
+    // =========================================================
+    // SIMPAN SURAT TEMPLATE OPSI D (custom jenis surat)
+    // =========================================================
+    private function storeSuratTemplate(Request $request, \App\Models\JenisSurat $jenisSurat)
+    {
+        $fieldConfig = is_array($jenisSurat->field_config)
+            ? $jenisSurat->field_config
+            : (json_decode($jenisSurat->field_config, true) ?? []);
+
+        $rules = [
+            'nama_pemohon'   => 'required|string|max:255',
+            'nik_pemohon'    => 'required|string|size:16',
+            'tempat_lahir'   => 'required|string|max:100',
+            'tanggal_lahir'  => 'required|date',
+            'jenis_kelamin'  => 'required|in:Laki-Laki,Perempuan',
+            'alamat_pemohon' => 'required|string|max:500',
+            'keperluan'      => 'required|string|max:500',
+            'dokumen_ktp'    => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'dokumen_kk'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ];
+
+        foreach ($fieldConfig as $field) {
+            if (!empty($field['required'])) {
+                $rules['field_' . $field['key']] = 'required';
+            }
+        }
+
+        $request->validate($rules);
+
+        $dataTambahan = [
+            'jenis'         => $jenisSurat->slug,
+            'template'      => $jenisSurat->template,
+            'tempat_lahir'  => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'agama'         => $request->agama,
+            'status_kawin'  => $request->status_kawin,
+            'pekerjaan'     => $request->pekerjaan,
+            'rt'            => $request->rt,
+            'rw'            => $request->rw,
+        ];
+
+        foreach ($fieldConfig as $field) {
+            $dataTambahan[$field['key']] = $request->input('field_' . $field['key']);
+        }
+
+        $permohonan = PermohonanSurat::create([
+            'id_user'           => Auth::id(),
+            'id_jenis_surat'    => $jenisSurat->id_jenis_surat,
+            'nama_pemohon'      => $request->nama_pemohon,
+            'nik_pemohon'       => $request->nik_pemohon,
+            'alamat_pemohon'    => $request->alamat_pemohon,
+            'keperluan'         => $request->keperluan,
+            'data_tambahan'     => $dataTambahan,
+            'tanggal_pengajuan' => now(),
+        ]);
+
+        foreach (['dokumen_ktp' => 'ktp', 'dokumen_kk' => 'kk'] as $inputName => $jenisDok) {
+            if ($request->hasFile($inputName) && $request->file($inputName)->isValid()) {
+                $file = $request->file($inputName);
+                Persyaratan::create([
+                    'id_permohonan' => $permohonan->id_permohonan,
+                    'nama_file'     => $file->getClientOriginalName(),
+                    'jenis_dokumen' => $jenisDok,
+                    'path_file'     => $file->store('persyaratan', 'public'),
+                    'uploaded_at'   => now(),
+                ]);
+            }
+        }
+
+        return redirect()
+            ->route('user.permohonan.index')
+            ->with('success', 'Permohonan berhasil dikirim! Silakan tunggu konfirmasi dari admin kelurahan.');
     }
 }

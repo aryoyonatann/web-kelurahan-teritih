@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
+<link rel="icon" type="image/jpeg" href="{{ asset('images/lambang_kota_serang.jpg') }}">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>
@@ -68,6 +68,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .icon-green  { background:#ecfdf5; color:var(--green); }
 .icon-red    { background:#fef2f2; color:var(--red); }
 .icon-purple { background:#f5f3ff; color:var(--purple); }
+.icon-teal   { background:#f0fdfa; color:#0d9488; }
 
 /* QUICK MENU */
 .quick-card {
@@ -207,6 +208,92 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
     border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600;
     color:white; white-space:nowrap; display:flex; align-items:center; gap:6px;
+    cursor:pointer; transition:background .18s; user-select:none;
+}
+.dash-hero-date:hover { background:rgba(255,255,255,.25); }
+
+/* =====================================================
+   MODAL PERMOHONAN PER BULAN
+===================================================== */
+.month-modal-overlay {
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(15,23,42,.5); backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center;
+    padding:16px; opacity:0; pointer-events:none; transition:opacity .2s;
+}
+.month-modal-overlay.show { opacity:1; pointer-events:all; }
+
+.month-modal {
+    background:white; border-radius:16px; width:100%; max-width:700px;
+    max-height:90vh; display:flex; flex-direction:column;
+    box-shadow:0 24px 64px rgba(0,0,0,.2);
+    transform:translateY(16px) scale(.97); transition:transform .25s;
+}
+.month-modal-overlay.show .month-modal { transform:translateY(0) scale(1); }
+
+.month-modal-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.month-modal-title { font-size:15px; font-weight:800; color:var(--navy); display:flex; align-items:center; gap:8px; }
+.month-modal-title i { color:var(--blue); }
+.month-modal-close {
+    width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+    background:white; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-size:16px; transition:all .18s;
+}
+.month-modal-close:hover { background:#fef2f2; color:var(--red); border-color:#fecaca; }
+
+.month-modal-filter {
+    display:flex; align-items:center; gap:10px; padding:14px 20px;
+    border-bottom:1px solid var(--border); flex-shrink:0; flex-wrap:wrap;
+}
+.month-modal-filter label { font-size:12px; font-weight:600; color:var(--navy); }
+.month-select {
+    padding:7px 12px; border-radius:8px; border:1.5px solid var(--border);
+    font-size:13px; font-family:inherit; color:var(--navy);
+    background:white; outline:none; cursor:pointer; transition:border-color .18s;
+}
+.month-select:focus { border-color:var(--blue); }
+.btn-filter-apply {
+    padding:7px 16px; border-radius:8px; border:none;
+    background:var(--blue); color:white; font-size:13px; font-weight:600;
+    cursor:pointer; transition:background .18s; font-family:inherit;
+    display:flex; align-items:center; gap:6px;
+}
+.btn-filter-apply:hover { background:var(--blue-dk); }
+
+.month-modal-body { overflow-y:auto; flex:1; padding:0; }
+
+.month-summary {
+    display:flex; gap:10px; padding:14px 20px; flex-wrap:wrap;
+    background:#f8fafc; border-bottom:1px solid var(--border);
+}
+.month-sum-item {
+    flex:1; min-width:80px; background:white; border-radius:9px;
+    border:1px solid var(--border); padding:10px 14px; text-align:center;
+}
+.month-sum-val  { font-size:20px; font-weight:800; color:var(--navy); }
+.month-sum-lbl  { font-size:10px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-top:2px; }
+
+.month-tbl { width:100%; border-collapse:collapse; font-size:13px; }
+.month-tbl th {
+    padding:9px 16px; text-align:left; font-size:10px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.05em;
+    color:var(--muted); border-bottom:1px solid var(--border); background:#f8fafc;
+    white-space:nowrap; position:sticky; top:0;
+}
+.month-tbl td { padding:10px 16px; border-bottom:1px solid var(--border); color:var(--slate); vertical-align:middle; }
+.month-tbl tbody tr:last-child td { border-bottom:none; }
+.month-tbl tbody tr:hover td { background:#f8fafc; }
+
+.month-empty {
+    padding:48px 20px; text-align:center; color:var(--muted); font-size:13px;
+}
+.month-empty i { font-size:36px; display:block; margin-bottom:10px; color:#e2e8f0; }
+
+#month-modal-loading {
+    padding:48px 20px; text-align:center; color:var(--muted); font-size:13px;
 }
 </style>
 @endpush
@@ -223,13 +310,15 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <div class="dash-hero-title">Dashboard Admin</div>
             <div class="dash-hero-sub">Kelurahan Teritih — Ringkasan aktivitas hari ini</div>
         </div>
-        <div class="dash-hero-date" style="position:relative;z-index:1">
+        {{-- Tombol tanggal — bisa diklik --}}
+        <div class="dash-hero-date" id="btn-open-month-modal" style="position:relative;z-index:1" title="Klik untuk lihat data permohonan per bulan">
             <i class="bi bi-calendar3"></i>
             {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+            <i class="bi bi-chevron-down" style="font-size:10px;opacity:.7"></i>
         </div>
     </div>
 
-    {{-- STAT CARDS — 2 kolom di mobile, 4 kolom di desktop --}}
+    {{-- STAT CARDS --}}
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">
             <div class="stat-card">
@@ -264,19 +353,23 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                 <div class="stat-icon icon-green"><i class="bi bi-envelope-paper-fill"></i></div>
             </div>
         </div>
+        {{-- ✅ LAPORAN diganti SURAT HARI INI --}}
         <div class="col-6 col-lg-3">
             <div class="stat-card">
                 <div>
-                    <div class="stat-label">Laporan</div>
-                    <div class="stat-value">—</div>
-                    <div class="stat-sub" style="color:var(--muted)"><i class="bi bi-flag"></i> Segera hadir</div>
+                    <div class="stat-label">Surat Hari Ini</div>
+                    <div class="stat-value">{{ number_format($suratHariIni ?? 0) }}</div>
+                    <div class="stat-sub {{ ($suratHariIni ?? 0) > 0 ? 'up' : 'info' }}">
+                        <i class="bi bi-{{ ($suratHariIni ?? 0) > 0 ? 'arrow-up-circle' : 'dash-circle' }}"></i>
+                        <span class="d-none d-sm-inline">{{ ($suratHariIni ?? 0) > 0 ? 'Masuk hari ini' : 'Belum ada' }}</span>
+                    </div>
                 </div>
-                <div class="stat-icon icon-red"><i class="bi bi-megaphone-fill"></i></div>
+                <div class="stat-icon icon-teal"><i class="bi bi-file-earmark-text-fill"></i></div>
             </div>
         </div>
     </div>
 
-    {{-- QUICK MENU — 4 kolom selalu, ikon lebih kecil di mobile --}}
+    {{-- QUICK MENU --}}
     <div class="row g-2 g-md-3 mb-4">
         <div class="col-3">
             <a href="{{ route('kependudukan.index') }}" class="quick-card">
@@ -308,7 +401,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-    {{-- MAIN GRID — full width di mobile, 8+4 di xl --}}
+    {{-- MAIN GRID --}}
     <div class="row g-3">
 
         {{-- KIRI --}}
@@ -478,12 +571,65 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
 </div>{{-- /page-wrapper --}}
 
+{{-- =====================================================
+     MODAL PERMOHONAN PER BULAN
+===================================================== --}}
+<div class="month-modal-overlay" id="monthModalOverlay">
+    <div class="month-modal">
+
+        {{-- Header --}}
+        <div class="month-modal-header">
+            <div class="month-modal-title">
+                <i class="bi bi-calendar3"></i>
+                Data Permohonan per Bulan
+            </div>
+            <button class="month-modal-close" id="btnCloseMonthModal">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        {{-- Filter --}}
+        <div class="month-modal-filter">
+            <label>Bulan:</label>
+            <select class="month-select" id="selectBulan">
+                @php
+                    $bulanList = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                @endphp
+                @foreach($bulanList as $i => $bln)
+                    <option value="{{ $i+1 }}" {{ ($i+1) == now()->month ? 'selected' : '' }}>{{ $bln }}</option>
+                @endforeach
+            </select>
+
+            <label>Tahun:</label>
+            <select class="month-select" id="selectTahun">
+                @for($y = now()->year; $y >= now()->year - 4; $y--)
+                    <option value="{{ $y }}" {{ $y == now()->year ? 'selected' : '' }}>{{ $y }}</option>
+                @endfor
+            </select>
+
+            <button class="btn-filter-apply" id="btnApplyFilter">
+                <i class="bi bi-search"></i> Tampilkan
+            </button>
+        </div>
+
+        {{-- Body --}}
+        <div class="month-modal-body" id="monthModalBody">
+            <div id="month-modal-loading" style="padding:48px 20px;text-align:center;color:#94a3b8;font-size:13px;">
+                <i class="bi bi-calendar3" style="font-size:36px;display:block;margin-bottom:10px;color:#e2e8f0"></i>
+                Pilih bulan dan tahun lalu klik Tampilkan
+            </div>
+        </div>
+
+    </div>
+</div>
+
 @include('admin.partials.footer')
 
 @endsection
 
 @push('scripts')
 <script>
+// ── Status Kantor ────────────────────────────────────────
 function updateStatusKantor() {
     const now  = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Jakarta'}));
     const day  = now.getDay();
@@ -517,6 +663,7 @@ function updateStatusKantor() {
 updateStatusKantor();
 setInterval(updateStatusKantor, 60000);
 
+// ── Notifikasi ───────────────────────────────────────────
 (function() {
     const API   = '{{ route("admin.notifikasi") }}';
     const panel = document.getElementById('dash-notif-list');
@@ -556,6 +703,134 @@ setInterval(updateStatusKantor, 60000);
 
     loadNotif();
     setInterval(loadNotif,30000);
+})();
+
+// ── Modal Permohonan per Bulan ───────────────────────────
+(function() {
+    const overlay  = document.getElementById('monthModalOverlay');
+    const btnOpen  = document.getElementById('btn-open-month-modal');
+    const btnClose = document.getElementById('btnCloseMonthModal');
+    const btnApply = document.getElementById('btnApplyFilter');
+    const body     = document.getElementById('monthModalBody');
+    const selBulan = document.getElementById('selectBulan');
+    const selTahun = document.getElementById('selectTahun');
+
+    const BULAN_NAMES = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    function openModal() {
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    btnOpen.addEventListener('click', openModal);
+    btnClose.addEventListener('click', closeModal);
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    function escHtml(s) {
+        return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    function statusBadge(status) {
+        if (status === 'disetujui') return '<span class="bdg bdg-approved">Disetujui</span>';
+        if (status === 'ditolak')  return '<span class="bdg bdg-rejected">Ditolak</span>';
+        return '<span class="bdg bdg-pending">Pending</span>';
+    }
+
+    function loadData() {
+        const bulan = selBulan.value;
+        const tahun = selTahun.value;
+
+        body.innerHTML = `<div style="padding:48px 20px;text-align:center;color:#94a3b8;font-size:13px">
+            <i class="bi bi-arrow-clockwise" style="font-size:32px;display:block;margin-bottom:10px;color:#e2e8f0;animation:spin 1s linear infinite"></i>
+            Memuat data...
+        </div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+
+        fetch(`{{ url('admin/dashboard/permohonan-bulan') }}?bulan=${bulan}&tahun=${tahun}`, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            const items  = data.data || [];
+            const total  = data.total || 0;
+            const setuju = data.disetujui || 0;
+            const tolak  = data.ditolak || 0;
+            const pend   = data.pending || 0;
+
+            let html = `
+            <div class="month-summary">
+                <div class="month-sum-item">
+                    <div class="month-sum-val">${total}</div>
+                    <div class="month-sum-lbl">Total</div>
+                </div>
+                <div class="month-sum-item" style="border-color:#bbf7d0">
+                    <div class="month-sum-val" style="color:var(--green)">${setuju}</div>
+                    <div class="month-sum-lbl">Disetujui</div>
+                </div>
+                <div class="month-sum-item" style="border-color:#fecaca">
+                    <div class="month-sum-val" style="color:var(--red)">${tolak}</div>
+                    <div class="month-sum-lbl">Ditolak</div>
+                </div>
+                <div class="month-sum-item" style="border-color:#bfdbfe">
+                    <div class="month-sum-val" style="color:var(--blue)">${pend}</div>
+                    <div class="month-sum-lbl">Pending</div>
+                </div>
+            </div>`;
+
+            if (!items.length) {
+                html += `<div class="month-empty">
+                    <i class="bi bi-inbox"></i>
+                    Tidak ada permohonan di ${BULAN_NAMES[bulan]} ${tahun}
+                </div>`;
+            } else {
+                html += `<div class="table-responsive">
+                <table class="month-tbl">
+                    <thead>
+                        <tr>
+                            <th>NO</th>
+                            <th>NAMA PEMOHON</th>
+                            <th>JENIS SURAT</th>
+                            <th>TANGGAL</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.map((p, i) => `
+                        <tr>
+                            <td style="color:var(--muted);font-size:12px">${i+1}</td>
+                            <td>
+                                <div style="font-weight:600;color:var(--navy);font-size:13px">${escHtml(p.nama_pemohon || '-')}</div>
+                                <div style="font-size:11px;color:var(--muted)">NIK: ${escHtml(p.nik_pemohon || '-')}</div>
+                            </td>
+                            <td style="font-size:12px">${escHtml(p.jenis_surat || '-')}</td>
+                            <td style="font-size:12px;color:var(--muted)">${escHtml(p.tanggal)}</td>
+                            <td>${statusBadge(p.status)}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table></div>`;
+            }
+
+            body.innerHTML = html;
+        })
+        .catch(() => {
+            body.innerHTML = `<div class="month-empty">
+                <i class="bi bi-wifi-off"></i>
+                Gagal memuat data. Coba lagi.
+            </div>`;
+        });
+    }
+
+    btnApply.addEventListener('click', loadData);
 })();
 </script>
 @endpush

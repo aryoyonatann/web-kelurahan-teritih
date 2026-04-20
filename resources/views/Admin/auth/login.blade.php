@@ -40,7 +40,7 @@
     }
 
     /* =====================================================
-       NAVBAR — Admin Portal style
+       NAVBAR
     ===================================================== */
     .admin-nav {
         background: white;
@@ -62,7 +62,6 @@
         text-decoration: none;
     }
 
-    /* ✅ Logo gambar seperti navbar.blade.php */
     .admin-nav-icon {
         width: 40px; height: 40px;
         border-radius: 8px;
@@ -79,25 +78,19 @@
     .admin-nav-sub  { font-size: 9px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
     .admin-nav-name { font-size: 16px; font-weight: 800; color: var(--navy); }
 
-    .admin-nav-links {
-        display: flex; align-items: center; gap: 4px;
-        list-style: none; margin: 0; padding: 0;
-    }
-    .admin-nav-links a {
-        display: block; padding: 6px 16px; border-radius: 8px;
-        font-size: 13.5px; font-weight: 500;
-        color: var(--slate); text-decoration: none; transition: all .18s;
-    }
-    .admin-nav-links a:hover { background: var(--bg); color: var(--navy); }
-
-    .admin-nav-badge {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 6px 14px; border-radius: 8px;
-        font-size: 12px; font-weight: 600;
+    .btn-back-home {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 8px 16px; border-radius: 8px;
+        font-size: 13px; font-weight: 600;
         border: 1.5px solid var(--border);
-        background: white; color: var(--muted);
+        background: white; color: var(--slate);
+        text-decoration: none; transition: all .18s;
     }
-    .admin-nav-badge i { color: var(--green); font-size: 12px; }
+    .btn-back-home:hover {
+        border-color: var(--navy);
+        color: var(--navy);
+        background: var(--bg);
+    }
 
     /* =====================================================
        PAGE BODY
@@ -256,7 +249,7 @@
     }
 
     /* =====================================================
-       FOOTER — Admin style
+       FOOTER
     ===================================================== */
     .main-footer { background: #0f172a; flex-shrink: 0; padding: 48px 32px 0; }
 
@@ -307,12 +300,11 @@
        RESPONSIVE
     ===================================================== */
     @media (max-width: 767px) {
-        .left-panel       { display: none; }
-        .right-panel      { padding: 32px 24px; }
-        .admin-nav-links  { display: none; }
-        .admin-nav        { padding: 0 16px; }
-        .page-body        { padding: 20px 12px; }
-        .main-footer      { padding: 36px 16px 0; }
+        .left-panel  { display: none; }
+        .right-panel { padding: 32px 24px; }
+        .admin-nav   { padding: 0 16px; }
+        .page-body   { padding: 20px 12px; }
+        .main-footer { padding: 36px 16px 0; }
     }
     </style>
 </head>
@@ -321,7 +313,6 @@
 {{-- NAVBAR --}}
 <nav class="admin-nav">
     <a href="{{ route('home') }}" class="admin-nav-brand">
-        {{-- ✅ Logo Kota Serang (sama seperti navbar.blade.php) --}}
         <div class="admin-nav-icon">
             <img src="{{ asset('images/lambang_kota_serang.jpg') }}" alt="Logo Kota Serang">
         </div>
@@ -331,15 +322,10 @@
         </div>
     </a>
 
-    <ul class="admin-nav-links">
-        <li><a href="{{ route('home') }}">Beranda Utama</a></li>
-        <li><a href="#">Pusat Bantuan</a></li>
-    </ul>
-
-    <div class="admin-nav-badge">
-        <i class="bi bi-shield-fill-check"></i>
-        v2.4.0 (Secure Mode)
-    </div>
+    {{-- Hanya tombol kembali ke beranda --}}
+    <a href="{{ route('home') }}" class="btn-back-home">
+        <i class="bi bi-arrow-left"></i> Kembali ke Beranda
+    </a>
 </nav>
 
 {{-- PAGE BODY --}}

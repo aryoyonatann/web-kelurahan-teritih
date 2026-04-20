@@ -11,13 +11,14 @@ use App\Http\Controllers\User\PermohonanUserController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\ProfilController; // ← tambah ini
 use Illuminate\Support\Facades\Route;
 
 // =========================================================
 // PUBLIC ROUTES — tidak perlu login
 // =========================================================
 Route::get('/',                 [PublicController::class, 'home'])        ->name('home');
-Route::get('/profil',           fn () => view('profil'))                  ->name('profil');
+Route::get('/profil',           [ProfilController::class, 'index'])       ->name('profil'); // ← diubah
 Route::get('/layanan',          fn () => view('layanan'))                 ->name('layanan');
 Route::get('/informasi',        [PublicController::class, 'informasi'])   ->name('informasi');
 Route::get('/informasi/berita', [PublicController::class, 'berita'])      ->name('informasi.berita');
@@ -42,8 +43,9 @@ Route::prefix('admin')->group(function () {
         Route::put('statistik-demografi',  [StatistikController::class, 'update'])->name('admin.statistik.update');
 
         // Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        Route::post('/logout',   [AdminLoginController::class, 'logout'])->name('admin.logout');
+        Route::get('/dashboard',                    [DashboardController::class, 'index'])           ->name('admin.dashboard');
+        Route::get('/dashboard/permohonan-bulan',   [DashboardController::class, 'permohonanBulan']) ->name('admin.dashboard.permohonan-bulan');
+        Route::post('/logout',                      [AdminLoginController::class, 'logout'])          ->name('admin.logout');
 
         Route::resource('jenis-surat', JenisSuratController::class);
 
@@ -60,6 +62,7 @@ Route::prefix('admin')->group(function () {
         // Kependudukan
         Route::get(   'kependudukan',               [KependudukanController::class, 'index'])       ->name('kependudukan.index');
         Route::post(  'kependudukan',               [KependudukanController::class, 'store'])       ->name('kependudukan.store');
+        Route::get(   'kependudukan-export',        [KependudukanController::class, 'export'])      ->name('kependudukan.export'); // ← tambah
         Route::get(   'kependudukan/{id}',          [KependudukanController::class, 'show'])        ->name('kependudukan.show');
         Route::patch( 'kependudukan/{id}/toggle',   [KependudukanController::class, 'toggleStatus'])->name('kependudukan.toggle');
         Route::delete('kependudukan/{id}',          [KependudukanController::class, 'destroy'])     ->name('kependudukan.destroy');
@@ -77,9 +80,10 @@ Route::middleware('auth')->group(function () {
         Route::get( 'permohonan/form/{slug}', [PermohonanUserController::class, 'form'])       ->name('permohonan.form');
         Route::post('permohonan/form/{slug}', [PermohonanUserController::class, 'storeSurat']) ->name('permohonan.store.surat');
 
-        Route::get(   'permohonan',      [PermohonanUserController::class, 'index'])   ->name('permohonan.index');
-        Route::get(   'permohonan/{id}', [PermohonanUserController::class, 'show'])    ->name('permohonan.show');
-        Route::delete('permohonan/{id}', [PermohonanUserController::class, 'destroy']) ->name('permohonan.destroy');
+        Route::get(   'permohonan',        [PermohonanUserController::class, 'index'])   ->name('permohonan.index');
+        Route::get(   'permohonan/create', [PermohonanUserController::class, 'create'])  ->name('permohonan.create');
+        Route::get(   'permohonan/{id}',   [PermohonanUserController::class, 'show'])    ->name('permohonan.show');
+        Route::delete('permohonan/{id}',   [PermohonanUserController::class, 'destroy']) ->name('permohonan.destroy');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])  ->name('profile.edit');

@@ -482,26 +482,59 @@
             </div>
             @endif
 
-            {{-- KEPERLUAN UMUM (jika tidak ada jenis / permohonan lama) --}}
+            {{-- TEMPLATE OPSI D: tampilkan field dinamis dari field_config --}}
             @if(!in_array($jenis, ['sktm','kematian','suami-istri','beda-nama','izin-cuti']))
+            @php
+                $fieldConfig  = is_array($data->jenisSurat->field_config)
+                    ? $data->jenisSurat->field_config
+                    : (json_decode($data->jenisSurat->field_config ?? '[]', true) ?? []);
+                $templateType = $data->jenisSurat->template ?? 'A';
+                $templateLabel = [
+                    'A' => 'Surat Keterangan Biasa',
+                    'B' => 'Surat Keterangan dengan Data Khusus',
+                    'C' => 'Surat Keterangan Dua Pihak',
+                ][$templateType] ?? 'Surat Keterangan';
+            @endphp
             <div class="section-card">
                 <div class="section-head">
                     <div class="section-head-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
                     <h3>Detail Permohonan</h3>
+                    <span style="margin-left:auto;font-size:11px;font-weight:700;background:#eff6ff;color:#1c64f2;border:1px solid #bfdbfe;border-radius:20px;padding:3px 10px">
+                        Template {{ $templateType }}: {{ $templateLabel }}
+                    </span>
                 </div>
                 <div class="fg">
                     <div class="fi c2">
-                        <div class="fl">Jenis Surat</div>
-                        <div class="fv">{{ $data->jenisSurat->nama_surat ?? '-' }}</div>
+                        <div class="fl">Keperluan / Tujuan Surat</div>
+                        <div class="fv">{{ $data->keperluan ?? '-' }}</div>
                     </div>
                     <div class="fi c2">
                         <div class="fl">Tanggal Pengajuan</div>
                         <div class="fv mono">{{ \Carbon\Carbon::parse($data->tanggal_pengajuan)->isoFormat('D MMMM Y') }}</div>
                     </div>
-                    <div class="fi c4">
-                        <div class="fl">Keperluan / Tujuan Surat</div>
-                        <div class="fv">{{ $data->keperluan ?? '-' }}</div>
-                    </div>
+
+                    {{-- Field dinamis dari field_config --}}
+                    @if(!empty($fieldConfig))
+                        @foreach($fieldConfig as $field)
+                        <div class="fi c2">
+                            <div class="fl">{{ $field['label'] }}</div>
+                            <div class="fv">
+                                @php
+                                    $val = $dt[$field['key']] ?? null;
+                                    // Format tanggal jika tipe date
+                                    if ($field['type'] === 'date' && $val) {
+                                        $val = \Carbon\Carbon::parse($val)->isoFormat('D MMMM Y');
+                                    }
+                                @endphp
+                                {{ $val ?? '-' }}
+                            </div>
+                        </div>
+                        @endforeach
+                    @else
+                        <div class="fi c4" style="color:#94a3b8;font-size:13px;font-style:italic">
+                            Tidak ada field tambahan yang dikonfigurasi untuk jenis surat ini.
+                        </div>
+                    @endif
                 </div>
             </div>
             @endif

@@ -102,33 +102,39 @@
             <div class="layanan-main-card">
                 <div class="layanan-card-header">
                     <div class="layanan-card-title"><i class="bi bi-list-ul"></i> Pilih Jenis Surat</div>
-                    <span class="count-badge">5 Layanan Tersedia</span>
+                    <span class="count-badge">{{ \App\Models\JenisSurat::count() }} Layanan Tersedia</span>
                 </div>
 
                 <div class="surat-grid">
 
                     @php
-                    $suratList = [
-                        ['slug'=>'sktm',       'nama'=>'Surat Keterangan Tidak Mampu',  'icon'=>'bi-currency-dollar',       'bg'=>'#fdf4ff','color'=>'#a855f7','desc'=>'Keterangan ekonomi lemah untuk keperluan berobat, sekolah, beasiswa, atau bantuan sosial.'],
-                        ['slug'=>'kematian',   'nama'=>'Surat Keterangan Kematian',     'icon'=>'bi-file-earmark-medical-fill','bg'=>'#f0fdf4','color'=>'#059669','desc'=>'Dokumen pelaporan kematian warga untuk administrasi Kartu Keluarga dan keperluan lainnya.'],
-                        ['slug'=>'suami-istri','nama'=>'Surat Keterangan Suami/Istri',  'icon'=>'bi-people-fill',            'bg'=>'#fff1f2','color'=>'#f43f5e','desc'=>'Surat keterangan status pasangan suami istri yang telah menikah untuk berbagai keperluan.'],
-                        ['slug'=>'beda-nama',  'nama'=>'Surat Keterangan Beda Nama',   'icon'=>'bi-person-badge-fill',       'bg'=>'#fffbeb','color'=>'#f59e0b','desc'=>'Surat keterangan perbedaan nama pada dokumen yang berbeda namun satu orang yang sama.'],
-                        ['slug'=>'izin-cuti',  'nama'=>'Surat Keterangan Izin Cuti',   'icon'=>'bi-calendar-check-fill',    'bg'=>'#eff6ff','color'=>'#1c64f2','desc'=>'Surat keterangan untuk keperluan pengajuan izin dari tempat kerja atau instansi.'],
+                    $suratConfig = [
+                        'sktm'        => ['icon'=>'bi-currency-dollar',         'bg'=>'#fdf4ff','color'=>'#a855f7'],
+                        'kematian'    => ['icon'=>'bi-file-earmark-medical-fill','bg'=>'#f0fdf4','color'=>'#059669'],
+                        'suami-istri' => ['icon'=>'bi-people-fill',             'bg'=>'#fff1f2','color'=>'#f43f5e'],
+                        'beda-nama'   => ['icon'=>'bi-person-badge-fill',       'bg'=>'#fffbeb','color'=>'#f59e0b'],
+                        'izin-cuti'   => ['icon'=>'bi-calendar-check-fill',    'bg'=>'#eff6ff','color'=>'#1c64f2'],
                     ];
+                    $semuaSurat = \App\Models\JenisSurat::orderBy('is_custom')->orderBy('id_jenis_surat')->get();
                     @endphp
 
-                    @foreach($suratList as $surat)
-                    @auth
-                    <a href="{{ route('user.permohonan.form', $surat['slug']) }}" class="surat-card">
-                    @else
-                    <a href="{{ route('login') }}" class="surat-card">
-                    @endauth
-                        <div class="surat-icon" style="background:{{ $surat['bg'] }};color:{{ $surat['color'] }}">
-                            <i class="bi {{ $surat['icon'] }}"></i>
+                    @foreach($semuaSurat as $surat)
+                    @php
+                        $cfg   = $suratConfig[$surat->slug] ?? ['icon'=>'bi-file-earmark-text','bg'=>'#f1f5f9','color'=>'#64748b'];
+                        $route = auth()->check() ? route('user.permohonan.form', $surat->slug) : route('login');
+                    @endphp
+                    <a href="{{ $route }}" class="surat-card">
+                        <div class="surat-icon" style="background:{{ $cfg['bg'] }};color:{{ $cfg['color'] }}">
+                            <i class="bi {{ $cfg['icon'] }}"></i>
                         </div>
                         <div style="flex:1">
-                            <div class="surat-name">{{ $surat['nama'] }}</div>
-                            <div class="surat-desc">{{ $surat['desc'] }}</div>
+                            @if($surat->is_custom)
+                            <div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;margin-bottom:5px">
+                                <i class="bi bi-plus-circle-fill" style="font-size:9px"></i> Baru
+                            </div>
+                            @endif
+                            <div class="surat-name">{{ $surat->nama_surat }}</div>
+                            <div class="surat-desc">{{ $surat->deskripsi ?? 'Surat keterangan resmi dari Kelurahan Teritih.' }}</div>
                             <div class="surat-cta">Ajukan Sekarang <i class="bi bi-arrow-right"></i></div>
                         </div>
                     </a>

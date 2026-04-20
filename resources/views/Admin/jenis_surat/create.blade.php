@@ -8,196 +8,311 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; }
-
     .form-page { padding: 0; min-height: 100vh; }
 
-    /* ── BACK BAR ── */
-    .back-bar {
-        display: flex; align-items: center; gap: 8px;
-        padding: 14px 32px; background: white;
-        border-bottom: 1px solid #e2e8f0;
-        font-size: 13px;
-    }
-    .back-btn {
-        display: inline-flex; align-items: center; gap: 6px;
-        color: #64748b; text-decoration: none; font-weight: 600;
-        padding: 5px 10px; border-radius: 7px;
-        transition: all .15s;
-    }
-    .back-btn:hover { background: #f1f5f9; color: #1c64f2; }
-    .bc-sep { color: #cbd5e1; }
-    .bc-cur { color: #0f172a; font-weight: 600; }
+    .back-bar { display:flex;align-items:center;gap:8px;padding:14px 32px;background:white;border-bottom:1px solid #e2e8f0;font-size:13px; }
+    .back-btn { display:inline-flex;align-items:center;gap:6px;color:#64748b;text-decoration:none;font-weight:600;padding:5px 10px;border-radius:7px;transition:all .15s; }
+    .back-btn:hover { background:#f1f5f9;color:#1c64f2; }
+    .bc-sep { color:#cbd5e1; }
+    .bc-cur { color:#0f172a;font-weight:600; }
 
-    /* ── HERO ── */
-    .form-hero {
-        background: linear-gradient(135deg, #1e40af 0%, #1c64f2 50%, #2563eb 100%);
-        padding: 28px 32px;
-        position: relative; overflow: hidden;
-    }
-    .form-hero::before {
-        content: '';
-        position: absolute; inset: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
-    .form-hero-inner { position: relative; z-index: 1; }
-    .form-hero h1 { font-size: 22px; font-weight: 800; color: white; margin: 0 0 4px; }
-    .form-hero p  { font-size: 13px; color: rgba(255,255,255,.75); margin: 0; }
+    .form-hero { background:linear-gradient(135deg,#1e40af,#1c64f2);padding:28px 32px;position:relative;overflow:hidden; }
+    .form-hero h1 { font-size:22px;font-weight:800;color:white;margin:0 0 4px; }
+    .form-hero p  { font-size:13px;color:rgba(255,255,255,.75);margin:0; }
 
-    /* ── FORM WRAPPER ── */
-    .form-wrapper { padding: 28px 32px; max-width: 720px; }
+    /* ── REVISI: full width, tidak dibatasi 800px ── */
+    .form-wrapper { padding: 28px 32px; }
 
-    /* ── FORM CARD ── */
-    .form-card {
-        background: white; border-radius: 14px;
-        border: 1px solid #e2e8f0;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0,0,0,.06);
-    }
-    .form-card-header {
-        padding: 16px 24px; border-bottom: 1px solid #e2e8f0;
-        background: #f8fafc;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .form-card-icon {
-        width: 36px; height: 36px; border-radius: 9px;
-        background: #eff6ff; color: #1c64f2;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 17px;
-    }
-    .form-card-title { font-size: 14px; font-weight: 700; color: #0f172a; }
-    .form-card-body  { padding: 24px; }
+    .form-card { background:white;border-radius:14px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:20px; }
+    .form-card-header { padding:16px 24px;border-bottom:1px solid #e2e8f0;background:#f8fafc;display:flex;align-items:center;gap:10px; }
+    .form-card-icon { width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px; }
+    .form-card-title { font-size:14px;font-weight:700;color:#0f172a; }
+    .form-card-body { padding:24px; }
 
-    /* ── FORM FIELDS ── */
-    .field-group { margin-bottom: 20px; }
-    .field-group:last-of-type { margin-bottom: 0; }
+    .field-group { margin-bottom:20px; }
+    .field-label { display:block;font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px; }
+    .field-label span { color:#dc2626;margin-left:2px; }
+    .field-input { width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;font-family:inherit;color:#0f172a;background:white;transition:all .2s;outline:none; }
+    .field-input:focus { border-color:#1c64f2;box-shadow:0 0 0 3px rgba(28,100,242,.1); }
+    .field-input::placeholder { color:#94a3b8; }
+    textarea.field-input { resize:vertical;min-height:90px; }
+    .field-error { font-size:12px;color:#dc2626;margin-top:5px;display:flex;align-items:center;gap:4px; }
+    .field-input.is-error { border-color:#dc2626; }
+    .field-hint { font-size:11px;color:#94a3b8;margin-top:5px; }
 
-    .field-label {
-        display: block; font-size: 12px; font-weight: 700;
-        color: #374151; text-transform: uppercase; letter-spacing: .05em;
-        margin-bottom: 8px;
-    }
-    .field-label span { color: #dc2626; margin-left: 2px; }
+    /* Template cards */
+    .template-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:4px; }
+    .template-card { border:2px solid #e2e8f0;border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;position:relative; }
+    .template-card:hover { border-color:#93c5fd; }
+    .template-card input[type=radio] { position:absolute;opacity:0;width:0;height:0; }
+    .template-card.selected { border-color:#1c64f2;background:#eff6ff; }
+    .template-card.selected .tc-icon { background:#1c64f2;color:white; }
+    .tc-icon { width:40px;height:40px;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;transition:all .2s; }
+    .tc-name { font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px; }
+    .tc-desc { font-size:11px;color:#64748b;line-height:1.5; }
+    .tc-check { position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:#1c64f2;color:white;display:none;align-items:center;justify-content:center;font-size:11px; }
+    .template-card.selected .tc-check { display:flex; }
 
-    .field-input {
-        width: 100%; padding: 11px 14px;
-        border: 1.5px solid #e2e8f0; border-radius: 9px;
-        font-size: 13px; font-family: inherit; color: #0f172a;
-        background: white; transition: all .2s;
-        outline: none;
-    }
-    .field-input:focus { border-color: #1c64f2; box-shadow: 0 0 0 3px rgba(28,100,242,.1); }
-    .field-input::placeholder { color: #94a3b8; }
+    /* Field builder */
+    .field-builder { display:none; }
+    .field-builder.show { display:block; }
 
-    textarea.field-input { resize: vertical; min-height: 110px; }
+    /* ── REVISI: preset grid lebih lebar karena full width ── */
+    .preset-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px; }
+    .preset-item { display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:9px;cursor:pointer;transition:all .15s; }
+    .preset-item:hover { border-color:#93c5fd;background:#f8fafc; }
+    .preset-item input[type=checkbox] { width:16px;height:16px;accent-color:#1c64f2;cursor:pointer;flex-shrink:0; }
+    .preset-item-info { flex:1; }
+    .preset-item-label { font-size:13px;font-weight:600;color:#0f172a;line-height:1.2; }
+    .preset-item-type { font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-top:2px; }
+    .preset-item.checked { border-color:#1c64f2;background:#eff6ff; }
+    .req-toggle { font-size:11px;color:#64748b;white-space:nowrap; }
+    .req-toggle input { accent-color:#ef4444; }
 
-    .field-hint { font-size: 11px; color: #94a3b8; margin-top: 5px; }
+    /* Custom field rows */
+    .custom-fields { margin-top:16px; }
+    .custom-field-row { display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0; }
+    .custom-field-row .cf-label { flex:1; }
+    .custom-field-row .cf-type  { width:130px;flex-shrink:0; }
+    .custom-field-row .cf-req   { flex-shrink:0;padding-top:8px;font-size:12px;color:#64748b;display:flex;align-items:center;gap:4px; }
+    .custom-field-row .cf-del   { flex-shrink:0;padding-top:6px; }
+    .btn-del { background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:7px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .15s; }
+    .btn-del:hover { background:#fee2e2; }
 
-    /* ── ERROR ── */
-    .field-error { font-size: 12px; color: #dc2626; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
-    .field-input.is-error { border-color: #dc2626; }
+    .btn-add-field { display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:1.5px dashed #93c5fd;background:#f0f9ff;color:#0284c7;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit; }
+    .btn-add-field:hover { border-color:#1c64f2;background:#eff6ff;color:#1c64f2; }
 
-    /* ── FORM FOOTER ── */
-    .form-footer {
-        padding: 16px 24px; background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
-        display: flex; align-items: center; justify-content: flex-end; gap: 10px;
-    }
-    .btn-batal {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 9px 18px; border-radius: 9px;
-        border: 1.5px solid #e2e8f0; background: white;
-        font-size: 13px; font-weight: 600; color: #64748b;
-        text-decoration: none; cursor: pointer; transition: all .15s;
-    }
-    .btn-batal:hover { background: #f8fafc; border-color: #cbd5e1; color: #334155; }
-    .btn-simpan {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 9px 22px; border-radius: 9px;
-        border: none; background: #1c64f2;
-        font-size: 13px; font-weight: 700; color: white;
-        cursor: pointer; transition: all .15s;
-    }
-    .btn-simpan:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(28,100,242,.3); }
+    .form-footer { padding:16px 24px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:flex-end;gap:10px; }
+    .btn-batal { display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;border:1.5px solid #e2e8f0;background:white;font-size:13px;font-weight:600;color:#64748b;text-decoration:none;cursor:pointer;transition:all .15s; }
+    .btn-batal:hover { background:#f8fafc;color:#334155; }
+    .btn-simpan { display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:9px;border:none;background:#1c64f2;font-size:13px;font-weight:700;color:white;cursor:pointer;transition:all .15s;font-family:inherit; }
+    .btn-simpan:hover { background:#1d4ed8;transform:translateY(-1px); }
+
+    .info-box { background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;font-size:12px;color:#1e40af;display:flex;gap:8px;margin-bottom:16px; }
+
+    /* ── 2 kolom untuk nama + deskripsi ── */
+    .info-grid { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
 </style>
 @endpush
 
 @section('content')
-
 @include('admin.partials.header')
 
 <div class="form-page">
-
-    {{-- BACK BAR --}}
     <div class="back-bar">
-        <a href="{{ route('jenis-surat.index') }}" class="back-btn">
-            <i class="bi bi-arrow-left"></i> Kembali
-        </a>
+        <a href="{{ route('jenis-surat.index') }}" class="back-btn"><i class="bi bi-arrow-left"></i> Kembali</a>
         <span class="bc-sep">/</span>
         <a href="{{ route('jenis-surat.index') }}" style="color:#64748b;text-decoration:none;font-size:13px">Jenis Surat</a>
         <span class="bc-sep">/</span>
         <span class="bc-cur">Tambah Baru</span>
     </div>
 
-    {{-- HERO --}}
     <div class="form-hero">
-        <div class="form-hero-inner">
-            <h1><i class="bi bi-plus-circle me-2"></i>Tambah Jenis Surat</h1>
-            <p>Isi form berikut untuk menambahkan jenis surat baru ke sistem</p>
-        </div>
+        <h1><i class="bi bi-plus-circle me-2"></i>Tambah Jenis Surat</h1>
+        <p>Pilih template form yang sesuai, lalu tentukan field yang dibutuhkan</p>
     </div>
 
-    {{-- FORM --}}
     <div class="form-wrapper">
-        <div class="form-card">
-            <div class="form-card-header">
-                <div class="form-card-icon"><i class="bi bi-file-earmark-plus"></i></div>
-                <div class="form-card-title">Informasi Jenis Surat</div>
+        <form action="{{ route('jenis-surat.store') }}" method="POST" id="formJenis">
+            @csrf
+
+            {{-- INFO SURAT --}}
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-card-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-file-earmark-plus"></i></div>
+                    <div class="form-card-title">Informasi Jenis Surat</div>
+                </div>
+                <div class="form-card-body">
+                    {{-- 2 kolom: nama kiri, deskripsi kanan --}}
+                    <div class="info-grid">
+                        <div class="field-group" style="margin-bottom:0">
+                            <label class="field-label">Nama Surat <span>*</span></label>
+                            <input type="text" name="nama_surat"
+                                class="field-input {{ $errors->has('nama_surat') ? 'is-error' : '' }}"
+                                value="{{ old('nama_surat') }}"
+                                placeholder="Contoh: Surat Keterangan Domisili">
+                            @error('nama_surat')<div class="field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
+                        </div>
+                        <div class="field-group" style="margin-bottom:0">
+                            <label class="field-label">Deskripsi <span style="color:#94a3b8;font-weight:400">(Opsional)</span></label>
+                            <textarea name="deskripsi" class="field-input" rows="1"
+                                style="min-height:46px;resize:none"
+                                placeholder="Keterangan singkat tentang kegunaan surat ini...">{{ old('deskripsi') }}</textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <form action="{{ route('jenis-surat.store') }}" method="POST">
-                @csrf
-                <div class="form-card-body">
-
-                    <div class="field-group">
-                        <label class="field-label">Nama Surat <span>*</span></label>
-                        <input type="text" name="nama_surat"
-                            class="field-input {{ $errors->has('nama_surat') ? 'is-error' : '' }}"
-                            placeholder="Contoh: Surat Keterangan Domisili"
-                            value="{{ old('nama_surat') }}"
-                            required>
-                        @error('nama_surat')
-                            <div class="field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>
-                        @enderror
-                        <div class="field-hint">Masukkan nama surat secara lengkap dan jelas.</div>
-                    </div>
-
-                    <div class="field-group">
-                        <label class="field-label">Deskripsi</label>
-                        <textarea name="deskripsi"
-                            class="field-input {{ $errors->has('deskripsi') ? 'is-error' : '' }}"
-                            placeholder="Keterangan singkat tentang kegunaan surat ini...">{{ old('deskripsi') }}</textarea>
-                        @error('deskripsi')
-                            <div class="field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>
-                        @enderror
-                        <div class="field-hint">Opsional. Berikan keterangan singkat agar mudah dipahami warga.</div>
-                    </div>
-
+            {{-- PILIH TEMPLATE --}}
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-card-icon" style="background:#f0fdf4;color:#059669"><i class="bi bi-layout-text-window"></i></div>
+                    <div class="form-card-title">Pilih Template Form</div>
                 </div>
+                <div class="form-card-body">
+                    @error('template')<div class="field-error" style="margin-bottom:12px"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
 
-                <div class="form-footer">
-                    <a href="{{ route('jenis-surat.index') }}" class="btn-batal">
-                        <i class="bi bi-x-lg"></i> Batal
-                    </a>
-                    <button type="submit" class="btn-simpan">
-                        <i class="bi bi-check-lg"></i> Simpan
+                    <div class="template-grid">
+
+                        {{-- Template A --}}
+                        <label class="template-card {{ old('template') === 'A' ? 'selected' : '' }}" onclick="selectTemplate('A')">
+                            <input type="radio" name="template" value="A" {{ old('template') === 'A' ? 'checked' : '' }}>
+                            <div class="tc-check"><i class="bi bi-check"></i></div>
+                            <div class="tc-icon">📄</div>
+                            <div class="tc-name">Surat Keterangan Biasa</div>
+                            <div class="tc-desc">Form biodata standar + keperluan surat. Cocok untuk surat keterangan sederhana.</div>
+                        </label>
+
+                        {{-- Template B --}}
+                        <label class="template-card {{ old('template') === 'B' ? 'selected' : '' }}" onclick="selectTemplate('B')">
+                            <input type="radio" name="template" value="B" {{ old('template') === 'B' ? 'checked' : '' }}>
+                            <div class="tc-check"><i class="bi bi-check"></i></div>
+                            <div class="tc-icon">📋</div>
+                            <div class="tc-name">Surat Keterangan dengan Data Khusus</div>
+                            <div class="tc-desc">Biodata + field tambahan yang bisa dikustomisasi sesuai kebutuhan surat.</div>
+                        </label>
+
+                        {{-- Template C --}}
+                        <label class="template-card {{ old('template') === 'C' ? 'selected' : '' }}" onclick="selectTemplate('C')">
+                            <input type="radio" name="template" value="C" {{ old('template') === 'C' ? 'checked' : '' }}>
+                            <div class="tc-check"><i class="bi bi-check"></i></div>
+                            <div class="tc-icon">👥</div>
+                            <div class="tc-name">Surat Keterangan Dua Pihak</div>
+                            <div class="tc-desc">Biodata pemohon + biodata pihak kedua. Cocok untuk surat yang melibatkan dua orang.</div>
+                        </label>
+
+                    </div>
+                    <div class="field-hint">Template menentukan tampilan form pengajuan yang dilihat warga.</div>
+                </div>
+            </div>
+
+            {{-- FIELD BUILDER (Template B & C) --}}
+            <div class="form-card field-builder" id="fieldBuilder">
+                <div class="form-card-header">
+                    <div class="form-card-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-ui-checks"></i></div>
+                    <div class="form-card-title">Konfigurasi Field Tambahan</div>
+                </div>
+                <div class="form-card-body">
+                    <div class="info-box">
+                        <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
+                        <div>Centang field yang ingin ditampilkan di form pengajuan warga. Tambahkan field kustom jika tidak ada di daftar. Centang <strong>Wajib</strong> jika field harus diisi.</div>
+                    </div>
+
+                    {{-- PRESET FIELDS --}}
+                    <div class="field-label" style="margin-bottom:10px">Field Tersedia — Centang yang Diperlukan</div>
+                    <div class="preset-grid" id="presetGrid">
+                        @foreach($presets as $preset)
+                        @php $isChecked = in_array($preset['key'], old('preset_fields', [])); @endphp
+                        <div class="preset-item {{ $isChecked ? 'checked' : '' }}" id="pi_{{ $preset['key'] }}"
+                            onclick="togglePreset('{{ $preset['key'] }}')">
+                            <input type="checkbox" name="preset_fields[]"
+                                value="{{ $preset['key'] }}"
+                                id="pf_{{ $preset['key'] }}"
+                                {{ $isChecked ? 'checked' : '' }}
+                                onclick="event.stopPropagation()">
+                            <div class="preset-item-info">
+                                <div class="preset-item-label">{{ $preset['label'] }}</div>
+                                <div class="preset-item-type">{{ $preset['type'] }}</div>
+                            </div>
+                            <div class="req-toggle" title="Wajib diisi?">
+                                <input type="checkbox" name="required_fields[]"
+                                    value="{{ $preset['key'] }}"
+                                    {{ in_array($preset['key'], old('required_fields', [])) ? 'checked' : '' }}
+                                    onclick="event.stopPropagation()"
+                                    title="Wajib">
+                                Wajib
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    {{-- CUSTOM FIELDS --}}
+                    <div class="field-label" style="margin-top:20px;margin-bottom:10px">Field Tambahan Kustom</div>
+                    <div id="customFieldsWrap"></div>
+                    <button type="button" class="btn-add-field" onclick="addCustomField()">
+                        <i class="bi bi-plus-lg"></i> Tambah Field Lain
                     </button>
                 </div>
-            </form>
-        </div>
-    </div>
+            </div>
 
+            <div class="form-footer" style="background:white;border:1px solid #e2e8f0;border-radius:14px;margin-top:4px">
+                <a href="{{ route('jenis-surat.index') }}" class="btn-batal"><i class="bi bi-x-lg"></i> Batal</a>
+                <button type="submit" class="btn-simpan"><i class="bi bi-check-lg"></i> Simpan</button>
+            </div>
+
+        </form>
+    </div>
 </div>
 
 @include('admin.partials.footer')
-
 @endsection
+
+@push('scripts')
+<script>
+let customFieldCount = 0;
+
+function selectTemplate(t) {
+    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+
+    const builder = document.getElementById('fieldBuilder');
+    if (t === 'B' || t === 'C') {
+        builder.classList.add('show');
+    } else {
+        builder.classList.remove('show');
+    }
+}
+
+function togglePreset(key) {
+    const item = document.getElementById('pi_' + key);
+    const cb   = document.getElementById('pf_' + key);
+    cb.checked = !cb.checked;
+    item.classList.toggle('checked', cb.checked);
+}
+
+function addCustomField() {
+    const i = customFieldCount++;
+    const wrap = document.getElementById('customFieldsWrap');
+    const div = document.createElement('div');
+    div.className = 'custom-field-row';
+    div.id = 'cf_' + i;
+    div.innerHTML = `
+        <div class="cf-label">
+            <input type="text" name="custom_label[]" class="field-input"
+                placeholder="Nama field (contoh: Nomor Sertifikat)" style="font-size:13px">
+        </div>
+        <div class="cf-type">
+            <select name="custom_type[]" class="field-input" style="font-size:13px">
+                <option value="text">Teks</option>
+                <option value="date">Tanggal</option>
+                <option value="number">Angka</option>
+                <option value="textarea">Teks Panjang</option>
+                <option value="select">Pilihan</option>
+            </select>
+        </div>
+        <div class="cf-req">
+            <input type="checkbox" name="custom_required[${i}]" title="Wajib diisi">
+            Wajib
+        </div>
+        <div class="cf-del">
+            <button type="button" class="btn-del" onclick="removeCustomField('cf_${i}')">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    `;
+    wrap.appendChild(div);
+}
+
+function removeCustomField(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const oldTemplate = '{{ old("template") }}';
+    if (oldTemplate === 'B' || oldTemplate === 'C') {
+        document.getElementById('fieldBuilder').classList.add('show');
+    }
+});
+</script>
+@endpush
