@@ -1,59 +1,259 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏛️ Web Kelurahan Teritih
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem informasi dan layanan administrasi digital **Kelurahan Teritih**, Kecamatan Walantaka, Kota Serang, Banten.
 
-## About Laravel
+Dibangun dengan **Laravel 12**, **MySQL**, dan **Bootstrap 5**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Permohonan Surat Online** — warga dapat mengajukan berbagai jenis surat (SKTM, Kematian, Suami/Istri, Beda Nama, Izin Cuti) secara online
+- **Manajemen Jenis Surat** — admin dapat membuat jenis surat kustom dengan template A/B/C
+- **Cetak Surat Resmi** — admin mencetak surat dengan kop kelurahan langsung dari browser
+- **Data Kependudukan** — manajemen akun warga, blokir, export CSV, filter RT/RW
+- **Statistik Demografi** — data populasi dan agama yang dikelola admin
+- **Informasi Kelurahan** — berita dan pengumuman untuk masyarakat
+- **Profil Kelurahan** — data singkat kelurahan yang dapat diperbarui admin
+- **Reset Password via Email** — notifikasi email otomatis
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## ⚙️ Persyaratan Sistem
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Kebutuhan | Versi Minimum |
+|-----------|--------------|
+| PHP | 8.2 |
+| Composer | 2.x |
+| Node.js | 18.x |
+| MySQL | 8.0 |
+| Laravel | 12.x |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🚀 Langkah Instalasi
 
-### Premium Partners
+### 1. Clone Repository
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+git clone https://github.com/username/web-kelurahan.git
+cd web-kelurahan
+```
 
-## Contributing
+### 2. Install Dependensi PHP
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+```
 
-## Code of Conduct
+### 3. Install Dependensi JavaScript
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+npm install
+```
 
-## Security Vulnerabilities
+### 4. Salin File Environment
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+cp .env.example .env
+```
 
-## License
+### 5. Generate Application Key
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan key:generate
+```
+
+### 6. Konfigurasi Database
+
+Buka file `.env` dan sesuaikan:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_kelurahan_teritih
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Buat database di MySQL terlebih dahulu:
+
+```sql
+CREATE DATABASE db_kelurahan_teritih;
+```
+
+### 7. Konfigurasi Email (untuk fitur Reset Password)
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=emailanda@gmail.com
+MAIL_PASSWORD=app_password_16_karakter
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="emailanda@gmail.com"
+MAIL_FROM_NAME="Kelurahan Teritih"
+```
+
+> **Catatan:** Gunakan **App Password** dari Google (bukan password biasa). Aktifkan 2-Step Verification di akun Google Anda terlebih dahulu.
+
+### 8. Cara Membuat Migration Baru
+
+Jika di masa depan perlu menambah tabel atau kolom baru, gunakan perintah:
+
+```bash
+# Membuat tabel baru
+php artisan make:migration create_nama_tabel_table
+
+# Menambah kolom ke tabel yang sudah ada
+php artisan make:migration add_nama_kolom_to_nama_tabel_table
+```
+
+File migration akan otomatis dibuat di `database/migrations/`. Buka file tersebut dan isi method `up()` dengan struktur yang diinginkan, lalu jalankan:
+
+```bash
+php artisan migrate
+```
+
+### 10. Cara Membuat Controller Baru
+
+```bash
+# Controller biasa
+php artisan make:controller NamaController
+
+# Controller dengan method CRUD lengkap (index, create, store, show, edit, update, destroy)
+php artisan make:controller NamaController --resource
+
+# Controller di dalam subfolder
+php artisan make:controller Admin/NamaController
+php artisan make:controller User/NamaController
+```
+
+File controller akan otomatis dibuat di `app/Http/Controllers/`. Daftarkan route-nya di `routes/web.php`.
+
+### 11. Jalankan Migration dan Seeder
+
+```bash
+php artisan migrate --seed
+```
+
+Seeder akan membuat:
+- 2 akun admin (lihat [Akun Default](#-akun-default))
+- 5 jenis surat bawaan
+- Data statistik demografi (siap diisi)
+- Data pengaturan kelurahan
+
+### 12. Buat Storage Link
+
+```bash
+php artisan storage:link
+```
+
+> Diperlukan agar foto profil dan file upload dapat ditampilkan.
+
+### 13. Build Asset
+
+Untuk development:
+```bash
+npm run dev
+```
+
+Untuk production:
+```bash
+npm run build
+```
+
+### 14. Jalankan Server
+
+```bash
+php artisan serve
+```
+
+Akses aplikasi di: **http://127.0.0.1:8000**
+
+---
+
+## 🔑 Akun Default
+
+Setelah menjalankan seeder:
+
+### Admin
+| Nama | Username | Password |
+|------|----------|----------|
+| Administrator Kelurahan Teritih | `adminteritih` | `Password12345` |
+| Administrator Kelurahan | `Admin1` | `Password12345` |
+
+> Akses admin di: `http://127.0.0.1:8000/admin/login`
+
+### Warga / Masyarakat
+Warga mendaftar sendiri melalui: `http://127.0.0.1:8000/register`
+
+---
+
+## 📁 Struktur Penting
+
+```
+web-kelurahan/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Admin/              # Controller panel admin
+│   │   ├── Auth/               # Controller autentikasi
+│   │   ├── User/               # Controller portal warga
+│   │   └── PublicController.php
+│   └── Models/                 # Model Eloquent
+├── database/
+│   ├── migrations/             # Skema database
+│   └── seeders/                # Data awal
+├── resources/views/
+│   ├── Admin/                  # Tampilan panel admin
+│   ├── User/                   # Tampilan portal warga
+│   ├── auth/                   # Login, register, dll
+│   ├── emails/                 # Template email
+│   └── partials/               # Navbar & footer
+└── routes/
+    ├── web.php                 # Route utama
+    └── auth.php                # Route autentikasi
+```
+
+---
+
+## 🔄 Perintah Berguna
+
+```bash
+# Clear semua cache
+php artisan optimize:clear
+
+# Reset dan isi ulang database dari awal
+php artisan migrate:fresh --seed
+
+# Lihat semua route terdaftar
+php artisan route:list
+
+# Lihat semua migration dan statusnya
+php artisan migrate:status
+```
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+- **Laravel 12** — PHP Framework
+- **MySQL 8** — Database
+- **Bootstrap 5.3** — CSS Framework
+- **Bootstrap Icons 1.11** — Icon library
+- **Plus Jakarta Sans** — Google Fonts
+- **Carbon** — Date & time manipulation
+- **Vite** — Asset bundler
+
+---
+
+## 👨‍💻 Developer
+
+Project ini dibuat oleh **Aryo Yonatan**.
+
+---
+
+## 📝 Lisensi
+
+Project ini dibuat untuk keperluan akademis dan layanan publik Kelurahan Teritih, Kota Serang.
