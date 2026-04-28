@@ -12,6 +12,7 @@ use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ProfilController; // ← tambah ini
+use App\Http\Controllers\ChatbotController; // ← tambah ini (chatbot AI)
 use Illuminate\Support\Facades\Route;
 
 // =========================================================
@@ -23,6 +24,9 @@ Route::get('/layanan',          fn () => view('layanan'))                 ->name
 Route::get('/informasi',        [PublicController::class, 'informasi'])   ->name('informasi');
 Route::get('/informasi/berita', [PublicController::class, 'berita'])      ->name('informasi.berita');
 Route::get('/informasi/berita/{slug}', [PublicController::class, 'detailBerita'])->name('informasi.berita.detail');
+
+// Chatbot AI - bisa diakses publik tanpa login
+Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 
 // =========================================================
 // ADMIN AREA
