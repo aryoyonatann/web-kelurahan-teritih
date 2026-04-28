@@ -2,7 +2,7 @@
 
 Sistem informasi dan layanan administrasi digital **Kelurahan Teritih**, Kecamatan Walantaka, Kota Serang, Banten.
 
-Dibangun dengan **Laravel 12**, **MySQL**, dan **Bootstrap 5**.
+Dibangun dengan **Laravel 12**, **MySQL**, **Bootstrap 5**, dan dilengkapi **Chatbot AI** berbasis **Google Gemini** untuk membantu warga mendapatkan informasi layanan kelurahan secara interaktif.
 
 ---
 
@@ -16,6 +16,7 @@ Dibangun dengan **Laravel 12**, **MySQL**, dan **Bootstrap 5**.
 - **Informasi Kelurahan** — berita dan pengumuman untuk masyarakat
 - **Profil Kelurahan** — data singkat kelurahan yang dapat diperbarui admin
 - **Reset Password via Email** — notifikasi email otomatis
+- **🤖 Chatbot AI Hybrid** — asisten virtual berbasis Google Gemini AI yang menggabungkan FAQ statis (untuk pertanyaan umum) dengan AI generative (untuk pertanyaan terbuka warga)
 
 ---
 
@@ -28,6 +29,7 @@ Dibangun dengan **Laravel 12**, **MySQL**, dan **Bootstrap 5**.
 | Node.js | 18.x |
 | MySQL | 8.0 |
 | Laravel | 12.x |
+| Google Gemini API Key | Free tier (Gemini 2.5 Flash-Lite) |
 
 ---
 
@@ -36,8 +38,8 @@ Dibangun dengan **Laravel 12**, **MySQL**, dan **Bootstrap 5**.
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/username/web-kelurahan.git
-cd web-kelurahan
+git clone https://github.com/aryoyonatann/website-kelurahan-teritih.git
+cd website-kelurahan-teritih
 ```
 
 ### 2. Install Dependensi PHP
@@ -98,7 +100,36 @@ MAIL_FROM_NAME="Kelurahan Teritih"
 
 > **Catatan:** Gunakan **App Password** dari Google (bukan password biasa). Aktifkan 2-Step Verification di akun Google Anda terlebih dahulu.
 
-### 8. Cara Membuat Migration Baru
+### 8. Konfigurasi Chatbot AI (Google Gemini)
+
+Aplikasi ini menggunakan **Google Gemini API** untuk fitur chatbot. Tambahkan konfigurasi berikut di file `.env`:
+
+```env
+# Gemini AI Chatbot
+GEMINI_API_KEY=AIza...isi_api_key_anda_di_sini
+GEMINI_MODEL=gemini-2.5-flash-lite
+```
+
+#### Cara Mendapatkan API Key Gemini (Gratis)
+
+1. Kunjungi [Google AI Studio](https://aistudio.google.com/apikey)
+2. Login menggunakan akun Google
+3. Klik tombol **"Create API Key"**
+4. Pilih project (atau buat baru)
+5. Copy API key yang muncul (format: `AIzaSy...`)
+6. Paste ke variabel `GEMINI_API_KEY` di file `.env`
+
+> **Penting:** Jangan pernah commit file `.env` ke Git atau bagikan API key kepada siapapun. File `.env` sudah termasuk dalam `.gitignore` secara default.
+
+#### Pilihan Model Gemini
+
+| Model | Karakteristik | Limit Free Tier |
+|-------|--------------|-----------------|
+| `gemini-2.5-flash-lite` | Cepat, hemat, **direkomendasikan** | 1.000 request/hari |
+| `gemini-2.5-flash` | Lebih pintar, sedikit lambat | 250 request/hari |
+| `gemini-2.5-pro` | Paling pintar, paling lambat | 100 request/hari |
+
+### 9. Cara Membuat Migration Baru
 
 Jika di masa depan perlu menambah tabel atau kolom baru, gunakan perintah:
 
@@ -174,6 +205,61 @@ Akses aplikasi di: **http://127.0.0.1:8000**
 
 ---
 
+## 🤖 Tentang Fitur Chatbot AI
+
+Chatbot pada portal ini menggunakan **pendekatan hybrid** yang menggabungkan dua jenis chatbot:
+
+### 1. Rule-based (FAQ Statis)
+
+Pertanyaan umum seperti "Cara mengajukan permohonan surat?" atau "Jam operasional kantor?" dijawab langsung dari daftar FAQ yang sudah disiapkan. Cepat, akurat, dan tidak memerlukan koneksi ke API eksternal.
+
+### 2. AI Generative (Gemini API)
+
+Untuk pertanyaan bebas yang diketik warga, chatbot akan mengirim permintaan ke Google Gemini API dengan **system prompt** yang berisi konteks Kelurahan Teritih (alamat, jam operasional, jenis surat aktif, prosedur, dll). AI akan menjawab secara natural dan kontekstual.
+
+### Fitur Keamanan Chatbot
+
+- **Validasi input** — pesan minimal 2 karakter, maksimal 500 karakter
+- **Rate limiting** — maksimal 10 request per menit per IP (mencegah spam)
+- **CSRF token** — proteksi dari serangan Cross-Site Request Forgery
+- **HTML escape** — semua input/output di-sanitize untuk mencegah XSS
+- **Safety filter Gemini** — blokir konten berbahaya (kekerasan, ujaran kebencian, dll)
+- **System prompt restriction** — AI hanya menjawab seputar layanan kelurahan dan tidak akan membahas topik di luar konteks
+
+### Arsitektur Chatbot
+
+```
+Browser (User)
+   ↓ POST /api/chatbot/ask
+Laravel Controller (ChatbotController)
+   ↓ Validasi + Rate Limit
+   ↓ Build System Prompt (ambil jenis surat dari DB)
+   ↓ HTTP Client → Gemini API
+   ↑ Parse Response
+Browser ← JSON response
+```
+
+### Endpoint API
+
+```
+POST /api/chatbot/ask
+Content-Type: application/json
+X-CSRF-TOKEN: {token}
+
+Body:
+{
+  "message": "Berapa lama proses pembuatan surat domisili?"
+}
+
+Response:
+{
+  "success": true,
+  "reply": "Proses pembuatan surat domisili biasanya..."
+}
+```
+
+---
+
 ## 🔑 Akun Default
 
 Setelah menjalankan seeder:
@@ -194,14 +280,18 @@ Warga mendaftar sendiri melalui: `http://127.0.0.1:8000/register`
 ## 📁 Struktur Penting
 
 ```
-web-kelurahan/
+website-kelurahan-teritih/
 ├── app/
 │   ├── Http/Controllers/
 │   │   ├── Admin/              # Controller panel admin
 │   │   ├── Auth/               # Controller autentikasi
 │   │   ├── User/               # Controller portal warga
+│   │   ├── ChatbotController.php  # Controller chatbot AI
+│   │   ├── ProfilController.php
 │   │   └── PublicController.php
 │   └── Models/                 # Model Eloquent
+├── config/
+│   └── services.php            # Konfigurasi Gemini API
 ├── database/
 │   ├── migrations/             # Skema database
 │   └── seeders/                # Data awal
@@ -210,9 +300,11 @@ web-kelurahan/
 │   ├── User/                   # Tampilan portal warga
 │   ├── auth/                   # Login, register, dll
 │   ├── emails/                 # Template email
-│   └── partials/               # Navbar & footer
+│   └── partials/
+│       ├── navbar.blade.php    # Navbar publik
+│       └── footer.blade.php    # Footer + UI Chatbot
 └── routes/
-    ├── web.php                 # Route utama
+    ├── web.php                 # Route utama (termasuk /api/chatbot/ask)
     └── auth.php                # Route autentikasi
 ```
 
@@ -221,8 +313,11 @@ web-kelurahan/
 ## 🔄 Perintah Berguna
 
 ```bash
-# Clear semua cache
+# Clear semua cache (termasuk config Gemini setelah edit .env)
 php artisan optimize:clear
+
+# Clear config saja (paling sering digunakan setelah edit .env)
+php artisan config:clear
 
 # Reset dan isi ulang database dari awal
 php artisan migrate:fresh --seed
@@ -232,28 +327,78 @@ php artisan route:list
 
 # Lihat semua migration dan statusnya
 php artisan migrate:status
+
+# Test koneksi ke Gemini API (via Tinker)
+php artisan tinker
+>>> config('services.gemini.api_key')
+>>> exit
 ```
 
 ---
 
 ## 🛠️ Teknologi yang Digunakan
 
+### Backend
 - **Laravel 12** — PHP Framework
 - **MySQL 8** — Database
+- **PHP 8.2** — Server-side language
+
+### Frontend
 - **Bootstrap 5.3** — CSS Framework
 - **Bootstrap Icons 1.11** — Icon library
 - **Plus Jakarta Sans** — Google Fonts
-- **Carbon** — Date & time manipulation
 - **Vite** — Asset bundler
+
+### AI & Integrasi
+- **Google Gemini API** — Large Language Model untuk chatbot
+- **Laravel HTTP Client** — Komunikasi REST API ke Gemini
+
+### Library Pendukung
+- **Carbon** — Date & time manipulation
+- **Laravel RateLimiter** — Proteksi spam pada chatbot
+
+---
+
+## 🐛 Troubleshooting
+
+### Chatbot menampilkan "Maaf, terjadi kesalahan"
+
+Beberapa kemungkinan penyebab:
+
+1. **API key belum diisi** di `.env` — pastikan `GEMINI_API_KEY` sudah benar
+2. **Cache config belum di-refresh** — jalankan `php artisan config:clear`
+3. **Meta tag CSRF tidak ada** — pastikan setiap layout publik memiliki `<meta name="csrf-token" content="{{ csrf_token() }}">`
+4. **Tidak ada koneksi internet** — Gemini API memerlukan akses internet
+
+Untuk debugging, periksa file log: `storage/logs/laravel.log`
+
+### Error: CSRF token mismatch (419)
+
+Pastikan setiap layout publik (`home.blade.php`, `profil.blade.php`, dll) memiliki meta tag CSRF di dalam tag `<head>`:
+
+```html
+<meta name="csrf-token" content="{{ csrf_token() }}">
+```
+
+### Tabel `jenis_surat` not found
+
+Jalankan migration:
+
+```bash
+php artisan migrate
+```
 
 ---
 
 ## 👨‍💻 Developer
 
-Project ini dibuat oleh **Aryo Yonatan**.
+Project ini dibuat oleh **Aryo Yonatan** sebagai bagian dari penelitian Skripsi Strata-1.
+
+**Kontak:**
+- GitHub: [@aryoyonatann](https://github.com/aryoyonatann)
 
 ---
 
 ## 📝 Lisensi
 
-Project ini dibuat untuk keperluan akademis dan layanan publik Kelurahan Teritih, Kota Serang.
+Project ini dibuat untuk keperluan akademis dan layanan publik Kelurahan Teritih, Kota Serang. Penggunaan ulang untuk tujuan komersial harus mendapatkan izin dari developer.
