@@ -205,7 +205,7 @@
                 </div>
             </div>
 
-            {{-- ══ BERITA: 2 besar + 2 sedang = 4 total ══ --}}
+            {{-- ══ BERITA ══ --}}
             <div class="fade-up fade-up-2">
                 <div class="berita-section-header">
                     <div class="section-label mb-0">

@@ -107,19 +107,17 @@
     display: flex; align-items: center; justify-content: center;
 }
 
-/* ✅ PANEL CHATBOT — flex column dengan max-height supaya muat di viewport */
+/* PANEL CHATBOT */
 #chatbot-panel {
     display: none;
     width: 360px;
     max-width: calc(100vw - 32px);
-    /* Max-height dibatasi agar tidak melebihi viewport, dikurangi tinggi tombol pill (52px) + gap (12px) + bottom (24px) + margin atas */
     max-height: calc(100vh - 24px - 12px - 52px - 24px);
     background: white;
     border-radius: 18px;
     box-shadow: 0 12px 48px rgba(0,0,0,.18);
     overflow: hidden;
     animation: slideUpChat .25s ease;
-    /* Flex column supaya area pesan bisa flex:1 dan scroll sendiri */
     flex-direction: column;
 }
 @keyframes slideUpChat {
@@ -127,7 +125,7 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 #chatbot-panel.open {
-    display: flex;  /* ✅ Diubah dari block ke flex */
+    display: flex; 
 }
 
 /* Header — fixed, tidak scroll */
@@ -154,7 +152,7 @@
 }
 .chat-close:hover { background: rgba(255,255,255,.28); }
 
-/* ✅ Area pesan — flex:1 + overflow-y auto, area inilah yang scroll */
+/* Area pesan — flex:1 + overflow-y auto, area inilah yang scroll */
 .chat-messages {
     padding: 16px;
     flex: 1; /* ✅ Mengisi sisa ruang available */
@@ -176,7 +174,7 @@
     max-width: 90%; align-self: flex-end;
 }
 
-/* ✅ FAQ list — fixed, tidak ikut flex (scroll dengan messages) */
+/* FAQ list — fixed, tidak ikut flex (scroll dengan messages) */
 .chat-faq-list {
     padding: 0 16px 12px;
     display: flex; flex-direction: column; gap: 7px;
@@ -194,7 +192,7 @@
 .chat-faq-item:hover { background: #eff6ff; border-color: #bfdbfe; }
 .chat-faq-item i { font-size: 14px; flex-shrink: 0; }
 
-/* ✅ Input area — fixed, selalu kelihatan */
+/* Input area — fixed, selalu kelihatan */
 .chat-input-wrap {
     display: flex; gap: 8px; padding: 12px;
     border-top: 1px solid #e2e8f0; background: white;
@@ -373,7 +371,7 @@
             <button class="chat-faq-item" onclick="askFaq(6)"><i class="bi bi-person-plus"></i> Cara daftar akun masyarakat</button>
         </div>
 
-        {{-- ✨ Input area untuk chat bebas dengan AI --}}
+        {{-- Input area untuk chat bebas dengan AI --}}
         <div class="chat-input-wrap">
             <input
                 type="text"
@@ -398,7 +396,7 @@
         </div>
     </div>
 
-    {{-- Tombol pill: ikon robot + teks "Tanya Kami" --}}
+    {{-- button ikon robot + teks "Tanya Kami" --}}
     <button id="chatbot-btn" onclick="toggleChat()" aria-label="Tanya Kami - Asisten Kelurahan">
         <span id="chatbot-notif">1</span>
         <span class="cb-label">Tanya Kami</span>

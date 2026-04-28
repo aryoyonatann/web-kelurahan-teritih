@@ -601,7 +601,7 @@
     };
 
     document.querySelectorAll('.pyr-bar').forEach(bar => {
-        // Hover
+
         bar.addEventListener('mouseenter', function(e) {
             if (!pinned) {
                 highlightRow(this);
@@ -627,10 +627,10 @@
             }
         });
 
-        // Klik — pin tooltip
+
         bar.addEventListener('click', function(e) {
             if (pinned && this.dataset.label === titEl.textContent) {
-                // Klik lagi pada baris yang sama = unpin
+                
                 pinned = false;
                 resetBars();
                 tip.style.opacity = '0';
@@ -641,7 +641,7 @@
             }
         });
 
-        // Touch
+        
         bar.addEventListener('touchstart', function(e) {
             e.preventDefault();
             const t = e.touches[0];
@@ -656,7 +656,6 @@
         }, { passive: false });
     });
 
-    // Klik di luar SVG = unpin
     document.addEventListener('click', function(e) {
         if (!e.target.closest('#pyrSvg') && !e.target.closest('#pyrTip')) {
             pinned = false;
@@ -666,7 +665,6 @@
     });
 })();
 
-// ── Donut chart SVG interaktif ────────────────────────────────────
 (function () {
     const data = [
         @foreach($agamaList as $ag)

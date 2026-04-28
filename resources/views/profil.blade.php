@@ -194,8 +194,6 @@
 
     <!-- ══ DATA SINGKAT (DINAMIS dari DB) ══ -->
     @php
-        // Ambil nilai dari $dataSingkat yang dikirim controller
-        // Fallback ke nilai default jika belum diset
         $ds = $dataSingkat ?? [];
         $dsItems = [
             [

@@ -26,7 +26,7 @@ class ChatbotController extends Controller
      */
     public function ask(Request $request): JsonResponse
     {
-        // ✅ 1. Validasi input
+        // Validasi input
         $validated = $request->validate([
             'message' => 'required|string|min:2|max:500',
         ], [
@@ -35,7 +35,7 @@ class ChatbotController extends Controller
             'message.max'      => 'Pertanyaan terlalu panjang (maksimal 500 karakter).',
         ]);
 
-        // ✅ 2. Rate limiting — cegah spam (10 request per menit per IP)
+        // Rate limiting — cegah spam (10 request per menit per IP)
         $key = 'chatbot:' . $request->ip();
         if (RateLimiter::tooManyAttempts($key, 10)) {
             $seconds = RateLimiter::availableIn($key);
@@ -46,7 +46,7 @@ class ChatbotController extends Controller
         }
         RateLimiter::hit($key, 60);
 
-        // ✅ 3. Cek konfigurasi API key
+        // Cek konfigurasi API key
         $apiKey = config('services.gemini.api_key');
         $model  = config('services.gemini.model');
 
@@ -148,16 +148,10 @@ class ChatbotController extends Controller
         return trim($reply);
     }
 
-    /**
-     * Bangun system prompt — "otak" chatbot.
-     *
-     * Berisi konteks tentang siapa AI ini, informasi kelurahan,
-     * jenis surat yang aktif (diambil dinamis dari database),
-     * dan batasan-batasan yang harus dipatuhi.
-     */
+    
     private function buildSystemPrompt(): string
     {
-        // ✅ Ambil daftar jenis surat aktif dari database (dinamis)
+        // Ambil daftar jenis surat aktif dari database (dinamis)
         $jenisSurat = JenisSurat::where('aktif', true)
             ->pluck('nama_surat')
             ->implode(', ');

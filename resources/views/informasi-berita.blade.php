@@ -206,7 +206,6 @@
         @endforeach
     </div>
 
-    {{-- ✅ FIX PAGINATION: pakai bootstrap-5 bawaan Laravel, bukan simple-bootstrap yang tidak ada --}}
     @if($beritaGrid->hasPages())
     <div class="pagination-wrap">
         {{ $beritaGrid->appends(request()->query())->links('pagination::bootstrap-5') }}

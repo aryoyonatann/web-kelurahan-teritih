@@ -11,8 +11,8 @@ use App\Http\Controllers\User\PermohonanUserController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\PublicController;
-use App\Http\Controllers\ProfilController; // ← tambah ini
-use App\Http\Controllers\ChatbotController; // ← tambah ini (chatbot AI)
+use App\Http\Controllers\ProfilController; 
+use App\Http\Controllers\ChatbotController; 
 use Illuminate\Support\Facades\Route;
 
 // =========================================================

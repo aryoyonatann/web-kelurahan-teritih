@@ -74,6 +74,7 @@
 <body>
 @include('partials.navbar')
 
+<!-- Hero -->
 <div class="layanan-hero">
     <div style="position:relative;z-index:2;max-width:560px">
         <div class="hero-badge"><i class="bi bi-shield-check-fill" style="font-size:10px"></i> Layanan Publik</div>

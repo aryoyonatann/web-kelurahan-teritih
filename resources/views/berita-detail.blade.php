@@ -164,7 +164,7 @@
                 </div>
             </div>
 
-            {{-- Berita Terkait (mobile: tampil di sini) --}}
+            {{-- Berita Terkait --}}
             @if($beritaLainnya->isNotEmpty())
             <div class="d-lg-none mt-2">
                 <div class="related-title"><i class="bi bi-newspaper" style="color:var(--blue)"></i> Berita Lainnya</div>
@@ -228,7 +228,7 @@
                 </a>
             </div>
 
-        </div>{{-- /sidebar --}}
+        </div>
 
     </div>
 </div>
