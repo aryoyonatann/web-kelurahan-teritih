@@ -25,7 +25,7 @@ Route::get('/informasi',        [PublicController::class, 'informasi'])   ->name
 Route::get('/informasi/berita', [PublicController::class, 'berita'])      ->name('informasi.berita');
 Route::get('/informasi/berita/{slug}', [PublicController::class, 'detailBerita'])->name('informasi.berita.detail');
 
-// Chatbot AI - bisa diakses publik tanpa login
+// Chatbot AI
 Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 
 // =========================================================
