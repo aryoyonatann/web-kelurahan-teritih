@@ -9,21 +9,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 
-/**
- * Chatbot AI Portal Kelurahan Teritih
- *
- * Menggunakan Google Gemini API untuk menjawab pertanyaan warga
- * seputar layanan administrasi kelurahan secara dinamis.
- *
- * Endpoint: POST /api/chatbot/ask
- * Payload : { "message": "pertanyaan dari user" }
- * Response: { "success": bool, "reply": "jawaban dari AI" }
- */
+
 class ChatbotController extends Controller
 {
-    /**
-     * Menerima pertanyaan user, kirim ke Gemini, kembalikan jawaban.
-     */
     public function ask(Request $request): JsonResponse
     {
         // Validasi input
