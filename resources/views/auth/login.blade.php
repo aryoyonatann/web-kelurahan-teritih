@@ -38,17 +38,17 @@
     }
 
     .login-nav {
-        background: white;
-        border-bottom: 1px solid var(--border);
+        background: #0d1b3e;
+        border-bottom: 1px solid #1e3a5f;
         padding: 0 32px;
-        height: 64px;
+        height: 72px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         position: sticky;
         top: 0;
         z-index: 1000;
-        box-shadow: 0 1px 8px rgba(0,0,0,.06);
+        box-shadow: 0 2px 12px rgba(0,0,0,.25);
         flex-shrink: 0;
     }
 
@@ -71,39 +71,39 @@
     }
 
     .login-nav-text { display: flex; flex-direction: column; line-height: 1.15; }
-    .login-nav-sub  { font-size: 9px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
-    .login-nav-name { font-size: 16px; font-weight: 800; color: var(--navy); }
+    .login-nav-sub  { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: rgba(255,255,255,.6); text-transform: uppercase; }
+    .login-nav-name { font-size: 18px; font-weight: 800; color: #ffffff; }
 
     .login-nav-links {
         display: flex; align-items: center; gap: 4px;
         list-style: none; margin: 0; padding: 0;
     }
     .login-nav-links a {
-        display: block; padding: 6px 14px; border-radius: 8px;
-        font-size: 13.5px; font-weight: 500;
-        color: var(--slate); text-decoration: none; transition: all .18s;
+        display: block; padding: 7px 16px; border-radius: 8px;
+        font-size: 15px; font-weight: 500;
+        color: rgba(255,255,255,.85); text-decoration: none; transition: all .18s;
     }
-    .login-nav-links a:hover { background: var(--bg); color: var(--blue); }
+    .login-nav-links a:hover { background: rgba(255,255,255,.12); color: #ffffff; }
 
     .login-nav-cta { display: flex; align-items: center; gap: 10px; }
 
     .btn-bantuan {
-        font-size: 13px; font-weight: 600;
-        color: var(--slate); text-decoration: none;
+        font-size: 14px; font-weight: 600;
+        color: rgba(255,255,255,.8); text-decoration: none;
         background: none; border: none; cursor: pointer;
         padding: 6px 4px; transition: color .18s;
     }
-    .btn-bantuan:hover { color: var(--blue); }
+    .btn-bantuan:hover { color: #ffffff; }
 
     .btn-daftar {
         display: inline-flex; align-items: center; gap: 6px;
-        padding: 7px 18px; border-radius: 8px;
-        font-size: 13px; font-weight: 700;
-        background: var(--navy); color: white;
+        padding: 8px 20px; border-radius: 8px;
+        font-size: 15px; font-weight: 700;
+        background: #1c64f2; color: white;
         border: none; text-decoration: none;
         transition: background .18s;
     }
-    .btn-daftar:hover { background: var(--navy2); color: white; }
+    .btn-daftar:hover { background: #1a56db; color: white; }
 
     .page-body {
         flex: 1;
@@ -325,9 +325,9 @@
 
 <nav class="login-nav">
     <a href="{{ route('home') }}" class="login-nav-brand">
-        {{-- ✅ FIXED: menggunakan nav-brand-icon & img seperti navbar.blade.php --}}
+    
         <div class="nav-brand-icon">
-            <img src="{{ asset('images/lambang_kota_serang.jpg') }}" alt="Logo Kota Serang">
+            <img src="{{ asset('images/logo kota serang.png') }}" alt="Logo Kota Serang">
         </div>
         <div class="login-nav-text">
             <span class="login-nav-sub">Kota Serang</span>
@@ -503,11 +503,9 @@
             <div class="col-lg-3 col-md-6">
                 <div class="footer-heading">Lokasi Kantor</div>
                 <div class="footer-map">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15866.25!2d106.1543!3d-6.1227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e418a2a78a50e07%3A0x74c78c4f5c5eed87!2sSerang%2C%20Kota%20Serang%2C%20Banten!5e0!3m2!1sen!2sid!4v1700000000000"
-                        width="100%" height="130" style="border:0;" allowfullscreen="" loading="lazy">
-                    </iframe>
-                </div>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
+                    width="100%" height="140" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
             </div>
 
         </div>

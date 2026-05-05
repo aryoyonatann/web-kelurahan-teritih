@@ -183,19 +183,7 @@
                     <div class="info-text">Pengajuan surat diproses pada hari kerja. Surat dapat dicetak langsung dari sistem setelah disetujui admin kelurahan.</div>
                 </div>
             </div>
-            <div class="sidebar-card">
-                <div class="bantuan-body">
-                    <div class="bantuan-title">Butuh Bantuan?</div>
-                    <div class="bantuan-item">
-                        <div class="bantuan-icon green"><i class="bi bi-chat-dots-fill"></i></div>
-                        <div><div class="bantuan-label">Chat WhatsApp</div><div class="bantuan-value">0812-3456-7890</div></div>
-                    </div>
-                    <div class="bantuan-item">
-                        <div class="bantuan-icon blue"><i class="bi bi-telephone-fill"></i></div>
-                        <div><div class="bantuan-label">Call Center</div><div class="bantuan-value">(0254) 123456</div></div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>

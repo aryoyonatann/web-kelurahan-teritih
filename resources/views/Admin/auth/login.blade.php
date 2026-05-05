@@ -43,17 +43,17 @@
        NAVBAR
     ===================================================== */
     .admin-nav {
-        background: white;
-        border-bottom: 1px solid var(--border);
+        background: #0d1b3e;
+        border-bottom: 1px solid #1e3a5f;
         padding: 0 32px;
-        height: 64px;
+        height: 72px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         position: sticky;
         top: 0;
         z-index: 1000;
-        box-shadow: 0 1px 8px rgba(0,0,0,.06);
+        box-shadow: 0 2px 12px rgba(0,0,0,.25);
         flex-shrink: 0;
     }
 
@@ -75,21 +75,21 @@
     }
 
     .admin-nav-text { display: flex; flex-direction: column; line-height: 1.15; }
-    .admin-nav-sub  { font-size: 9px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
-    .admin-nav-name { font-size: 16px; font-weight: 800; color: var(--navy); }
+    .admin-nav-sub  { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: rgba(255,255,255,.6); text-transform: uppercase; }
+    .admin-nav-name { font-size: 18px; font-weight: 800; color: #ffffff; }
 
     .btn-back-home {
         display: inline-flex; align-items: center; gap: 7px;
         padding: 8px 16px; border-radius: 8px;
-        font-size: 13px; font-weight: 600;
-        border: 1.5px solid var(--border);
-        background: white; color: var(--slate);
+        font-size: 14px; font-weight: 600;
+        border: 1.5px solid rgba(255,255,255,.3);
+        background: rgba(255,255,255,.1); color: rgba(255,255,255,.85);
         text-decoration: none; transition: all .18s;
     }
     .btn-back-home:hover {
-        border-color: var(--navy);
-        color: var(--navy);
-        background: var(--bg);
+        border-color: rgba(255,255,255,.6);
+        color: #ffffff;
+        background: rgba(255,255,255,.2);
     }
 
     /* =====================================================
@@ -314,7 +314,7 @@
 <nav class="admin-nav">
     <a href="{{ route('home') }}" class="admin-nav-brand">
         <div class="admin-nav-icon">
-            <img src="{{ asset('images/lambang_kota_serang.jpg') }}" alt="Logo Kota Serang">
+            <img src="{{ asset('images/logo kota serang.png') }}" alt="Logo Kota Serang">
         </div>
         <div class="admin-nav-text">
             <span class="admin-nav-sub">Admin Portal</span>
@@ -477,11 +477,9 @@
             <div class="col-lg-3 col-md-6">
                 <div class="footer-heading">Lokasi Kantor</div>
                 <div class="footer-map">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15866.25!2d106.1543!3d-6.1227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e418a2a78a50e07%3A0x74c78c4f5c5eed87!2sSerang%2C%20Kota%20Serang%2C%20Banten!5e0!3m2!1sen!2sid!4v1700000000000"
-                        width="100%" height="130" style="border:0;" allowfullscreen="" loading="lazy">
-                    </iframe>
-                </div>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
+                    width="100%" height="140" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
             </div>
 
         </div>

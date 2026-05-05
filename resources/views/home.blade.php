@@ -352,31 +352,12 @@
                         <i class="bi bi-megaphone-fill"></i> Pengumuman Penting
                     </div>
                     <div class="pengumuman-text">
-                        Untuk pengurusan KTP Digital, dimohon membawa KTP fisik asli dan Smartphone Android/iOS. Pelayanan tersedia di Loket 2.
+                        Layanan administrasi kependudukan tersedia pada hari kerja Senin–Kamis pukul 08.00–16.00 dan Jumat pukul 08.00–15.30. Harap membawa dokumen persyaratan yang lengkap saat mengajukan permohonan.
                     </div>
                 </div>
             </div>
 
-            {{-- Butuh Bantuan --}}
-            <div class="sidebar-card">
-                <div class="bantuan-body">
-                    <div class="bantuan-title">Butuh Bantuan?</div>
-                    <div class="bantuan-item">
-                        <div class="bantuan-icon" style="background:#ecfdf5;color:var(--green)"><i class="bi bi-chat-dots-fill"></i></div>
-                        <div>
-                            <div class="bantuan-label">Chat WhatsApp</div>
-                            <div class="bantuan-value">0812-3456-7890</div>
-                        </div>
-                    </div>
-                    <div class="bantuan-item">
-                        <div class="bantuan-icon" style="background:#eff6ff;color:var(--blue)"><i class="bi bi-telephone-fill"></i></div>
-                        <div>
-                            <div class="bantuan-label">Call Center</div>
-                            <div class="bantuan-value">(0254) 123456</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
         </div>
         {{-- /RIGHT --}}

@@ -3,12 +3,12 @@
    NAVBAR USER — authenticated masyarakat
 ===================================================== */
 .main-nav {
-    background: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 0 32px; height: 64px;
+    background: #0d1b3e;
+    border-bottom: 1px solid #1e3a5f;
+    padding: 0 32px; height: 72px;
     display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 1000;
-    box-shadow: 0 1px 8px rgba(0,0,0,.06); flex-shrink: 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.25); flex-shrink: 0;
 }
 .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .nav-brand-icon {
@@ -18,46 +18,45 @@
     color: white; font-size: 20px; flex-shrink: 0;
 }
 .nav-brand-text { display: flex; flex-direction: column; line-height: 1.15; }
-.nav-brand-sub  { font-size: 9px; font-weight: 700; letter-spacing: .12em; color: #64748b; text-transform: uppercase; }
-.nav-brand-name { font-size: 16px; font-weight: 800; color: #0d1b3e; }
+.nav-brand-sub  { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: rgba(255,255,255,.6); text-transform: uppercase; }
+.nav-brand-name { font-size: 18px; font-weight: 800; color: #ffffff; }
 
 .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; margin: 0; padding: 0; }
 .nav-links a {
-    display: block; padding: 6px 14px; border-radius: 8px;
-    font-size: 13.5px; font-weight: 500; color: #334155;
+    display: block; padding: 7px 16px; border-radius: 8px;
+    font-size: 15px; font-weight: 500; color: rgba(255,255,255,.85);
     text-decoration: none; transition: all .18s;
 }
-.nav-links a:hover  { background: #f1f5f9; color: #1c64f2; }
-.nav-links a.active { color: #1c64f2; font-weight: 700; border-bottom: 2px solid #1c64f2; border-radius: 0; }
+.nav-links a:hover  { background: rgba(255,255,255,.12); color: #ffffff; }
+.nav-links a.active { color: #ffffff; font-weight: 700; border-bottom: 2px solid #60a5fa; border-radius: 0; }
 
 .user-chip {
     display: flex; align-items: center; gap: 10px;
     padding: 5px 12px 5px 5px;
-    border: 1.5px solid #e2e8f0; border-radius: 40px;
-    cursor: pointer; transition: all .18s; background: white; position: relative;
+    border: 1.5px solid rgba(255,255,255,.25); border-radius: 40px;
+    cursor: pointer; transition: all .18s; background: rgba(255,255,255,.1); position: relative;
 }
-.user-chip:hover { border-color: #bfdbfe; background: #eff6ff; }
+.user-chip:hover { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.18); }
 .user-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: linear-gradient(135deg, #1c64f2, #1e3a5f);
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, #1c64f2, #60a5fa);
     display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 12px; font-weight: 800; flex-shrink: 0;
-    overflow: hidden;
+    color: white; font-size: 13px; font-weight: 800; flex-shrink: 0; overflow: hidden;
 }
 .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .user-info { line-height: 1.2; }
-.user-name { font-size: 13px; font-weight: 700; color: #0d1b3e; }
-.user-role { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+.user-name { font-size: 14px; font-weight: 700; color: #ffffff; }
+.user-role { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.65); text-transform: uppercase; letter-spacing: .05em; }
 .user-dropdown {
     position: absolute; top: calc(100% + 8px); right: 0;
     background: white; border: 1px solid #e2e8f0;
-    border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.1);
-    min-width: 190px; overflow: hidden; display: none; z-index: 200;
+    border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    min-width: 200px; overflow: hidden; display: none; z-index: 200;
 }
 .user-chip.open .user-dropdown { display: block; }
 .dd-item {
     display: flex; align-items: center; gap: 9px;
-    padding: 10px 16px; font-size: 13px; font-weight: 500;
+    padding: 11px 16px; font-size: 14px; font-weight: 500;
     color: #334155; text-decoration: none; transition: background .15s;
     background: none; border: none; width: 100%; cursor: pointer; text-align: left;
 }
@@ -70,21 +69,24 @@
     display: none;
     flex-direction: column; justify-content: center; align-items: center;
     width: 40px; height: 40px; border-radius: 10px;
-    border: 1.5px solid #e2e8f0; background: white;
+    border: 1.5px solid rgba(255,255,255,.3); background: rgba(255,255,255,.1);
     cursor: pointer; gap: 5px; transition: all .18s; flex-shrink: 0;
 }
-.nav-hamburger:hover { border-color: #bfdbfe; background: #eff6ff; }
+.nav-hamburger:hover { border-color: rgba(255,255,255,.6); background: rgba(255,255,255,.2); }
 .nav-hamburger span {
     display: block; width: 18px; height: 2px;
-    background: #334155; border-radius: 2px;
+    background: #ffffff; border-radius: 2px;
     transition: all .25s cubic-bezier(.4,0,.2,1); transform-origin: center;
 }
 .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* =====================================================
+   MOBILE DRAWER
+===================================================== */
 .mobile-drawer {
-    position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+    position: fixed; top: 72px; left: 0; right: 0; bottom: 0;
     background: white; z-index: 999;
     transform: translateX(100%);
     transition: transform .3s cubic-bezier(.4,0,.2,1);
@@ -96,7 +98,7 @@
 .drawer-user-section {
     padding: 20px 20px 16px;
     background: linear-gradient(135deg, #0d1b3e, #1e3a5f);
-    display: flex; align-items: center; gap: 14px;
+    display: flex; align-items: center; gap: 14px; flex-shrink: 0;
 }
 .drawer-avatar {
     width: 48px; height: 48px; border-radius: 50%;
@@ -109,27 +111,53 @@
 .drawer-user-role { font-size: 11px; color: rgba(255,255,255,.65); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
 
 .drawer-nav-links { padding: 8px 0; flex: 1; }
+
+/* DEFAULT — icon & teks abu gelap */
 .drawer-nav-link {
     display: flex; align-items: center; gap: 12px;
-    padding: 13px 20px; font-size: 14px; font-weight: 500; color: #334155;
-    text-decoration: none; transition: all .15s; border-left: 3px solid transparent;
+    padding: 15px 20px; font-size: 16px; font-weight: 500;
+    color: #334155;
+    text-decoration: none; transition: all .15s;
+    border-left: 3px solid transparent;
 }
+.drawer-nav-link i {
+    font-size: 19px; width: 24px; text-align: center;
+    color: #64748b !important;   /* abu, override Bootstrap Icons */
+    transition: color .15s;
+}
+/* HOVER */
 .drawer-nav-link:hover { background: #f8fafc; color: #1c64f2; border-left-color: #1c64f2; }
+.drawer-nav-link:hover i { color: #1c64f2 !important; }
+/* ACTIVE */
 .drawer-nav-link.active { background: #eff6ff; color: #1c64f2; font-weight: 700; border-left-color: #1c64f2; }
-.drawer-nav-link i { font-size: 17px; width: 22px; text-align: center; }
+.drawer-nav-link.active i { color: #1c64f2 !important; }
+
 .drawer-divider { height: 1px; background: #e2e8f0; margin: 4px 20px; }
 
+/* ACTION LINKS */
 .drawer-action-link {
     display: flex; align-items: center; gap: 12px;
-    padding: 13px 20px; font-size: 14px; font-weight: 500; color: #334155;
-    text-decoration: none; transition: all .15s; border: none; background: none;
-    width: 100%; cursor: pointer; text-align: left;
+    padding: 15px 20px; font-size: 16px; font-weight: 500;
+    color: #334155;
+    text-decoration: none; transition: all .15s;
+    border: none; background: none; width: 100%; cursor: pointer; text-align: left;
+}
+.drawer-action-link i {
+    font-size: 19px; width: 24px; text-align: center;
+    color: #64748b !important;
+    transition: color .15s;
 }
 .drawer-action-link:hover { background: #f8fafc; color: #0d1b3e; }
+.drawer-action-link:hover i { color: #0d1b3e !important; }
+/* DANGER */
 .drawer-action-link.danger { color: #ef4444; }
-.drawer-action-link.danger:hover { background: #fef2f2; }
-.drawer-action-link i { font-size: 17px; width: 22px; text-align: center; }
+.drawer-action-link.danger i { color: #ef4444 !important; }
+.drawer-action-link.danger:hover { background: #fef2f2; color: #dc2626; }
+.drawer-action-link.danger:hover i { color: #dc2626 !important; }
 
+/* =====================================================
+   LOGOUT POPUP
+===================================================== */
 .logout-overlay {
     position: fixed; inset: 0; z-index: 9999;
     background: rgba(13, 27, 62, 0.55); backdrop-filter: blur(4px);
@@ -149,21 +177,22 @@
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 18px; font-size: 28px; color: #ef4444;
 }
-.logout-title { font-size: 18px; font-weight: 800; color: #0d1b3e; margin-bottom: 8px; }
-.logout-desc  { font-size: 13.5px; color: #64748b; line-height: 1.65; margin-bottom: 24px; }
+.logout-title { font-size: 20px; font-weight: 800; color: #0d1b3e; margin-bottom: 8px; }
+.logout-desc  { font-size: 15px; color: #64748b; line-height: 1.65; margin-bottom: 24px; }
 .logout-actions { display: flex; gap: 10px; }
 .btn-logout-cancel {
-    flex: 1; padding: 11px; border-radius: 10px; border: 1.5px solid #e2e8f0; background: white;
-    font-size: 13.5px; font-weight: 600; color: #334155; cursor: pointer; transition: all .18s; font-family: inherit;
+    flex: 1; padding: 12px; border-radius: 10px; border: 1.5px solid #e2e8f0; background: white;
+    font-size: 15px; font-weight: 600; color: #334155; cursor: pointer; transition: all .18s; font-family: inherit;
 }
 .btn-logout-cancel:hover { border-color: #cbd5e1; background: #f8fafc; }
 .btn-logout-confirm {
-    flex: 1; padding: 11px; border-radius: 10px; border: none; background: #ef4444; color: white;
-    font-size: 13.5px; font-weight: 700; cursor: pointer; transition: background .18s; font-family: inherit;
+    flex: 1; padding: 12px; border-radius: 10px; border: none; background: #ef4444; color: white;
+    font-size: 15px; font-weight: 700; cursor: pointer; transition: background .18s; font-family: inherit;
 }
 .btn-logout-confirm:hover { background: #dc2626; }
+
 .drawer-overlay {
-    display: none; position: fixed; inset: 0; top: 64px;
+    display: none; position: fixed; inset: 0; top: 72px;
     background: rgba(0,0,0,.35); z-index: 998;
 }
 .drawer-overlay.open { display: block; }
@@ -196,7 +225,6 @@
         </div>
     </a>
 
-    {{-- ✅ Link Kontak DIHAPUS --}}
     <ul class="nav-links">
         <li><a href="{{ route('home') }}"      class="{{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a></li>
         <li><a href="{{ route('profil') }}"    class="{{ request()->routeIs('profil') ? 'active' : '' }}">Profil</a></li>
@@ -232,7 +260,6 @@
 
 <div class="drawer-overlay" id="drawerOverlay"></div>
 
-{{-- ✅ Mobile Drawer — Link Kontak DIHAPUS --}}
 <div class="mobile-drawer" id="mobileDrawer">
     <div class="drawer-user-section">
         <div class="drawer-avatar">
@@ -253,7 +280,7 @@
         <a href="{{ route('profil') }}"    class="drawer-nav-link {{ request()->routeIs('profil') ? 'active' : '' }}"><i class="bi bi-building"></i> Profil</a>
         <a href="{{ route('layanan') }}"   class="drawer-nav-link {{ request()->routeIs('layanan') ? 'active' : '' }}"><i class="bi bi-file-earmark-text"></i> Layanan</a>
         <a href="{{ route('informasi') }}" class="drawer-nav-link {{ request()->routeIs('informasi', 'informasi.berita') ? 'active' : '' }}"><i class="bi bi-newspaper"></i> Informasi</a>
-        {{-- ✅ Link Kontak DIHAPUS dari drawer --}}
+
         <div class="drawer-divider"></div>
         <a href="{{ route('profile.edit') }}"          class="drawer-action-link"><i class="bi bi-person-circle"></i> Profil Saya</a>
         <a href="{{ route('user.permohonan.index') }}" class="drawer-action-link"><i class="bi bi-file-earmark-check"></i> Permohonan Saya</a>

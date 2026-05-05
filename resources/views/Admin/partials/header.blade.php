@@ -6,11 +6,11 @@
 ========================================================= */
 .app-header {
     position: sticky; top: 0; z-index: 1030;
-    background: #fff; border-bottom: 1px solid #e2e8f0;
+    background: #0d1b3e; border-bottom: 1px solid #1e3a5f;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 16px; height: 58px; gap: 12px;
 }
-@media(min-width:768px){ .app-header{ padding:0 24px; height:62px; } }
+@media(min-width:768px){ .app-header{ padding:0 24px; height:66px; } }
 
 .header-brand { display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; }
 .brand-logo {
@@ -19,29 +19,29 @@
     color:white; font-size:16px; flex-shrink:0;
 }
 .brand-text  { display:flex; flex-direction:column; line-height:1.2; }
-.brand-top   { font-size:9px; font-weight:700; letter-spacing:.1em; color:#64748b; text-transform:uppercase; }
-.brand-name  { font-size:13px; font-weight:700; color:#0f172a; }
+.brand-top   { font-size: 10px; font-weight: 700; letter-spacing:.1em; color: rgba(255,255,255,.6); text-transform:uppercase; }
+.brand-name  { font-size: 14px; font-weight: 700; color: #ffffff; }
 
 /* Desktop nav */
 .header-nav { display:flex; gap:4px; flex:1; justify-content:center; }
 .nav-pill {
     display:inline-flex; align-items:center; gap:6px;
-    padding:6px 12px; border-radius:8px;
-    font-size:13px; font-weight:500;
-    color:#334155; text-decoration:none; transition:all .18s; white-space:nowrap;
+    padding:7px 14px; border-radius:8px;
+    font-size:14px; font-weight:500;
+    color: rgba(255,255,255,.8); text-decoration:none; transition:all .18s; white-space:nowrap;
 }
-.nav-pill:hover  { background:#f1f5f9; color:#1c64f2; }
-.nav-pill.active { background:#eff6ff; color:#1c64f2; font-weight:600; }
+.nav-pill:hover  { background: rgba(255,255,255,.12); color:#ffffff; }
+.nav-pill.active { background: rgba(28,100,242,.4); color:#ffffff; font-weight:600; }
 
 /* Right icons */
 .hdr-icon-btn {
-    width:34px; height:34px; background:none;
-    border:1px solid #e2e8f0; border-radius:8px;
+    width:36px; height:36px; background: rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.2); border-radius:8px;
     display:flex; align-items:center; justify-content:center;
-    cursor:pointer; color:#334155; transition:all .18s; padding:0; position:relative;
+    cursor:pointer; color: rgba(255,255,255,.8); transition:all .18s; padding:0; position:relative;
 }
-.hdr-icon-btn:hover { background:#f1f5f9; color:#1c64f2; }
-.logout-btn:hover   { background:#fef2f2; color:#ef4444; border-color:#fecaca; }
+.hdr-icon-btn:hover { background: rgba(255,255,255,.18); color:#ffffff; border-color: rgba(255,255,255,.4); }
+
 .hdr-badge {
     position:absolute; top:-5px; right:-5px;
     background:#ef4444; color:white;
@@ -51,18 +51,52 @@
 }
 .hdr-badge.show { display:block; }
 
+/* =========================================================
+   ADMIN CHIP — selalu dark, tidak berubah saat mobile
+========================================================= */
+.admin-wrap { position:relative; }
+
 .admin-chip {
     display:flex; align-items:center; gap:8px;
-    padding:4px 8px; border-radius:10px; background:#f1f5f9; cursor:pointer;
+    padding:5px 10px 5px 6px; border-radius:10px;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.18);
+    cursor:pointer; transition:background .18s; user-select:none;
 }
+.admin-chip:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.3); }
+
 .admin-avatar {
-    width:28px; height:28px;
+    width:30px; height:30px;
     background:linear-gradient(135deg,#1c64f2,#60a5fa);
-    border-radius:7px; color:white; font-weight:700; font-size:12px;
+    border-radius:7px; color:white; font-weight:700; font-size:13px;
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
 }
-.admin-uname { font-size:12px; font-weight:600; color:#0f172a; line-height:1.2; }
-.admin-role  { font-size:10px; color:#64748b; line-height:1.2; }
+.admin-uname { font-size:13px; font-weight:600; color:#ffffff; line-height:1.2; }
+.admin-role  { font-size:11px; color: rgba(255,255,255,.6); line-height:1.2; }
+
+/* Admin Dropdown */
+.admin-dropdown {
+    display:none; position:absolute; top:calc(100% + 8px); right:0;
+    background:white; border:1px solid #e2e8f0;
+    border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.15);
+    min-width:210px; overflow:hidden; z-index:2000;
+}
+.admin-dropdown.show { display:block; }
+.admin-dd-info {
+    display:flex; align-items:center; gap:10px;
+    padding:14px 16px; background:#f8fafc;
+}
+.admin-dd-divider { height:1px; background:#e2e8f0; }
+.admin-dd-item {
+    display:flex; align-items:center; gap:8px;
+    padding:10px 16px; font-size:13px; font-weight:500;
+    color:#334155; text-decoration:none; cursor:pointer;
+    background:none; border:none; width:100%; text-align:left;
+    transition:background .15s; font-family:inherit;
+}
+.admin-dd-item:hover { background:#f8fafc; }
+.admin-dd-logout { color:#ef4444; }
+.admin-dd-logout:hover { background:#fef2f2; }
 
 /* =========================================================
    NOTIFIKASI DROPDOWN
@@ -109,7 +143,9 @@
 @keyframes pulse-red { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
 .hdr-badge.pulse { animation:pulse-red .5s ease 4; }
 
-/* LOGOUT MODAL */
+/* =========================================================
+   LOGOUT MODAL
+========================================================= */
 .logout-modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .logout-modal-overlay.show{opacity:1;pointer-events:all}
 .logout-modal{background:white;border-radius:16px;padding:28px 28px 24px;width:100%;max-width:380px;margin:16px;box-shadow:0 20px 60px rgba(0,0,0,.18);transform:translateY(20px) scale(.97);transition:transform .22s}
@@ -124,81 +160,45 @@
 .btn-logout-confirm:hover{background:#dc2626}
 
 /* =========================================================
-   ADMIN CHIP DROPDOWN
-========================================================= */
-.admin-wrap { position:relative; }
-.admin-chip {
-    display:flex; align-items:center; gap:8px;
-    padding:4px 8px; border-radius:10px; background:#f1f5f9;
-    cursor:pointer; transition:background .18s; user-select:none;
-}
-.admin-chip:hover { background:#e2e8f0; }
-.admin-avatar {
-    width:28px; height:28px;
-    background:linear-gradient(135deg,#1c64f2,#60a5fa);
-    border-radius:7px; color:white; font-weight:700; font-size:12px;
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
-}
-.admin-uname { font-size:12px; font-weight:600; color:#0f172a; line-height:1.2; }
-.admin-role  { font-size:10px; color:#64748b; line-height:1.2; }
-
-.admin-dropdown {
-    display:none; position:absolute; top:calc(100% + 8px); right:0;
-    background:white; border:1px solid #e2e8f0;
-    border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.12);
-    min-width:200px; overflow:hidden; z-index:2000;
-}
-.admin-dropdown.show { display:block; }
-.admin-dd-info {
-    display:flex; align-items:center; gap:10px;
-    padding:14px 16px; background:#f8fafc;
-}
-.admin-dd-divider { height:1px; background:#e2e8f0; }
-.admin-dd-item {
-    display:flex; align-items:center; gap:8px;
-    padding:10px 16px; font-size:13px; font-weight:500;
-    color:#334155; text-decoration:none; cursor:pointer;
-    background:none; border:none; width:100%; text-align:left;
-    transition:background .15s; font-family:inherit;
-}
-.admin-dd-item:hover { background:#f8fafc; }
-.admin-dd-logout { color:#ef4444; }
-.admin-dd-logout:hover { background:#fef2f2; }
-
-/* =========================================================
    HAMBURGER & MOBILE MENU
 ========================================================= */
 .btn-hamburger {
-    width:34px; height:34px; background:none;
-    border:1px solid #e2e8f0; border-radius:8px;
+    width:34px; height:34px;
+    background: rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.2); border-radius:8px;
     display:flex; align-items:center; justify-content:center;
-    cursor:pointer; color:#334155; transition:all .18s; padding:0;
+    cursor:pointer; color: rgba(255,255,255,.85); transition:all .18s; padding:0;
 }
-.btn-hamburger:hover { background:#f1f5f9; color:#1c64f2; }
+.btn-hamburger:hover { background: rgba(255,255,255,.18); color:#ffffff; border-color: rgba(255,255,255,.4); }
 
 .mobile-menu {
     display:none;
     position:fixed; top:58px; left:0; right:0; z-index:1029;
-    background:white; border-bottom:1px solid #e2e8f0;
-    box-shadow:0 8px 24px rgba(0,0,0,.1);
-    padding:12px 16px 16px;
+    background: #0d1b3e;
+    border-bottom:1px solid #1e3a5f;
+    box-shadow:0 8px 24px rgba(0,0,0,.3);
+    padding:10px 12px 14px;
 }
 .mobile-menu.show { display:block; }
+
 .mobile-menu .nav-pill {
     display:flex; width:100%; padding:10px 14px;
     border-radius:9px; margin-bottom:4px; font-size:14px;
+    color: rgba(255,255,255,.8);
 }
+.mobile-menu .nav-pill:hover  { background: rgba(255,255,255,.1); color:#ffffff; }
+.mobile-menu .nav-pill.active { background: rgba(28,100,242,.4); color:#ffffff; }
 .mobile-menu .nav-pill:last-child { margin-bottom:0; }
+
 .mobile-menu-overlay {
     display:none; position:fixed; inset:0; z-index:1028;
-    background:rgba(0,0,0,.3);
+    background:rgba(0,0,0,.4);
 }
 .mobile-menu-overlay.show { display:block; }
 </style>
 @endpush
 @endonce
 
-{{-- OVERLAY untuk menutup mobile menu --}}
 <div class="mobile-menu-overlay" id="mob-overlay"></div>
 
 <header class="app-header shadow-sm">
@@ -206,7 +206,8 @@
     {{-- BRAND --}}
     <a href="{{ route('admin.dashboard') }}" class="header-brand">
         <div class="brand-logo" style="background:transparent;padding:2px;">
-            <img src="{{ asset('images/lambang_kota_serang.jpg') }}" alt="Logo Kota Serang" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
+            <img src="{{ asset('images/logo kota serang.png') }}" alt="Logo Kota Serang"
+                 style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
         </div>
         <div class="brand-text">
             <span class="brand-top">ADMIN PORTAL</span>
@@ -268,17 +269,18 @@
             </div>
         </div>
 
-        {{-- Admin chip dengan dropdown logout --}}
+        {{-- Admin Chip --}}
         <div class="admin-wrap" id="admin-wrap">
             <div class="admin-chip" id="btn-admin-chip">
                 <div class="admin-avatar">
                     {{ strtoupper(substr(auth('admin')->user()->nama_admin ?? 'A', 0, 1)) }}
                 </div>
-                <div class="d-none d-lg-block">
+                <div class="d-none d-md-block">
                     <div class="admin-uname">{{ auth('admin')->user()->nama_admin ?? 'Administrator' }}</div>
                     <div class="admin-role">Administrator Kelurahan</div>
                 </div>
-                <i class="bi bi-chevron-down d-none d-lg-inline" id="admin-chevron" style="font-size:11px;color:#64748b;transition:transform .2s"></i>
+                <i class="bi bi-chevron-down d-none d-md-inline" id="admin-chevron"
+                   style="font-size:11px;color:rgba(255,255,255,.6);transition:transform .2s"></i>
             </div>
 
             {{-- Dropdown --}}
@@ -288,7 +290,9 @@
                         {{ strtoupper(substr(auth('admin')->user()->nama_admin ?? 'A', 0, 1)) }}
                     </div>
                     <div>
-                        <div style="font-size:13px;font-weight:700;color:#0f172a">{{ auth('admin')->user()->nama_admin ?? 'Administrator' }}</div>
+                        <div style="font-size:13px;font-weight:700;color:#0f172a">
+                            {{ auth('admin')->user()->nama_admin ?? 'Administrator' }}
+                        </div>
                         <div style="font-size:11px;color:#64748b">Administrator Kelurahan</div>
                     </div>
                 </div>
@@ -310,7 +314,7 @@
     </div>
 </header>
 
-{{-- LOGOUT CONFIRMATION MODAL --}}
+{{-- LOGOUT MODAL --}}
 <div class="logout-modal-overlay" id="logout-modal-overlay">
     <div class="logout-modal">
         <div class="logout-modal-icon"><i class="bi bi-box-arrow-right"></i></div>
@@ -325,7 +329,6 @@
     </div>
 </div>
 
-{{-- Form logout tersembunyi (dipakai modal confirm) --}}
 <form action="{{ route('admin.logout') }}" method="POST" id="form-logout" class="d-none">
     @csrf
 </form>
@@ -361,7 +364,7 @@
 @once
 @push('scripts')
 <script>
-// ── Logout modal ─────────────────────────────────────────
+// Logout modal
 function showLogoutModal() {
     document.getElementById('admin-dropdown')?.classList.remove('show');
     document.getElementById('mobile-menu')?.classList.remove('show');
@@ -380,7 +383,7 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') hideLogoutModal();
 });
 
-// ── Admin chip dropdown ──────────────────────────────────
+// Admin chip dropdown
 (function() {
     const chip     = document.getElementById('btn-admin-chip');
     const dropdown = document.getElementById('admin-dropdown');
@@ -400,7 +403,7 @@ document.addEventListener('keydown', function(e) {
     });
 })();
 
-// ── Hamburger toggle ─────────────────────────────────────
+// Hamburger toggle
 (function() {
     const btn     = document.getElementById('btn-hamburger');
     const menu    = document.getElementById('mobile-menu');
@@ -425,7 +428,7 @@ document.addEventListener('keydown', function(e) {
     menu.querySelectorAll('.nav-pill').forEach(a => a.addEventListener('click', closeMenu));
 })();
 
-// ── Notifikasi ───────────────────────────────────────────
+// Notifikasi
 (function () {
     const POLL_MS  = 30000;
     const API_URL  = '{{ route("admin.notifikasi") }}';

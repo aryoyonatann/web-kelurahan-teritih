@@ -11,15 +11,15 @@ use App\Http\Controllers\User\PermohonanUserController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\PublicController;
-use App\Http\Controllers\ProfilController; 
-use App\Http\Controllers\ChatbotController; 
+use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
 
 // =========================================================
 // PUBLIC ROUTES — tidak perlu login
 // =========================================================
 Route::get('/',                 [PublicController::class, 'home'])        ->name('home');
-Route::get('/profil',           [ProfilController::class, 'index'])       ->name('profil'); // ← diubah
+Route::get('/profil',           [ProfilController::class, 'index'])       ->name('profil');
 Route::get('/layanan',          fn () => view('layanan'))                 ->name('layanan');
 Route::get('/informasi',        [PublicController::class, 'informasi'])   ->name('informasi');
 Route::get('/informasi/berita', [PublicController::class, 'berita'])      ->name('informasi.berita');
@@ -32,11 +32,13 @@ Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbo
 // ADMIN AREA
 // =========================================================
 Route::prefix('admin')->group(function () {
+    
+    Route::get('/', fn () => redirect()->route('admin.login'));
 
     Route::get('/login',  [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/login', [AdminLoginController::class, 'login']);
 
-    Route::middleware('auth:admin')->group(function () {
+    Route::middleware('auth.admin')->group(function () {
 
         // Notifikasi
         Route::get('notifikasi',            [NotifikasiController::class, 'index'])   ->name('admin.notifikasi');
@@ -64,12 +66,12 @@ Route::prefix('admin')->group(function () {
         Route::resource('informasi-admin', InformasiKelurahanController::class);
 
         // Kependudukan
-        Route::get(   'kependudukan',               [KependudukanController::class, 'index'])       ->name('kependudukan.index');
-        Route::post(  'kependudukan',               [KependudukanController::class, 'store'])       ->name('kependudukan.store');
-        Route::get(   'kependudukan-export',        [KependudukanController::class, 'export'])      ->name('kependudukan.export'); // ← tambah
-        Route::get(   'kependudukan/{id}',          [KependudukanController::class, 'show'])        ->name('kependudukan.show');
-        Route::patch( 'kependudukan/{id}/toggle',   [KependudukanController::class, 'toggleStatus'])->name('kependudukan.toggle');
-        Route::delete('kependudukan/{id}',          [KependudukanController::class, 'destroy'])     ->name('kependudukan.destroy');
+        Route::get(   'kependudukan',               [KependudukanController::class, 'index'])        ->name('kependudukan.index');
+        Route::post(  'kependudukan',               [KependudukanController::class, 'store'])        ->name('kependudukan.store');
+        Route::get(   'kependudukan-export',        [KependudukanController::class, 'export'])       ->name('kependudukan.export');
+        Route::get(   'kependudukan/{id}',          [KependudukanController::class, 'show'])         ->name('kependudukan.show');
+        Route::patch( 'kependudukan/{id}/toggle',   [KependudukanController::class, 'toggleStatus']) ->name('kependudukan.toggle');
+        Route::delete('kependudukan/{id}',          [KependudukanController::class, 'destroy'])      ->name('kependudukan.destroy');
     });
 });
 
@@ -80,7 +82,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('user')->name('user.')->group(function () {
 
-        // PENTING: route form/{slug} harus di atas route {id}
+        // route form/{slug} harus di atas route {id}
         Route::get( 'permohonan/form/{slug}', [PermohonanUserController::class, 'form'])       ->name('permohonan.form');
         Route::post('permohonan/form/{slug}', [PermohonanUserController::class, 'storeSurat']) ->name('permohonan.store.surat');
 
