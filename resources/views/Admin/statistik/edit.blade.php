@@ -41,6 +41,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 .stat-input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 .pct-note{font-size:11px;color:#94a3b8;margin-top:4px}
 
+/* Grid 2 kolom untuk Laki-Laki & Perempuan */
+.jk-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
 /* Grid untuk data singkat — 3 kolom */
 .data-singkat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .ds-item{padding:14px 16px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0}
@@ -67,11 +70,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 @media(max-width:900px){
     .data-singkat-grid{grid-template-columns:1fr 1fr}
     .agama-grid{grid-template-columns:1fr}
+    .jk-grid{grid-template-columns:1fr}
 }
 @media(max-width:640px){
     .stat-content{padding:20px 16px}
     .data-singkat-grid{grid-template-columns:1fr}
     .umur-grid{grid-template-columns:1fr}
+    .jk-grid{grid-template-columns:1fr}
 }
 </style>
 @endpush
@@ -102,7 +107,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         @csrf @method('PUT')
 
         {{-- ══════════════════════════════════════════ --}}
-        {{-- ① DATA SINGKAT KELURAHAN (tampil di profil) --}}
+        {{-- ① DATA SINGKAT KELURAHAN                  --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
@@ -118,78 +123,54 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                     <div>Data ini ditampilkan di bagian <strong>"Data Singkat Kelurahan"</strong> pada halaman Profil yang dapat dilihat oleh masyarakat.</div>
                 </div>
                 <div class="data-singkat-grid">
-                    {{-- Kode Pos --}}
                     <div class="ds-item">
                         <div class="ds-item-label">
                             <div class="ds-item-icon" style="background:#fef3c7;color:#d97706"><i class="bi bi-mailbox2"></i></div>
                             Kode Pos
                         </div>
                         <input type="hidden" name="singkat[kode_pos][label]" value="Kode Pos">
-                        <input type="text" name="singkat[kode_pos][nilai]"
-                            class="stat-input"
-                            value="{{ $dataSingkat['kode_pos'] ?? '42183' }}"
-                            placeholder="Contoh: 42183" maxlength="10">
+                        <input type="text" name="singkat[kode_pos][nilai]" class="stat-input" value="{{ $dataSingkat['kode_pos'] ?? '42183' }}" placeholder="Contoh: 42183" maxlength="10">
                     </div>
-                    {{-- Luas Wilayah --}}
                     <div class="ds-item">
                         <div class="ds-item-label">
                             <div class="ds-item-icon" style="background:#ecfdf5;color:#10b981"><i class="bi bi-map-fill"></i></div>
                             Luas Wilayah (km²)
                         </div>
                         <input type="hidden" name="singkat[luas_wilayah][label]" value="Luas Wilayah">
-                        <input type="text" name="singkat[luas_wilayah][nilai]"
-                            class="stat-input"
-                            value="{{ $dataSingkat['luas_wilayah'] ?? '2.54' }}"
-                            placeholder="Contoh: 2.54">
+                        <input type="text" name="singkat[luas_wilayah][nilai]" class="stat-input" value="{{ $dataSingkat['luas_wilayah'] ?? '2.54' }}" placeholder="Contoh: 2.54">
                     </div>
-                    {{-- Jumlah Penduduk --}}
                     <div class="ds-item">
                         <div class="ds-item-label">
                             <div class="ds-item-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-people-fill"></i></div>
                             Jumlah Penduduk (Jiwa)
                         </div>
                         <input type="hidden" name="singkat[jumlah_penduduk][label]" value="Jumlah Penduduk">
-                        <input type="text" name="singkat[jumlah_penduduk][nilai]"
-                            class="stat-input"
-                            value="{{ $dataSingkat['jumlah_penduduk'] ?? '4.520' }}"
-                            placeholder="Contoh: 4.520">
+                        <input type="text" name="singkat[jumlah_penduduk][nilai]" class="stat-input" value="{{ $dataSingkat['jumlah_penduduk'] ?? '4.520' }}" placeholder="Contoh: 4.520">
                         <div class="pct-note">Tampil dengan satuan "Jiwa" di halaman profil</div>
                     </div>
-                    {{-- Kecamatan --}}
                     <div class="ds-item">
                         <div class="ds-item-label">
                             <div class="ds-item-icon" style="background:#fdf4ff;color:#a855f7"><i class="bi bi-diagram-3-fill"></i></div>
                             Kecamatan
                         </div>
                         <input type="hidden" name="singkat[kecamatan][label]" value="Kecamatan">
-                        <input type="text" name="singkat[kecamatan][nilai]"
-                            class="stat-input"
-                            value="{{ $dataSingkat['kecamatan'] ?? 'Walantaka' }}"
-                            placeholder="Contoh: Walantaka">
+                        <input type="text" name="singkat[kecamatan][nilai]" class="stat-input" value="{{ $dataSingkat['kecamatan'] ?? 'Walantaka' }}" placeholder="Contoh: Walantaka">
                     </div>
-                    {{-- Kota --}}
                     <div class="ds-item">
                         <div class="ds-item-label">
                             <div class="ds-item-icon" style="background:#fff1f2;color:#f43f5e"><i class="bi bi-geo-alt-fill"></i></div>
                             Kota / Kabupaten
                         </div>
                         <input type="hidden" name="singkat[kota][label]" value="Kota">
-                        <input type="text" name="singkat[kota][nilai]"
-                            class="stat-input"
-                            value="{{ $dataSingkat['kota'] ?? 'Serang' }}"
-                            placeholder="Contoh: Serang">
+                        <input type="text" name="singkat[kota][nilai]" class="stat-input" value="{{ $dataSingkat['kota'] ?? 'Serang' }}" placeholder="Contoh: Serang">
                     </div>
-                    {{-- Provinsi --}}
                     <div class="ds-item">
                         <div class="ds-item-label">
                             <div class="ds-item-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-globe2"></i></div>
                             Provinsi
                         </div>
                         <input type="hidden" name="singkat[provinsi][label]" value="Provinsi">
-                        <input type="text" name="singkat[provinsi][nilai]"
-                            class="stat-input"
-                            value="{{ $dataSingkat['provinsi'] ?? 'Banten' }}"
-                            placeholder="Contoh: Banten">
+                        <input type="text" name="singkat[provinsi][nilai]" class="stat-input" value="{{ $dataSingkat['provinsi'] ?? 'Banten' }}" placeholder="Contoh: Banten">
                     </div>
                 </div>
             </div>
@@ -204,6 +185,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 <div class="group-title">Data Kependudukan Utama</div>
             </div>
             <div class="group-body">
+
+                {{-- Total, KK, RT, RW --}}
                 @foreach(['total_penduduk','jumlah_kk','jumlah_rt','jumlah_rw'] as $kunci)
                 @php $s = $statistik[$kunci] ?? null; @endphp
                 @if($s)
@@ -214,6 +197,69 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 </div>
                 @endif
                 @endforeach
+
+                {{-- ── Laki-Laki & Perempuan (2 kolom) ── --}}
+                <div style="margin-top:4px">
+                    <div style="font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+                        <i class="bi bi-gender-ambiguous" style="color:#2563eb"></i>
+                        Jumlah Berdasarkan Jenis Kelamin
+                    </div>
+                    <div class="jk-grid">
+                        {{-- Laki-Laki --}}
+                        @php
+                            $sLaki = $statistik['jiwa_lakilaki'] ?? null;
+                            $nilaiLaki = $sLaki ? $sLaki->nilai : 0;
+                        @endphp
+                        <div class="stat-row" style="border-color:#bfdbfe;background:#eff6ff">
+                            <div class="stat-row-label" style="color:#1d4ed8">
+                                👨 Laki-Laki (Jiwa)
+                            </div>
+                            <input type="hidden" name="statistik[jiwa_lakilaki][label]" value="Laki-Laki">
+                            <input type="number" name="statistik[jiwa_lakilaki][nilai]"
+                                   id="input_jiwa_lakilaki"
+                                   class="stat-input jk-input"
+                                   value="{{ $nilaiLaki }}" min="0"
+                                   style="border-color:#bfdbfe"
+                                   oninput="hitungJK()">
+                            <div class="pct-note" id="pct_laki">
+                                {{ ($nilaiLaki + ($statistik['jiwa_perempuan']->nilai ?? 0)) > 0
+                                    ? round($nilaiLaki / ($nilaiLaki + ($statistik['jiwa_perempuan']->nilai ?? 0)) * 100, 1)
+                                    : 0 }}% dari total
+                            </div>
+                        </div>
+
+                        {{-- Perempuan --}}
+                        @php
+                            $sPrmp = $statistik['jiwa_perempuan'] ?? null;
+                            $nilaiPrmp = $sPrmp ? $sPrmp->nilai : 0;
+                        @endphp
+                        <div class="stat-row" style="border-color:#fecdd3;background:#fff1f2">
+                            <div class="stat-row-label" style="color:#be123c">
+                                👩 Perempuan (Jiwa)
+                            </div>
+                            <input type="hidden" name="statistik[jiwa_perempuan][label]" value="Perempuan">
+                            <input type="number" name="statistik[jiwa_perempuan][nilai]"
+                                   id="input_jiwa_perempuan"
+                                   class="stat-input jk-input"
+                                   value="{{ $nilaiPrmp }}" min="0"
+                                   style="border-color:#fecdd3"
+                                   oninput="hitungJK()">
+                            <div class="pct-note" id="pct_perempuan">
+                                {{ ($nilaiLaki + $nilaiPrmp) > 0
+                                    ? round($nilaiPrmp / ($nilaiLaki + $nilaiPrmp) * 100, 1)
+                                    : 0 }}% dari total
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Ringkasan live --}}
+                    <div id="jk-summary" style="margin-top:10px;padding:10px 14px;border-radius:9px;background:#f8fafc;border:1px solid #e2e8f0;font-size:12px;color:#475569;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                        <span><strong>Total L+P:</strong> <span id="jk-total">{{ number_format($nilaiLaki + $nilaiPrmp) }}</span> jiwa</span>
+                        <span style="color:#cbd5e1">|</span>
+                        <span>Dari setiap 100 perempuan terdapat <strong id="jk-rasio">{{ $nilaiPrmp > 0 ? round($nilaiLaki / $nilaiPrmp * 100) : 0 }}</strong> laki-laki</span>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -368,6 +414,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
 @push('scripts')
 <script>
+// Hitung persentase agama live
 function hitungAgama() {
     const keys = ['jiwa_islam','jiwa_kristen','jiwa_katolik','jiwa_hindu','jiwa_buddha','jiwa_konghucu','jiwa_lainnya'];
     const tot  = keys.reduce((s,k) => s + (parseFloat(document.getElementById('input_'+k)?.value)||0), 0);
@@ -378,6 +425,25 @@ function hitungAgama() {
         const pEl = document.getElementById('pct_'+k);
         if (pEl) pEl.textContent = pct + '%';
     });
+}
+
+// Hitung persentase & rasio jenis kelamin live
+function hitungJK() {
+    const l = parseFloat(document.getElementById('input_jiwa_lakilaki')?.value) || 0;
+    const p = parseFloat(document.getElementById('input_jiwa_perempuan')?.value) || 0;
+    const tot = l + p;
+
+    // Update pct note
+    const pctLEl = document.getElementById('pct_laki');
+    const pctPEl = document.getElementById('pct_perempuan');
+    if (pctLEl) pctLEl.textContent = (tot > 0 ? (Math.round(l/tot*1000)/10) : 0) + '% dari total';
+    if (pctPEl) pctPEl.textContent = (tot > 0 ? (Math.round(p/tot*1000)/10) : 0) + '% dari total';
+
+    // Update summary
+    const totEl   = document.getElementById('jk-total');
+    const rasioEl = document.getElementById('jk-rasio');
+    if (totEl)   totEl.textContent   = tot.toLocaleString('id-ID');
+    if (rasioEl) rasioEl.textContent = p > 0 ? Math.round(l/p*100) : 0;
 }
 </script>
 @endpush

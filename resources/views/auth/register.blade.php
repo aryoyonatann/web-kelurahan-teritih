@@ -43,7 +43,6 @@
     }
     .reg-nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 
-    /* ✅ FIXED: nav-brand-icon mengikuti navbar.blade.php */
     .nav-brand-icon {
         width: 40px; height: 40px;
         border-radius: 8px;
@@ -154,7 +153,7 @@
     }
     .secure-note i { color: var(--green); font-size: 14px; }
 
-    /* ── MODAL SYARAT & KETENTUAN ── */
+    /* MODAL SYARAT & KETENTUAN */
     .tnc-overlay {
         position: fixed; inset: 0; z-index: 9999;
         background: rgba(13,27,62,.55); backdrop-filter: blur(4px);
@@ -225,8 +224,10 @@
     .footer-social:hover { background: var(--blue); color: white; }
     .footer-heading { font-size: 12px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
     .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-    .footer-links a { color: #94a3b8; text-decoration: none; font-size: 13px; transition: color .18s; }
+    .footer-links a { color: #94a3b8; text-decoration: none; font-size: 13px; transition: color .18s; display: flex; align-items: center; gap: 6px; }
+    .footer-links a i { font-size: 10px; color: #475569; }
     .footer-links a:hover { color: #60a5fa; }
+    .footer-links a:hover i { color: #60a5fa; }
     .footer-contact { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
     .footer-contact li { display: flex; gap: 10px; font-size: 12.5px; color: #94a3b8; align-items: flex-start; }
     .footer-contact li i { color: #60a5fa; flex-shrink: 0; margin-top: 2px; }
@@ -417,7 +418,6 @@
 {{-- MODAL SYARAT & KETENTUAN --}}
 <div class="tnc-overlay" id="tncOverlay">
     <div class="tnc-modal">
-
         <div class="tnc-modal-header">
             <div class="tnc-modal-title">
                 <i class="bi bi-file-earmark-text-fill"></i>
@@ -425,15 +425,12 @@
             </div>
             <button class="tnc-modal-close" onclick="tutupModal()"><i class="bi bi-x-lg"></i></button>
         </div>
-
         <div class="tnc-modal-body">
-
             <div class="tnc-section">
                 <div class="tnc-section-title"><i class="bi bi-info-circle-fill"></i> 1. Ketentuan Umum</div>
                 <p>Dengan mendaftarkan diri sebagai pengguna Portal Layanan Digital Kelurahan Teritih, Anda menyatakan telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan yang berlaku.</p>
                 <p>Portal ini merupakan layanan resmi yang dikelola oleh Pemerintah Kelurahan Teritih, Kecamatan Walantaka, Kota Serang, Banten.</p>
             </div>
-
             <div class="tnc-section">
                 <div class="tnc-section-title"><i class="bi bi-person-check-fill"></i> 2. Persyaratan Pendaftaran</div>
                 <ul>
@@ -443,7 +440,6 @@
                     <li>NIK yang digunakan wajib valid dan belum pernah didaftarkan sebelumnya.</li>
                 </ul>
             </div>
-
             <div class="tnc-section">
                 <div class="tnc-section-title"><i class="bi bi-shield-lock-fill"></i> 3. Keamanan Akun</div>
                 <ul>
@@ -453,9 +449,8 @@
                     <li>Kelurahan Teritih tidak akan pernah meminta kata sandi Anda melalui telepon atau pesan.</li>
                 </ul>
             </div>
-
             <div class="tnc-section">
-                <div class="tnc-section-title"><i class="bi bi-database-fill-lock"></i> 4. Privasi & Data Pribadi</div>
+                <div class="tnc-section-title"><i class="bi bi-database-fill-lock"></i> 4. Privasi &amp; Data Pribadi</div>
                 <p>Data pribadi yang Anda berikan akan digunakan semata-mata untuk keperluan pelayanan administrasi kependudukan Kelurahan Teritih.</p>
                 <ul>
                     <li>Data Anda disimpan dengan enkripsi dan tidak akan dijual atau dibagikan kepada pihak ketiga.</li>
@@ -463,7 +458,6 @@
                     <li>Anda berhak meminta koreksi atau penghapusan data dengan menghubungi kantor kelurahan.</li>
                 </ul>
             </div>
-
             <div class="tnc-section">
                 <div class="tnc-section-title"><i class="bi bi-file-earmark-check-fill"></i> 5. Penggunaan Layanan</div>
                 <ul>
@@ -474,9 +468,8 @@
                     <li>Penyalahgunaan layanan dapat mengakibatkan penonaktifan akun.</li>
                 </ul>
             </div>
-
             <div class="tnc-section">
-                <div class="tnc-section-title"><i class="bi bi-telephone-fill"></i> 6. Kontak & Pengaduan</div>
+                <div class="tnc-section-title"><i class="bi bi-telephone-fill"></i> 6. Kontak &amp; Pengaduan</div>
                 <p>Jika Anda memiliki pertanyaan, kendala, atau pengaduan terkait layanan ini, silakan hubungi:</p>
                 <ul>
                     <li>Telepon: (0254) 123456</li>
@@ -485,27 +478,24 @@
                     <li>Datang langsung ke Kantor Kelurahan Teritih pada jam kerja</li>
                 </ul>
             </div>
-
             <div class="tnc-section">
                 <div class="tnc-section-title"><i class="bi bi-patch-check-fill"></i> 7. Persetujuan</div>
                 <p>Dengan mengklik tombol <strong>"Saya Setuju"</strong> di bawah atau mencentang kotak persetujuan pada form pendaftaran, Anda menyatakan telah membaca dan menyetujui seluruh syarat dan ketentuan di atas.</p>
             </div>
-
         </div>
-
         <div class="tnc-modal-footer">
             <button class="btn-tnc-tutup" onclick="tutupModal()">Tutup</button>
             <button class="btn-tnc-setuju" onclick="setujuTnc()">
                 <i class="bi bi-check-circle-fill"></i> Saya Setuju
             </button>
         </div>
-
     </div>
 </div>
 
 <footer class="main-footer">
     <div class="container-fluid px-0">
         <div class="row g-4 pb-2">
+
             <div class="col-lg-3 col-md-6">
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <div class="footer-logo"><i class="bi bi-bank2"></i></div>
@@ -521,16 +511,20 @@
                     <a href="#" class="footer-social"><i class="bi bi-telephone-fill"></i></a>
                 </div>
             </div>
+
+            {{-- TAUTAN CEPAT: route disesuaikan dengan web.php --}}
             <div class="col-lg-2 col-md-6">
                 <div class="footer-heading">Tautan Cepat</div>
                 <ul class="footer-links">
-                    <li><a href="#">Profil Kelurahan</a></li>
-                    <li><a href="#">Struktur Organisasi</a></li>
-                    <li><a href="#">Layanan Online</a></li>
-                    <li><a href="#">Transparansi Anggaran</a></li>
-                    <li><a href="#">Peta Wilayah</a></li>
+                    <li><a href="{{ route('home') }}"><i class="bi bi-chevron-right"></i> Beranda</a></li>
+                    <li><a href="{{ route('profil') }}"><i class="bi bi-chevron-right"></i> Profil Kelurahan</a></li>
+                    <li><a href="{{ route('layanan') }}"><i class="bi bi-chevron-right"></i> Layanan Online</a></li>
+                    <li><a href="{{ route('informasi') }}"><i class="bi bi-chevron-right"></i> Informasi</a></li>
+                    <li><a href="{{ route('informasi.berita') }}"><i class="bi bi-chevron-right"></i> Berita Kelurahan</a></li>
+                    <li><a href="{{ route('login') }}"><i class="bi bi-chevron-right"></i> Login Masyarakat</a></li>
                 </ul>
             </div>
+
             <div class="col-lg-4 col-md-6">
                 <div class="footer-heading">Kontak Kami</div>
                 <ul class="footer-contact">
@@ -540,13 +534,15 @@
                     <li><i class="bi bi-clock-fill"></i><span>Senin–Jumat: 08.00–16.00</span></li>
                 </ul>
             </div>
+
             <div class="col-lg-3 col-md-6">
                 <div class="footer-heading">Lokasi Kantor</div>
                 <div class="footer-map">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
-                    width="100%" height="140" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
+                        width="100%" height="140" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
             </div>
-            </div>
+
         </div>
         <div class="footer-bottom">
             <span>© {{ date('Y') }} Kelurahan Teritih, Kota Serang. Hak Cipta Dilindungi.</span>
@@ -579,22 +575,18 @@ function bukaModal(e) {
     document.getElementById('tncOverlay').classList.add('show');
     document.body.style.overflow = 'hidden';
 }
-
 function tutupModal() {
     document.getElementById('tncOverlay').classList.remove('show');
     document.body.style.overflow = '';
 }
-
 function setujuTnc() {
     const cb = document.getElementById('syarat');
     if (cb) cb.checked = true;
     tutupModal();
 }
-
 document.getElementById('tncOverlay').addEventListener('click', function(e) {
     if (e.target === this) tutupModal();
 });
-
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') tutupModal();
 });

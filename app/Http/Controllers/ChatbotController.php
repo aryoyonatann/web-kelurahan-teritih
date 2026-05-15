@@ -46,7 +46,7 @@ class ChatbotController extends Controller
             ], 500);
         }
 
-        // ✅ 4. Kirim ke Gemini API
+    
         try {
             $reply = $this->callGemini(
                 apiKey: $apiKey,
@@ -70,11 +70,6 @@ class ChatbotController extends Controller
         }
     }
 
-    /**
-     * Kirim request ke Gemini API.
-     *
-     * @throws \Exception
-     */
     private function callGemini(string $apiKey, string $model, string $systemPrompt, string $userMessage): string
     {
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
@@ -102,8 +97,8 @@ class ChatbotController extends Controller
                 ],
                 // Konfigurasi generasi — kontrol gaya jawaban
                 'generationConfig' => [
-                    'temperature'     => 0.4,   // 0=konsisten, 1=kreatif. Rendah = jarang ngarang
-                    'maxOutputTokens' => 500,   // batasi panjang jawaban
+                    'temperature'     => 0.4,   
+                    'maxOutputTokens' => 500,   
                     'topP'            => 0.9,
                 ],
                 // Safety settings — blokir konten berbahaya

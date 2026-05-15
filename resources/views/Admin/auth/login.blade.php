@@ -39,9 +39,6 @@
         flex-direction: column;
     }
 
-    /* =====================================================
-       NAVBAR
-    ===================================================== */
     .admin-nav {
         background: #0d1b3e;
         border-bottom: 1px solid #1e3a5f;
@@ -92,9 +89,6 @@
         background: rgba(255,255,255,.2);
     }
 
-    /* =====================================================
-       PAGE BODY
-    ===================================================== */
     .page-body {
         flex: 1;
         display: flex;
@@ -103,9 +97,6 @@
         padding: 36px 20px;
     }
 
-    /* =====================================================
-       LOGIN CARD
-    ===================================================== */
     .login-card {
         width: 100%;
         max-width: 980px;
@@ -117,7 +108,6 @@
         min-height: 520px;
     }
 
-    /* LEFT PANEL */
     .left-panel {
         flex: 0 0 44%;
         position: relative;
@@ -172,7 +162,6 @@
         border-top: 1px solid rgba(255,255,255,.1); padding-top: 12px;
     }
 
-    /* RIGHT PANEL */
     .right-panel {
         flex: 1;
         padding: 44px 48px;
@@ -248,9 +237,7 @@
         margin-top: 4px;
     }
 
-    /* =====================================================
-       FOOTER
-    ===================================================== */
+    /* FOOTER */
     .main-footer { background: #0f172a; flex-shrink: 0; padding: 48px 32px 0; }
 
     .footer-logo {
@@ -278,9 +265,21 @@
         font-size: 12px; font-weight: 700; color: #cbd5e1;
         text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px;
     }
-    .footer-links        { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-    .footer-links a      { color: #94a3b8; text-decoration: none; font-size: 13px; transition: color .18s; }
-    .footer-links a:hover{ color: #93c5fd; }
+
+    /* Info Sistem */
+    .footer-info-item {
+        display: flex; align-items: flex-start; gap: 8px;
+        font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 14px;
+    }
+    .footer-info-item:last-child { margin-bottom: 0; }
+    .footer-info-item i { color: #475569; flex-shrink: 0; margin-top: 2px; font-size: 12px; }
+    .footer-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 9px; border-radius: 999px;
+        font-size: 10.5px; font-weight: 600; letter-spacing: .02em;
+    }
+    .footer-badge-green { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+    .footer-badge-blue  { background: #0c1a3a; color: #60a5fa; border: 1px solid #1e40af; }
 
     .footer-contact      { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
     .footer-contact li   { display: flex; gap: 10px; font-size: 12.5px; color: #94a3b8; align-items: flex-start; }
@@ -296,9 +295,6 @@
     .footer-bottom a { color: #64748b; text-decoration: none; transition: color .18s; }
     .footer-bottom a:hover { color: #94a3b8; }
 
-    /* =====================================================
-       RESPONSIVE
-    ===================================================== */
     @media (max-width: 767px) {
         .left-panel  { display: none; }
         .right-panel { padding: 32px 24px; }
@@ -310,7 +306,6 @@
 </head>
 <body>
 
-{{-- NAVBAR --}}
 <nav class="admin-nav">
     <a href="{{ route('home') }}" class="admin-nav-brand">
         <div class="admin-nav-icon">
@@ -321,18 +316,14 @@
             <span class="admin-nav-name">Kelurahan Teritih</span>
         </div>
     </a>
-
-    {{-- Hanya tombol kembali ke beranda --}}
     <a href="{{ route('home') }}" class="btn-back-home">
         <i class="bi bi-arrow-left"></i> Kembali ke Beranda
     </a>
 </nav>
 
-{{-- PAGE BODY --}}
 <div class="page-body">
     <div class="login-card">
 
-        {{-- LEFT PANEL --}}
         <div class="left-panel">
             <div class="lp-top">
                 <div class="lp-badge">
@@ -344,7 +335,6 @@
                     Platform terintegrasi untuk pengelolaan data kependudukan, layanan administrasi, dan pelaporan statistik Kelurahan Teritih.
                 </p>
             </div>
-
             <div class="lp-bot">
                 <div class="lp-features">
                     <div class="lp-feat"><i class="bi bi-people-fill"></i> Data Warga</div>
@@ -357,7 +347,6 @@
             </div>
         </div>
 
-        {{-- RIGHT PANEL --}}
         <div class="right-panel">
             <div class="rp-title">Login Administrator</div>
             <div class="rp-subtitle">Masukkan kredensial administrator Anda untuk mengakses dashboard.</div>
@@ -365,7 +354,6 @@
             <form method="POST" action="{{ route('admin.login') }}">
                 @csrf
 
-                {{-- Username --}}
                 <div class="mb-3">
                     <label class="field-label">Username</label>
                     <div class="input-wrap">
@@ -382,7 +370,6 @@
                     @enderror
                 </div>
 
-                {{-- Password --}}
                 <div class="mb-3">
                     <div class="label-row">
                         <label>Kata Sandi</label>
@@ -403,7 +390,6 @@
                     @enderror
                 </div>
 
-                {{-- Remember --}}
                 <div class="form-check mb-4">
                     <input class="form-check-input" type="checkbox" name="remember" id="remember">
                     <label class="form-check-label" for="remember" style="font-size:13px">
@@ -429,7 +415,6 @@
     </div>
 </div>
 
-{{-- FOOTER --}}
 <footer class="main-footer">
     <div class="container-fluid px-0">
         <div class="row g-4 pb-2">
@@ -452,14 +437,37 @@
                 </div>
             </div>
 
+            {{-- INFO SISTEM: menggantikan Tautan Internal yang tidak relevan --}}
             <div class="col-lg-2 col-md-6">
-                <div class="footer-heading">Tautan Internal</div>
-                <ul class="footer-links">
-                    <li><a href="#">Webmail Kelurahan</a></li>
-                    <li><a href="#">Sistem Kepegawaian</a></li>
-                    <li><a href="#">Arsip Digital</a></li>
-                    <li><a href="#">Helpdesk IT</a></li>
-                </ul>
+                <div class="footer-heading">Info Sistem</div>
+                <div class="footer-info-item">
+                    <i class="bi bi-layers"></i>
+                    <div>
+                        <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Versi Aplikasi</div>
+                        <span class="footer-badge footer-badge-blue mt-1">SIMPEKA v2.0</span>
+                    </div>
+                </div>
+                <div class="footer-info-item">
+                    <i class="bi bi-circle-fill" style="color:#4ade80;font-size:8px;margin-top:4px;"></i>
+                    <div>
+                        <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Status Sistem</div>
+                        <span class="footer-badge footer-badge-green mt-1">Beroperasi Normal</span>
+                    </div>
+                </div>
+                <div class="footer-info-item">
+                    <i class="bi bi-calendar3"></i>
+                    <div>
+                        <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Pembaruan Terakhir</div>
+                        <span style="color:#64748b;font-size:11.5px;">{{ date('d M Y') }}</span>
+                    </div>
+                </div>
+                <div class="footer-info-item">
+                    <i class="bi bi-shield-lock"></i>
+                    <div>
+                        <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Akses</div>
+                        <span style="color:#64748b;font-size:11.5px;">Khusus Petugas</span>
+                    </div>
+                </div>
             </div>
 
             <div class="col-lg-4 col-md-6">
@@ -477,9 +485,9 @@
             <div class="col-lg-3 col-md-6">
                 <div class="footer-heading">Lokasi Kantor</div>
                 <div class="footer-map">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
-                    width="100%" height="140" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-            </div>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
+                        width="100%" height="140" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
             </div>
 
         </div>

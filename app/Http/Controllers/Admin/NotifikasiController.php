@@ -8,14 +8,10 @@ use Illuminate\Http\Request;
 
 class NotifikasiController extends Controller
 {
-    /**
-     * Ambil notifikasi terbaru untuk polling.
-     * Dipakai oleh header.blade.php via fetch() setiap 30 detik.
-     */
+   
     public function index(Request $request)
     {
-        // Ambil permohonan yang belum ada approval (pending/baru masuk)
-        // Ambil 10 terbaru, urutkan dari yang paling baru
+
         $permohonan = PermohonanSurat::with(['user', 'jenisSurat'])
             ->whereDoesntHave('approval')
             ->orWhereHas('approval', fn($q) => $q->whereRaw('LOWER(status) = ?', ['pending']))

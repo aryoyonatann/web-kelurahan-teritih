@@ -27,21 +27,38 @@
     .card-section-body{padding:20px}
     .form-label-custom{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#374151;margin-bottom:6px;display:block}
     .form-label-custom .req{color:var(--red);margin-left:2px}
+    .form-label-custom .opt{color:#94a3b8;font-weight:600;margin-left:4px;text-transform:none;letter-spacing:0}
     .form-control,.form-select{font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--navy);transition:all .15s;width:100%}
     .form-control:focus,.form-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(28,100,242,.1);outline:none}
     .form-control.is-invalid,.form-select.is-invalid{border-color:var(--red)}
-    .invalid-feedback{font-size:12px;color:var(--red);margin-top:4px;display:block}
+    .invalid-feedback{font-size:12px;color:var(--red);margin-top:4px;display:flex;align-items:center;gap:4px}
     .btn-isi-sendiri{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;background:var(--blue-lt);color:var(--blue);border:1.5px solid #bfdbfe;cursor:pointer;transition:all .15s;font-family:inherit}
     .btn-isi-sendiri:hover{background:#dbeafe}
     .btn-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--navy),var(--blue));color:white;border:none;cursor:pointer;transition:all .18s;font-family:inherit;margin-top:8px}
     .btn-submit:hover{opacity:.9;transform:translateY(-1px)}
     .alert-info-box{background:var(--blue-lt);border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;font-size:13px;color:#1e40af;display:flex;align-items:flex-start;gap:10px;margin-bottom:16px}
     .alert-error-box{background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#991b1b}
+    /* File upload */
+    .file-wrap{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+    .file-wrap:hover{border-color:var(--blue);background:#eff6ff}
+    .file-wrap input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .file-icon{font-size:26px;color:#94a3b8;margin-bottom:6px}
+    .file-label{font-size:12px;font-weight:600;color:var(--muted)}
+    .file-hint{font-size:11px;color:#94a3b8;margin-top:3px}
+    .file-name{font-size:12px;font-weight:600;color:var(--blue);margin-top:6px;display:none}
+    .file-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+    .file-list-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#1e40af}
+    .file-list-item i{flex-shrink:0;color:#1c64f2}
+    .file-list-item .fn{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .file-list-item .fs{color:#64748b;font-weight:500;font-size:11px;flex-shrink:0}
+    .file-warn{margin-top:8px;padding:8px 12px;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#92400e;display:flex;align-items:center;gap:6px}
     </style>
 </head>
 <body>
 
 @include('partials.navbar-user')
+
+@php $maxPendukung = 3; @endphp
 
 <div class="form-page">
 
@@ -49,7 +66,6 @@
         <i class="bi bi-arrow-left"></i> Kembali ke Layanan
     </a>
 
-    <!-- {-- HERO --} -->
     <div class="form-hero">
         <div style="position:relative;z-index:1">
             <div class="form-hero-badge">
@@ -60,7 +76,6 @@
         </div>
     </div>
 
-    <!-- {-- ERROR BOX --} -->
     @if($errors->any())
     <div class="alert-error-box">
         <strong><i class="bi bi-exclamation-triangle-fill"></i> Terdapat kesalahan:</strong>
@@ -73,7 +88,7 @@
     <form method="POST" action="{{ route('user.permohonan.store.surat', 'beda-nama') }}" enctype="multipart/form-data">
         @csrf
 
-        <!-- {-- PENGAJUAN UNTUK SIAPA --} -->
+        <!-- PENGAJUAN UNTUK SIAPA -->
         <div class="card-section">
             <div class="card-section-head">
                 <div class="card-section-head-icon" style="background:var(--blue-lt);color:var(--blue)">
@@ -103,7 +118,7 @@
             </div>
         </div>
 
-        <!-- {-- DATA PEMOHON --} -->
+        <!-- DATA PEMOHON -->
         <div class="card-section">
             <div class="card-section-head">
                 <div class="card-section-head-icon" style="background:var(--blue-lt);color:var(--blue)">
@@ -198,7 +213,7 @@
             </div>
         </div>
 
-                {{-- PERBEDAAN NAMA --}}
+        <!-- PERBEDAAN NAMA -->
         <div class="card-section">
             <div class="card-section-head">
                 <div class="card-section-head-icon" style="background:#fffbeb;color:#d97706">
@@ -247,31 +262,67 @@
             </div>
         </div>
 
-        <!-- {-- DOKUMEN --} -->
+        <!-- LAMPIRAN DOKUMEN -->
         <div class="card-section">
             <div class="card-section-head">
-                <div class="card-section-head-icon" style="background:var(--blue-lt);color:var(--blue)">
+                <div class="card-section-head-icon" style="background:#fffbeb;color:#f59e0b">
                     <i class="bi bi-paperclip"></i>
                 </div>
                 <div class="card-section-title">Lampiran Dokumen</div>
             </div>
             <div class="card-section-body">
                 <div class="row g-3">
+                    <!-- KTP -->
                     <div class="col-md-6">
                         <label class="form-label-custom">Foto/Scan KTP <span class="req">*</span></label>
-                        <input type="file" name="dokumen_ktp"
-                            class="form-control @error('dokumen_ktp') is-invalid @enderror"
-                            accept=".jpg,.jpeg,.png,.pdf" required>
-                        <div style="font-size:11px;color:var(--muted);margin-top:4px">JPG, PNG, atau PDF. Maks 10MB.</div>
-                        @error('dokumen_ktp')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                        <div class="file-wrap">
+                            <input type="file" name="dokumen_ktp" accept=".jpg,.jpeg,.png,.pdf"
+                                onchange="showFileName(this,'fname_ktp')" required>
+                            <div class="file-icon"><i class="bi bi-cloud-upload"></i></div>
+                            <div class="file-label">Klik atau drag file ke sini</div>
+                            <div class="file-hint">JPG, PNG, atau PDF. Maks 10MB.</div>
+                            <div class="file-name" id="fname_ktp"></div>
+                        </div>
+                        @error('dokumen_ktp')<div class="invalid-feedback" style="display:flex"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
                     </div>
+                    <!-- KK -->
                     <div class="col-md-6">
                         <label class="form-label-custom">Foto/Scan Kartu Keluarga <span class="req">*</span></label>
-                        <input type="file" name="dokumen_kk"
-                            class="form-control @error('dokumen_kk') is-invalid @enderror"
-                            accept=".jpg,.jpeg,.png,.pdf" required>
-                        <div style="font-size:11px;color:var(--muted);margin-top:4px">JPG, PNG, atau PDF. Maks 10MB.</div>
-                        @error('dokumen_kk')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                        <div class="file-wrap">
+                            <input type="file" name="dokumen_kk" accept=".jpg,.jpeg,.png,.pdf"
+                                onchange="showFileName(this,'fname_kk')" required>
+                            <div class="file-icon"><i class="bi bi-cloud-upload"></i></div>
+                            <div class="file-label">Klik atau drag file ke sini</div>
+                            <div class="file-hint">JPG, PNG, atau PDF. Maks 10MB.</div>
+                            <div class="file-name" id="fname_kk"></div>
+                        </div>
+                        @error('dokumen_kk')<div class="invalid-feedback" style="display:flex"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
+                    </div>
+                    <!-- Dokumen Pendukung -->
+                    <div class="col-12">
+                        <label class="form-label-custom">
+                            Dokumen Pendukung
+                            <span class="opt">(Opsional — maks. {{ $maxPendukung }} file)</span>
+                        </label>
+                        <div class="file-wrap">
+                            <input type="file" name="dokumen_pendukung[]" id="inputPendukung"
+                                accept=".jpg,.jpeg,.png,.pdf" multiple
+                                onchange="showMultipleFiles(this)">
+                            <div class="file-icon"><i class="bi bi-files"></i></div>
+                            <div class="file-label">Klik atau drag untuk pilih beberapa file sekaligus</div>
+                            <div class="file-hint">JPG, PNG, atau PDF. Maks 10MB per file. Bisa pilih hingga {{ $maxPendukung }} file.</div>
+                        </div>
+                        <div class="file-list" id="listPendukung"></div>
+                        <div class="file-warn" id="warnPendukung" style="display:none">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span id="warnPendukungText"></span>
+                        </div>
+                        @error('dokumen_pendukung')<div class="invalid-feedback" style="display:flex"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
+                        @foreach($errors->get('dokumen_pendukung.*') as $msgs)
+                            @foreach($msgs as $m)
+                                <div class="invalid-feedback" style="display:flex"><i class="bi bi-exclamation-circle"></i> {{ $m }}</div>
+                            @endforeach
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -287,6 +338,9 @@
 @include('partials.footer')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+const MAX_PENDUKUNG = {{ $maxPendukung }};
+const MAX_SIZE_MB   = 10;
+
 const userData = {
     nama:         '{{ Auth::user()->nama ?? "" }}',
     nik:          '{{ Auth::user()->nik ?? "" }}',
@@ -296,6 +350,7 @@ const userData = {
     rt:           '{{ Auth::user()->rt ?? "" }}',
     rw:           '{{ Auth::user()->rw ?? "" }}',
 };
+
 function isiDataSendiri() {
     document.getElementById('namaPemohon').value   = userData.nama;
     document.getElementById('nikPemohon').value    = userData.nik;
@@ -305,13 +360,68 @@ function isiDataSendiri() {
     document.getElementById('rtField').value       = userData.rt;
     document.getElementById('rwField').value       = userData.rw;
 }
+
 function togglePengajuan(val) {
     const info = document.getElementById('infoOrangLain');
     const btn  = document.getElementById('btnIsiSendiri');
     info.style.display = val === 'orang_lain' ? 'flex' : 'none';
     btn.style.display  = val === 'orang_lain' ? 'none'  : 'inline-flex';
 }
-</script>
 
+function showFileName(input, id) {
+    const el = document.getElementById(id);
+    if (input.files && input.files[0]) {
+        el.textContent = '✓ ' + input.files[0].name;
+        el.style.display = 'block';
+    }
+}
+
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+function showMultipleFiles(input) {
+    const list     = document.getElementById('listPendukung');
+    const warn     = document.getElementById('warnPendukung');
+    const warnText = document.getElementById('warnPendukungText');
+    list.innerHTML = '';
+    warn.style.display = 'none';
+
+    if (!input.files || input.files.length === 0) return;
+
+    const files    = Array.from(input.files);
+    const problems = [];
+
+    if (files.length > MAX_PENDUKUNG) {
+        problems.push(`Anda memilih ${files.length} file, hanya ${MAX_PENDUKUNG} pertama yang akan diunggah.`);
+    }
+
+    files.slice(0, MAX_PENDUKUNG).forEach((file) => {
+        const sizeMB   = file.size / (1024 * 1024);
+        const oversized = sizeMB > MAX_SIZE_MB;
+        if (oversized) problems.push(`File "${file.name}" melebihi ${MAX_SIZE_MB}MB.`);
+
+        const item = document.createElement('div');
+        item.className = 'file-list-item';
+        item.innerHTML = `
+            <i class="bi bi-file-earmark-check-fill"></i>
+            <span class="fn">${file.name}</span>
+            <span class="fs">${formatSize(file.size)}</span>`;
+        if (oversized) {
+            item.style.cssText = 'background:#fef2f2;border-color:#fecaca;color:#991b1b';
+            item.querySelector('i').style.color = '#dc2626';
+            item.querySelector('i').className = 'bi bi-file-earmark-x-fill';
+        }
+        list.appendChild(item);
+    });
+
+    if (problems.length > 0) {
+        warnText.textContent = problems.join(' ');
+        warn.style.display = 'flex';
+    }
+}
+</script>
 </body>
 </html>

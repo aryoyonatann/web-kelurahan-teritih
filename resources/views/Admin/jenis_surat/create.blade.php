@@ -20,7 +20,6 @@
     .form-hero h1 { font-size:22px;font-weight:800;color:white;margin:0 0 4px; }
     .form-hero p  { font-size:13px;color:rgba(255,255,255,.75);margin:0; }
 
-    /* ── REVISI: full width, tidak dibatasi 800px ── */
     .form-wrapper { padding: 28px 32px; }
 
     .form-card { background:white;border-radius:14px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:20px; }
@@ -52,12 +51,12 @@
     .tc-desc { font-size:11px;color:#64748b;line-height:1.5; }
     .tc-check { position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:#1c64f2;color:white;display:none;align-items:center;justify-content:center;font-size:11px; }
     .template-card.selected .tc-check { display:flex; }
+    .tc-example { font-size:10px;color:#94a3b8;margin-top:6px;font-style:italic;line-height:1.4; }
 
     /* Field builder */
     .field-builder { display:none; }
     .field-builder.show { display:block; }
 
-    /* ── REVISI: preset grid lebih lebar karena full width ── */
     .preset-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px; }
     .preset-item { display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:9px;cursor:pointer;transition:all .15s; }
     .preset-item:hover { border-color:#93c5fd;background:#f8fafc; }
@@ -68,6 +67,23 @@
     .preset-item.checked { border-color:#1c64f2;background:#eff6ff; }
     .req-toggle { font-size:11px;color:#64748b;white-space:nowrap; }
     .req-toggle input { accent-color:#ef4444; }
+
+    /* Preset group (shown based on template) */
+    .preset-group { display:none; }
+    .preset-group.active { display:block; }
+
+    /* Pihak Kedua preview box (only for template C) */
+    .pihak2-preview { background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none; }
+    .pihak2-preview.show { display:block; }
+    .pihak2-preview-header { display:flex;align-items:center;gap:10px;margin-bottom:12px; }
+    .pihak2-preview-icon { width:34px;height:34px;border-radius:9px;background:#f43f5e;color:white;display:flex;align-items:center;justify-content:center;font-size:16px; }
+    .pihak2-preview-title { font-size:13px;font-weight:700;color:#991b1b; }
+    .pihak2-preview-sub { font-size:12px;color:#b91c1c;margin-top:2px; }
+    .pihak2-fields { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px; }
+    .pihak2-field { background:white;border:1px solid #fecaca;border-radius:7px;padding:8px 12px;font-size:12px; }
+    .pihak2-field-label { font-weight:600;color:#991b1b; }
+    .pihak2-field-type { font-size:10px;color:#dc2626;text-transform:uppercase;letter-spacing:.05em;margin-top:2px; }
+    .pihak2-field-req { display:inline-block;background:#dc2626;color:white;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:6px;text-transform:uppercase;letter-spacing:.05em; }
 
     /* Custom field rows */
     .custom-fields { margin-top:16px; }
@@ -90,8 +106,12 @@
 
     .info-box { background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;font-size:12px;color:#1e40af;display:flex;gap:8px;margin-bottom:16px; }
 
-    /* ── 2 kolom untuk nama + deskripsi ── */
     .info-grid { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
+
+    @media (max-width: 991px) {
+        .template-grid, .preset-grid, .pihak2-fields { grid-template-columns:1fr; }
+        .info-grid { grid-template-columns:1fr; }
+    }
 </style>
 @endpush
 
@@ -123,7 +143,6 @@
                     <div class="form-card-title">Informasi Jenis Surat</div>
                 </div>
                 <div class="form-card-body">
-                    {{-- 2 kolom: nama kiri, deskripsi kanan --}}
                     <div class="info-grid">
                         <div class="field-group" style="margin-bottom:0">
                             <label class="field-label">Nama Surat <span>*</span></label>
@@ -160,7 +179,8 @@
                             <div class="tc-check"><i class="bi bi-check"></i></div>
                             <div class="tc-icon">📄</div>
                             <div class="tc-name">Surat Keterangan Biasa</div>
-                            <div class="tc-desc">Form biodata standar + keperluan surat. Cocok untuk surat keterangan sederhana.</div>
+                            <div class="tc-desc">Form biodata standar + keperluan surat saja. Tanpa field tambahan.</div>
+                            <div class="tc-example">Contoh: Domisili, Tidak Mampu, Kelakuan Baik</div>
                         </label>
 
                         {{-- Template B --}}
@@ -169,7 +189,8 @@
                             <div class="tc-check"><i class="bi bi-check"></i></div>
                             <div class="tc-icon">📋</div>
                             <div class="tc-name">Surat Keterangan dengan Data Khusus</div>
-                            <div class="tc-desc">Biodata + field tambahan yang bisa dikustomisasi sesuai kebutuhan surat.</div>
+                            <div class="tc-desc">Biodata + field konteks peristiwa (tanggal, lokasi, dokumen, dll).</div>
+                            <div class="tc-example">Contoh: Kehilangan, Usaha, Izin Keramaian</div>
                         </label>
 
                         {{-- Template C --}}
@@ -178,11 +199,12 @@
                             <div class="tc-check"><i class="bi bi-check"></i></div>
                             <div class="tc-icon">👥</div>
                             <div class="tc-name">Surat Keterangan Dua Pihak</div>
-                            <div class="tc-desc">Biodata pemohon + biodata pihak kedua. Cocok untuk surat yang melibatkan dua orang.</div>
+                            <div class="tc-desc">Biodata pemohon <strong>+ biodata Pihak Kedua otomatis</strong> (Nama, NIK, TTL, Alamat, Hubungan).</div>
+                            <div class="tc-example">Contoh: Ahli Waris, Wali, Hubungan Keluarga</div>
                         </label>
 
                     </div>
-                    <div class="field-hint">Template menentukan tampilan form pengajuan yang dilihat warga.</div>
+                    <div class="field-hint">Template menentukan struktur form pengajuan yang dilihat warga.</div>
                 </div>
             </div>
 
@@ -193,37 +215,93 @@
                     <div class="form-card-title">Konfigurasi Field Tambahan</div>
                 </div>
                 <div class="form-card-body">
-                    <div class="info-box">
-                        <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
-                        <div>Centang field yang ingin ditampilkan di form pengajuan warga. Tambahkan field kustom jika tidak ada di daftar. Centang <strong>Wajib</strong> jika field harus diisi.</div>
-                    </div>
 
-                    {{-- PRESET FIELDS --}}
-                    <div class="field-label" style="margin-bottom:10px">Field Tersedia — Centang yang Diperlukan</div>
-                    <div class="preset-grid" id="presetGrid">
-                        @foreach($presets as $preset)
-                        @php $isChecked = in_array($preset['key'], old('preset_fields', [])); @endphp
-                        <div class="preset-item {{ $isChecked ? 'checked' : '' }}" id="pi_{{ $preset['key'] }}"
-                            onclick="togglePreset('{{ $preset['key'] }}')">
-                            <input type="checkbox" name="preset_fields[]"
-                                value="{{ $preset['key'] }}"
-                                id="pf_{{ $preset['key'] }}"
-                                {{ $isChecked ? 'checked' : '' }}
-                                onclick="event.stopPropagation()">
-                            <div class="preset-item-info">
-                                <div class="preset-item-label">{{ $preset['label'] }}</div>
-                                <div class="preset-item-type">{{ $preset['type'] }}</div>
-                            </div>
-                            <div class="req-toggle" title="Wajib diisi?">
-                                <input type="checkbox" name="required_fields[]"
-                                    value="{{ $preset['key'] }}"
-                                    {{ in_array($preset['key'], old('required_fields', [])) ? 'checked' : '' }}
-                                    onclick="event.stopPropagation()"
-                                    title="Wajib">
-                                Wajib
+                    {{-- ── PREVIEW BLOK PIHAK KEDUA (hanya muncul untuk template C) ── --}}
+                    <div class="pihak2-preview" id="pihak2Preview">
+                        <div class="pihak2-preview-header">
+                            <div class="pihak2-preview-icon"><i class="bi bi-people-fill"></i></div>
+                            <div>
+                                <div class="pihak2-preview-title">Blok "Data Pihak Kedua" — Otomatis Tampil di Form Warga</div>
+                                <div class="pihak2-preview-sub">Field ini sudah built-in untuk template Dua Pihak, tidak perlu dicentang.</div>
                             </div>
                         </div>
-                        @endforeach
+                        <div class="pihak2-fields">
+                            @foreach($pihakKeduaFields as $f)
+                            <div class="pihak2-field">
+                                <div class="pihak2-field-label">
+                                    {{ $f['label'] }}
+                                    @if($f['required'])<span class="pihak2-field-req">Wajib</span>@endif
+                                </div>
+                                <div class="pihak2-field-type">{{ $f['type'] }}</div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
+                        <div>Centang field konteks tambahan yang ingin ditampilkan di form pengajuan warga. Tambahkan field kustom jika tidak ada di daftar. Centang <strong>Wajib</strong> jika field harus diisi.</div>
+                    </div>
+
+                    {{-- PRESET FIELDS — DINAMIS PER TEMPLATE --}}
+                    <div class="field-label" style="margin-bottom:10px">Field Tersedia — Centang yang Diperlukan</div>
+
+                    {{-- Preset untuk Template B --}}
+                    <div class="preset-group" id="presetGroupB">
+                        <div class="preset-grid">
+                            @foreach($presetsB as $preset)
+                            @php $isChecked = in_array($preset['key'], old('preset_fields', [])); @endphp
+                            <div class="preset-item {{ $isChecked ? 'checked' : '' }}" id="piB_{{ $preset['key'] }}"
+                                onclick="togglePreset('B','{{ $preset['key'] }}')">
+                                <input type="checkbox" name="preset_fields[]"
+                                    value="{{ $preset['key'] }}"
+                                    id="pfB_{{ $preset['key'] }}"
+                                    {{ $isChecked ? 'checked' : '' }}
+                                    onclick="event.stopPropagation()">
+                                <div class="preset-item-info">
+                                    <div class="preset-item-label">{{ $preset['label'] }}</div>
+                                    <div class="preset-item-type">{{ $preset['type'] }}</div>
+                                </div>
+                                <div class="req-toggle" title="Wajib diisi?">
+                                    <input type="checkbox" name="required_fields[]"
+                                        value="{{ $preset['key'] }}"
+                                        {{ in_array($preset['key'], old('required_fields', [])) ? 'checked' : '' }}
+                                        onclick="event.stopPropagation()"
+                                        title="Wajib">
+                                    Wajib
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Preset untuk Template C --}}
+                    <div class="preset-group" id="presetGroupC">
+                        <div class="preset-grid">
+                            @foreach($presetsC as $preset)
+                            @php $isChecked = in_array($preset['key'], old('preset_fields', [])); @endphp
+                            <div class="preset-item {{ $isChecked ? 'checked' : '' }}" id="piC_{{ $preset['key'] }}"
+                                onclick="togglePreset('C','{{ $preset['key'] }}')">
+                                <input type="checkbox" name="preset_fields[]"
+                                    value="{{ $preset['key'] }}"
+                                    id="pfC_{{ $preset['key'] }}"
+                                    {{ $isChecked ? 'checked' : '' }}
+                                    onclick="event.stopPropagation()">
+                                <div class="preset-item-info">
+                                    <div class="preset-item-label">{{ $preset['label'] }}</div>
+                                    <div class="preset-item-type">{{ $preset['type'] }}</div>
+                                </div>
+                                <div class="req-toggle" title="Wajib diisi?">
+                                    <input type="checkbox" name="required_fields[]"
+                                        value="{{ $preset['key'] }}"
+                                        {{ in_array($preset['key'], old('required_fields', [])) ? 'checked' : '' }}
+                                        onclick="event.stopPropagation()"
+                                        title="Wajib">
+                                    Wajib
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     {{-- CUSTOM FIELDS --}}
@@ -252,20 +330,59 @@
 let customFieldCount = 0;
 
 function selectTemplate(t) {
+    // Update visual radio
     document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('selected');
+    }
 
-    const builder = document.getElementById('fieldBuilder');
-    if (t === 'B' || t === 'C') {
-        builder.classList.add('show');
-    } else {
+    const builder       = document.getElementById('fieldBuilder');
+    const presetGroupB  = document.getElementById('presetGroupB');
+    const presetGroupC  = document.getElementById('presetGroupC');
+    const pihak2Preview = document.getElementById('pihak2Preview');
+
+    // Reset state
+    presetGroupB.classList.remove('active');
+    presetGroupC.classList.remove('active');
+    pihak2Preview.classList.remove('show');
+
+    if (t === 'A') {
         builder.classList.remove('show');
+    } else if (t === 'B') {
+        builder.classList.add('show');
+        presetGroupB.classList.add('active');
+        // Pastikan checkbox dari group C tidak ikut tersubmit
+        uncheckGroup('C');
+    } else if (t === 'C') {
+        builder.classList.add('show');
+        presetGroupC.classList.add('active');
+        pihak2Preview.classList.add('show');
+        uncheckGroup('B');
     }
 }
 
-function togglePreset(key) {
-    const item = document.getElementById('pi_' + key);
-    const cb   = document.getElementById('pf_' + key);
+/**
+ * Uncheck semua checkbox di group preset yang TIDAK aktif,
+ * supaya tidak ikut tersubmit dan menyimpan field yang tidak valid
+ * untuk template terpilih.
+ */
+function uncheckGroup(which) {
+    const prefix = 'pf' + which + '_';
+    document.querySelectorAll(`[id^="${prefix}"]`).forEach(cb => {
+        cb.checked = false;
+    });
+    // Required checkbox di group yang sama juga di-uncheck
+    document.querySelectorAll(`#presetGroup${which} input[name="required_fields[]"]`).forEach(cb => {
+        cb.checked = false;
+    });
+    document.querySelectorAll(`#presetGroup${which} .preset-item`).forEach(item => {
+        item.classList.remove('checked');
+    });
+}
+
+function togglePreset(group, key) {
+    const item = document.getElementById('pi' + group + '_' + key);
+    const cb   = document.getElementById('pf' + group + '_' + key);
     cb.checked = !cb.checked;
     item.classList.toggle('checked', cb.checked);
 }
@@ -310,8 +427,25 @@ function removeCustomField(id) {
 
 document.addEventListener('DOMContentLoaded', function() {
     const oldTemplate = '{{ old("template") }}';
-    if (oldTemplate === 'B' || oldTemplate === 'C') {
-        document.getElementById('fieldBuilder').classList.add('show');
+    if (oldTemplate === 'A' || oldTemplate === 'B' || oldTemplate === 'C') {
+        // Trigger ulang state UI sesuai old value
+        const card = document.querySelector(`.template-card input[value="${oldTemplate}"]`);
+        if (card) {
+            // Simulasi klik tanpa event handler
+            const builder       = document.getElementById('fieldBuilder');
+            const presetGroupB  = document.getElementById('presetGroupB');
+            const presetGroupC  = document.getElementById('presetGroupC');
+            const pihak2Preview = document.getElementById('pihak2Preview');
+
+            if (oldTemplate === 'B') {
+                builder.classList.add('show');
+                presetGroupB.classList.add('active');
+            } else if (oldTemplate === 'C') {
+                builder.classList.add('show');
+                presetGroupC.classList.add('active');
+                pihak2Preview.classList.add('show');
+            }
+        }
     }
 });
 </script>

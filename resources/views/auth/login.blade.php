@@ -57,7 +57,6 @@
         text-decoration: none;
     }
 
-    /* ✅ FIXED: nav-brand-icon mengikuti navbar.blade.php */
     .nav-brand-icon {
         width: 40px; height: 40px;
         border-radius: 8px;
@@ -294,8 +293,10 @@
         text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px;
     }
     .footer-links        { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-    .footer-links a      { color: #94a3b8; text-decoration: none; font-size: 13px; transition: color .18s; }
+    .footer-links a      { color: #94a3b8; text-decoration: none; font-size: 13px; transition: color .18s; display: flex; align-items: center; gap: 6px; }
+    .footer-links a i    { font-size: 10px; color: #475569; }
     .footer-links a:hover{ color: #60a5fa; }
+    .footer-links a:hover i { color: #60a5fa; }
 
     .footer-contact      { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
     .footer-contact li   { display: flex; gap: 10px; font-size: 12.5px; color: #94a3b8; align-items: flex-start; }
@@ -325,7 +326,6 @@
 
 <nav class="login-nav">
     <a href="{{ route('home') }}" class="login-nav-brand">
-    
         <div class="nav-brand-icon">
             <img src="{{ asset('images/logo kota serang.png') }}" alt="Logo Kota Serang">
         </div>
@@ -476,14 +476,16 @@
                 </div>
             </div>
 
+            {{-- TAUTAN CEPAT: route disesuaikan dengan web.php --}}
             <div class="col-lg-2 col-md-6">
                 <div class="footer-heading">Tautan Cepat</div>
                 <ul class="footer-links">
-                    <li><a href="#">Profil Kelurahan</a></li>
-                    <li><a href="#">Struktur Organisasi</a></li>
-                    <li><a href="#">Layanan Online</a></li>
-                    <li><a href="#">Transparansi Anggaran</a></li>
-                    <li><a href="#">Peta Wilayah</a></li>
+                    <li><a href="{{ route('home') }}"><i class="bi bi-chevron-right"></i> Beranda</a></li>
+                    <li><a href="{{ route('profil') }}"><i class="bi bi-chevron-right"></i> Profil Kelurahan</a></li>
+                    <li><a href="{{ route('layanan') }}"><i class="bi bi-chevron-right"></i> Layanan Online</a></li>
+                    <li><a href="{{ route('informasi') }}"><i class="bi bi-chevron-right"></i> Informasi</a></li>
+                    <li><a href="{{ route('informasi.berita') }}"><i class="bi bi-chevron-right"></i> Berita Kelurahan</a></li>
+                    <li><a href="{{ route('register') }}"><i class="bi bi-chevron-right"></i> Daftar Akun</a></li>
                 </ul>
             </div>
 
@@ -503,9 +505,9 @@
             <div class="col-lg-3 col-md-6">
                 <div class="footer-heading">Lokasi Kantor</div>
                 <div class="footer-map">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
-                    width="100%" height="140" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-            </div>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3264.628318155724!2d106.21330817398886!3d-6.111405093875137!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e41f4528991d579%3A0x30e6a19597ad1d4a!2sBalai%20Desa%20Kelurahan%20Teritih!5e1!3m2!1sid!2sid!4v1776310241900!5m2!1sid!2sid"
+                        width="100%" height="140" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
             </div>
 
         </div>

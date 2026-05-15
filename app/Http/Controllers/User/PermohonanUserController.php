@@ -34,6 +34,92 @@ class PermohonanUserController extends Controller
         'izin-cuti'   => 'User.permohonan.form_izin_cuti',
     ];
 
+    /**
+     * Aturan validasi untuk dokumen wajib (KTP & KK)
+     * + Dokumen Pendukung opsional max 3 file.
+     */
+    private const MAX_DOKUMEN_PENDUKUNG = 3;
+
+    private function dokumenRules(): array
+    {
+        return [
+            'dokumen_ktp'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'dokumen_kk'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'dokumen_pendukung'   => 'nullable|array|max:' . self::MAX_DOKUMEN_PENDUKUNG,
+            'dokumen_pendukung.*' => 'file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ];
+    }
+
+    private function dokumenMessages(): array
+    {
+        return [
+            'dokumen_ktp.required'        => 'KTP wajib diunggah.',
+            'dokumen_ktp.mimes'           => 'Format KTP harus JPG, PNG, atau PDF.',
+            'dokumen_ktp.max'             => 'Ukuran KTP maksimal 10MB.',
+            'dokumen_kk.required'         => 'Kartu Keluarga wajib diunggah.',
+            'dokumen_kk.mimes'            => 'Format KK harus JPG, PNG, atau PDF.',
+            'dokumen_kk.max'              => 'Ukuran KK maksimal 10MB.',
+            'dokumen_pendukung.max'       => 'Maksimal ' . self::MAX_DOKUMEN_PENDUKUNG . ' dokumen pendukung.',
+            'dokumen_pendukung.*.mimes'   => 'Format dokumen pendukung harus JPG, PNG, atau PDF.',
+            'dokumen_pendukung.*.max'     => 'Ukuran dokumen pendukung maksimal 10MB per file.',
+            'dokumen_pendukung.*.file'    => 'Dokumen pendukung tidak valid.',
+        ];
+    }
+
+    /**
+     * Helper: simpan semua dokumen (KTP wajib, KK wajib, pendukung opsional max 3)
+     * ke tabel persyaratan untuk permohonan yang diberikan.
+     */
+    private function simpanDokumen(Request $request, PermohonanSurat $permohonan): void
+    {
+        // KTP
+        if ($request->hasFile('dokumen_ktp') && $request->file('dokumen_ktp')->isValid()) {
+            $file = $request->file('dokumen_ktp');
+            Persyaratan::create([
+                'id_permohonan' => $permohonan->id_permohonan,
+                'nama_file'     => $file->getClientOriginalName(),
+                'jenis_dokumen' => 'ktp',
+                'path_file'     => $file->store('persyaratan', 'public'),
+                'uploaded_at'   => now(),
+            ]);
+        }
+
+        // KK
+        if ($request->hasFile('dokumen_kk') && $request->file('dokumen_kk')->isValid()) {
+            $file = $request->file('dokumen_kk');
+            Persyaratan::create([
+                'id_permohonan' => $permohonan->id_permohonan,
+                'nama_file'     => $file->getClientOriginalName(),
+                'jenis_dokumen' => 'kk',
+                'path_file'     => $file->store('persyaratan', 'public'),
+                'uploaded_at'   => now(),
+            ]);
+        }
+
+        // Dokumen Pendukung (opsional, max 3 file)
+        if ($request->hasFile('dokumen_pendukung')) {
+            $files = $request->file('dokumen_pendukung');
+            // Pastikan iterable array (input multiple selalu array kalau name="dokumen_pendukung[]")
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            // Batasi defensive di sisi server juga, jaga-jaga
+            $files = array_slice($files, 0, self::MAX_DOKUMEN_PENDUKUNG);
+
+            foreach ($files as $i => $file) {
+                if ($file && $file->isValid()) {
+                    Persyaratan::create([
+                        'id_permohonan' => $permohonan->id_permohonan,
+                        'nama_file'     => $file->getClientOriginalName(),
+                        'jenis_dokumen' => 'pendukung_' . ($i + 1),
+                        'path_file'     => $file->store('persyaratan', 'public'),
+                        'uploaded_at'   => now(),
+                    ]);
+                }
+            }
+        }
+    }
+
     // =========================================================
     // DAFTAR PERMOHONAN MILIK USER
     // =========================================================
@@ -79,7 +165,7 @@ class PermohonanUserController extends Controller
         }
 
         // Validasi dasar semua surat
-        $rules = [
+        $rules = array_merge([
             'jenis_pengajuan' => 'required|in:sendiri,orang_lain',
             'nama_pemohon'    => 'required|string|max:255',
             'nik_pemohon'     => 'required|string|size:16',
@@ -87,11 +173,9 @@ class PermohonanUserController extends Controller
             'tanggal_lahir'   => 'required|date',
             'jenis_kelamin'   => 'required|in:Laki-Laki,Perempuan',
             'alamat_pemohon'  => 'required|string|max:500',
-            'dokumen_ktp'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-            'dokumen_kk'      => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-        ];
+        ], $this->dokumenRules());
 
-        $messages = [
+        $messages = array_merge([
             'nama_pemohon.required'  => 'Nama pemohon wajib diisi.',
             'nik_pemohon.required'   => 'NIK wajib diisi.',
             'nik_pemohon.size'       => 'NIK harus 16 digit.',
@@ -99,13 +183,7 @@ class PermohonanUserController extends Controller
             'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
             'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'alamat_pemohon.required'=> 'Alamat wajib diisi.',
-            'dokumen_ktp.required'   => 'KTP wajib diunggah.',
-            'dokumen_ktp.mimes'      => 'Format KTP harus JPG, PNG, atau PDF.',
-            'dokumen_ktp.max'        => 'Ukuran KTP maksimal 10MB.',
-            'dokumen_kk.required'    => 'Kartu Keluarga wajib diunggah.',
-            'dokumen_kk.mimes'       => 'Format KK harus JPG, PNG, atau PDF.',
-            'dokumen_kk.max'         => 'Ukuran KK maksimal 10MB.',
-        ];
+        ], $this->dokumenMessages());
 
         // Validasi tambahan per jenis surat
         $extraRules    = [];
@@ -280,33 +358,12 @@ class PermohonanUserController extends Controller
             'nik_pemohon'       => $request->nik_pemohon,
             'alamat_pemohon'    => $request->alamat_pemohon,
             'keperluan'         => $keperluan,
-            'data_tambahan'     => $dataTambahan,   // cast 'array' di model handle encode otomatis
+            'data_tambahan'     => $dataTambahan,
             'tanggal_pengajuan' => now(),
         ]);
 
-        // ── Simpan dokumen KTP ──────────────────────────────────
-        if ($request->hasFile('dokumen_ktp') && $request->file('dokumen_ktp')->isValid()) {
-            $file = $request->file('dokumen_ktp');
-            Persyaratan::create([
-                'id_permohonan' => $permohonan->id_permohonan,
-                'nama_file'     => $file->getClientOriginalName(),
-                'jenis_dokumen' => 'ktp',
-                'path_file'     => $file->store('persyaratan', 'public'),
-                'uploaded_at'   => now(),
-            ]);
-        }
-
-        // ── Simpan dokumen KK ───────────────────────────────────
-        if ($request->hasFile('dokumen_kk') && $request->file('dokumen_kk')->isValid()) {
-            $file = $request->file('dokumen_kk');
-            Persyaratan::create([
-                'id_permohonan' => $permohonan->id_permohonan,
-                'nama_file'     => $file->getClientOriginalName(),
-                'jenis_dokumen' => 'kk',
-                'path_file'     => $file->store('persyaratan', 'public'),
-                'uploaded_at'   => now(),
-            ]);
-        }
+        // ── Simpan semua dokumen (KTP + KK + Pendukung) ─────────
+        $this->simpanDokumen($request, $permohonan);
 
         return redirect()
             ->route('user.permohonan.index')
@@ -360,7 +417,7 @@ class PermohonanUserController extends Controller
             ? $jenisSurat->field_config
             : (json_decode($jenisSurat->field_config, true) ?? []);
 
-        $rules = [
+        $rules = array_merge([
             'nama_pemohon'   => 'required|string|max:255',
             'nik_pemohon'    => 'required|string|size:16',
             'tempat_lahir'   => 'required|string|max:100',
@@ -368,9 +425,9 @@ class PermohonanUserController extends Controller
             'jenis_kelamin'  => 'required|in:Laki-Laki,Perempuan',
             'alamat_pemohon' => 'required|string|max:500',
             'keperluan'      => 'required|string|max:500',
-            'dokumen_ktp'    => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-            'dokumen_kk'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-        ];
+        ], $this->dokumenRules());
+
+        $messages = $this->dokumenMessages();
 
         foreach ($fieldConfig as $field) {
             if (!empty($field['required'])) {
@@ -378,7 +435,21 @@ class PermohonanUserController extends Controller
             }
         }
 
-        $request->validate($rules);
+        // Template C: Pihak Kedua hardcoded — field nama_pihak2, nik_pihak2, alamat_pihak2, hubungan wajib
+        if (($jenisSurat->template ?? null) === 'C') {
+            $rules['field_nama_pihak2']   = 'required|string|max:255';
+            $rules['field_nik_pihak2']    = 'required|string|size:16';
+            $rules['field_alamat_pihak2'] = 'required|string|max:500';
+            $rules['field_hubungan']      = 'required|string|max:100';
+
+            $messages['field_nama_pihak2.required']   = 'Nama Pihak Kedua wajib diisi.';
+            $messages['field_nik_pihak2.required']    = 'NIK Pihak Kedua wajib diisi.';
+            $messages['field_nik_pihak2.size']        = 'NIK Pihak Kedua harus 16 digit.';
+            $messages['field_alamat_pihak2.required'] = 'Alamat Pihak Kedua wajib diisi.';
+            $messages['field_hubungan.required']      = 'Hubungan dengan Pemohon wajib diisi.';
+        }
+
+        $request->validate($rules, $messages);
 
         $dataTambahan = [
             'jenis'         => $jenisSurat->slug,
@@ -393,8 +464,16 @@ class PermohonanUserController extends Controller
             'rw'            => $request->rw,
         ];
 
+        // Simpan field dari config (preset + custom)
         foreach ($fieldConfig as $field) {
             $dataTambahan[$field['key']] = $request->input('field_' . $field['key']);
+        }
+
+        // Simpan field Pihak Kedua (built-in untuk template C)
+        if (($jenisSurat->template ?? null) === 'C') {
+            foreach (['nama_pihak2','nik_pihak2','ttl_pihak2','pekerjaan_pihak2','alamat_pihak2','hubungan'] as $k) {
+                $dataTambahan[$k] = $request->input('field_' . $k);
+            }
         }
 
         $permohonan = PermohonanSurat::create([
@@ -408,18 +487,8 @@ class PermohonanUserController extends Controller
             'tanggal_pengajuan' => now(),
         ]);
 
-        foreach (['dokumen_ktp' => 'ktp', 'dokumen_kk' => 'kk'] as $inputName => $jenisDok) {
-            if ($request->hasFile($inputName) && $request->file($inputName)->isValid()) {
-                $file = $request->file($inputName);
-                Persyaratan::create([
-                    'id_permohonan' => $permohonan->id_permohonan,
-                    'nama_file'     => $file->getClientOriginalName(),
-                    'jenis_dokumen' => $jenisDok,
-                    'path_file'     => $file->store('persyaratan', 'public'),
-                    'uploaded_at'   => now(),
-                ]);
-            }
-        }
+        // Simpan semua dokumen (KTP + KK + Pendukung)
+        $this->simpanDokumen($request, $permohonan);
 
         return redirect()
             ->route('user.permohonan.index')

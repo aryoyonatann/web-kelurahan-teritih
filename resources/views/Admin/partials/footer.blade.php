@@ -31,6 +31,20 @@
 .footer-contact li i { color: #60a5fa; margin-top: 2px; flex-shrink: 0; }
 .footer-map          { border-radius: 8px; overflow: hidden; border: 1px solid #1e293b; }
 .footer-bottom       { border-top: 1px solid #1e293b; padding: 16px 0; font-size: 12px; color: #475569; }
+
+/* Info Sistem */
+.footer-info-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 12px; color: #64748b; line-height: 1.5;
+}
+.footer-info-item i { color: #475569; flex-shrink: 0; margin-top: 2px; font-size: 12px; }
+.footer-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 999px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .02em;
+}
+.footer-badge-green { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+.footer-badge-blue  { background: #0c1a3a; color: #60a5fa; border: 1px solid #1e40af; }
 </style>
 @endpush
 @endonce
@@ -55,16 +69,39 @@
                 </div>
             </div>
 
-            <!-- Tautan Internal -->
+            <!-- Info Sistem (pengganti Tautan Internal) -->
             <div class="col-lg-2 col-md-6">
-                <h6 class="footer-heading">Tautan Internal</h6>
-                <ul class="footer-links">
-                    <li><a href="{{ route('admin.dashboard') }}"><i class="bi bi-chevron-right"></i> Dashboard</a></li>
-                    <li><a href="{{ route('permohonan.index') }}"><i class="bi bi-chevron-right"></i> Permohonan Surat</a></li>
-                    <li><a href="{{ route('jenis-surat.index') }}"><i class="bi bi-chevron-right"></i> Jenis Surat</a></li>
-                    <li><a href="#"><i class="bi bi-chevron-right"></i> Kependudukan</a></li>
-                    <li><a href="#"><i class="bi bi-chevron-right"></i> Helpdesk / IT</a></li>
-                </ul>
+                <h6 class="footer-heading">Info Sistem</h6>
+                <div class="d-flex flex-column gap-3">
+                    <div class="footer-info-item">
+                        <i class="bi bi-layers"></i>
+                        <div>
+                            <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Versi Aplikasi</div>
+                            <span class="footer-badge footer-badge-blue mt-1">SIMPEKA v2.0</span>
+                        </div>
+                    </div>
+                    <div class="footer-info-item">
+                        <i class="bi bi-circle-fill" style="color:#4ade80;font-size:8px;margin-top:4px;"></i>
+                        <div>
+                            <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Status Sistem</div>
+                            <span class="footer-badge footer-badge-green mt-1">Beroperasi Normal</span>
+                        </div>
+                    </div>
+                    <div class="footer-info-item">
+                        <i class="bi bi-calendar3"></i>
+                        <div>
+                            <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Pembaruan Terakhir</div>
+                            <span style="color:#64748b;font-size:11.5px;">{{ date('d M Y') }}</span>
+                        </div>
+                    </div>
+                    <div class="footer-info-item">
+                        <i class="bi bi-shield-lock"></i>
+                        <div>
+                            <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Akses</div>
+                            <span style="color:#64748b;font-size:11.5px;">Khusus Petugas</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Kontak -->
@@ -82,6 +119,10 @@
                     <li>
                         <i class="bi bi-envelope-fill text-primary"></i>
                         <span>support@kelurahan-teritih.go.id</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-headset text-primary"></i>
+                        <span>Helpdesk IT: Ext. 101 &mdash; Senin&ndash;Jumat 08.00&ndash;16.00</span>
                     </li>
                 </ul>
             </div>
@@ -101,7 +142,7 @@
 
         <div class="footer-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
             <span>© {{ date('Y') }} Kelurahan Teritih. Hak Cipta Dilindungi.</span>
-            <span>Sistem Informasi Pelayanan Publik v2.0</span>
+            <span>Sistem Informasi Pelayanan Kelurahan (SIMPEKA) v2.0</span>
         </div>
     </div>
 </footer>

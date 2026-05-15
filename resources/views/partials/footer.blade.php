@@ -28,8 +28,10 @@
     text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px;
 }
 .footer-links        { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
-.footer-links a      { color: #94a3b8; text-decoration: none; font-size: 13px; transition: color .18s; }
+.footer-links a      { color: #94a3b8; text-decoration: none; font-size: 13px; transition: color .18s; display: flex; align-items: center; gap: 6px; }
+.footer-links a i    { font-size: 10px; color: #475569; }
 .footer-links a:hover{ color: #60a5fa; }
+.footer-links a:hover i { color: #60a5fa; }
 
 .footer-contact      { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
 .footer-contact li   { display: flex; gap: 10px; font-size: 12.5px; color: #94a3b8; align-items: flex-start; }
@@ -128,12 +130,11 @@
     display: flex; 
 }
 
-/* Header — fixed, tidak scroll */
 .chat-header {
     background: linear-gradient(135deg, #0d1b3e, #1c64f2);
     padding: 16px 18px;
     display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0; /* ✅ Header selalu kelihatan, tidak ikut scroll */
+    flex-shrink: 0;
 }
 .chat-header-left { display: flex; align-items: center; gap: 12px; }
 .chat-header-avatar {
@@ -152,11 +153,10 @@
 }
 .chat-close:hover { background: rgba(255,255,255,.28); }
 
-/* Area pesan — flex:1 + overflow-y auto, area inilah yang scroll */
 .chat-messages {
     padding: 16px;
-    flex: 1; /* ✅ Mengisi sisa ruang available */
-    min-height: 120px; /* Minimum supaya tidak collapse */
+    flex: 1;
+    min-height: 120px;
     overflow-y: auto;
     background: #f8fafc;
     display: flex; flex-direction: column; gap: 10px;
@@ -174,13 +174,12 @@
     max-width: 90%; align-self: flex-end;
 }
 
-/* FAQ list — fixed, tidak ikut flex (scroll dengan messages) */
 .chat-faq-list {
     padding: 0 16px 12px;
     display: flex; flex-direction: column; gap: 7px;
     background: #f8fafc;
     flex-shrink: 0;
-    max-height: 200px; /* ✅ Batasi max tinggi FAQ list */
+    max-height: 200px;
     overflow-y: auto;
 }
 .chat-faq-item {
@@ -192,7 +191,6 @@
 .chat-faq-item:hover { background: #eff6ff; border-color: #bfdbfe; }
 .chat-faq-item i { font-size: 14px; flex-shrink: 0; }
 
-/* Input area — fixed, selalu kelihatan */
 .chat-input-wrap {
     display: flex; gap: 8px; padding: 12px;
     border-top: 1px solid #e2e8f0; background: white;
@@ -214,7 +212,6 @@
 .chat-send-btn:hover:not(:disabled) { background: #1550c5; transform: scale(1.05); }
 .chat-send-btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
-/* Indikator AI sedang mengetik */
 .chat-typing {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 11px 14px; background: white;
@@ -234,7 +231,6 @@
     30%           { transform: translateY(-5px); opacity: 1; }
 }
 
-/* ✅ Footer panel — fixed, selalu kelihatan */
 .chat-footer {
     padding: 10px 16px; border-top: 1px solid #e2e8f0; background: white;
     display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b;
@@ -254,7 +250,6 @@
 }
 .chat-back-btn:hover { color: #1c64f2; }
 
-/* Badge "AI" */
 .chat-ai-badge {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 2px 8px; background: linear-gradient(135deg, #1c64f2, #0d1b3e);
@@ -296,11 +291,41 @@
         <div class="col-lg-2 col-md-6">
             <div class="footer-heading">Tautan Cepat</div>
             <ul class="footer-links">
-                <li><a href="#">Profil Kelurahan</a></li>
-                <li><a href="#">Struktur Organisasi</a></li>
-                <li><a href="#">Layanan Online</a></li>
-                <li><a href="#">Transparansi Anggaran</a></li>
-                <li><a href="#">Peta Wilayah</a></li>
+                <li>
+                    <a href="{{ route('home') }}">
+                        <i class="bi bi-chevron-right"></i> Beranda
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('profil') }}">
+                        <i class="bi bi-chevron-right"></i> Profil Kelurahan
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('layanan') }}">
+                        <i class="bi bi-chevron-right"></i> Layanan Online
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('informasi') }}">
+                        <i class="bi bi-chevron-right"></i> Informasi
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('informasi.berita') }}">
+                        <i class="bi bi-chevron-right"></i> Berita Kelurahan
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('login') }}">
+                        <i class="bi bi-chevron-right"></i> Login Masyarakat
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('register') }}">
+                        <i class="bi bi-chevron-right"></i> Daftar Akun
+                    </a>
+                </li>
             </ul>
         </div>
 

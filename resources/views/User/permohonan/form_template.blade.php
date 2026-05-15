@@ -23,10 +23,12 @@
     .sec-head{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);background:#f8fafc}
     .sec-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
     .sec-title{font-size:14px;font-weight:700;color:var(--navy)}
+    .sec-sub{font-size:11px;color:var(--muted);margin-left:auto;font-weight:500}
     .sec-body{padding:20px}
 
     .form-label-custom{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151;margin-bottom:6px}
     .form-label-custom .req{color:var(--red);margin-left:2px}
+    .form-label-custom .opt{color:#94a3b8;font-weight:600;margin-left:4px;text-transform:none;letter-spacing:0}
     .form-control{border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;padding:10px 14px;transition:all .15s;outline:none;width:100%}
     .form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(28,100,242,.1)}
     .form-control::placeholder{color:#94a3b8}
@@ -41,6 +43,14 @@
     .file-label{font-size:12px;font-weight:600;color:var(--muted)}
     .file-hint{font-size:11px;color:#94a3b8;margin-top:3px}
     .file-name{font-size:12px;font-weight:600;color:var(--blue);margin-top:6px;display:none}
+
+    /* File list untuk multiple upload */
+    .file-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+    .file-list-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#1e40af}
+    .file-list-item i{flex-shrink:0;color:#1c64f2}
+    .file-list-item .fn{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .file-list-item .fs{color:#64748b;font-weight:500;font-size:11px;flex-shrink:0}
+    .file-warn{margin-top:8px;padding:8px 12px;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#92400e;display:flex;align-items:center;gap:6px}
 
     .btn-submit{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--navy),var(--blue));color:white;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit}
     .btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(28,100,242,.35)}
@@ -57,6 +67,22 @@
 @php
     $template    = $jenisSurat->template ?? 'A';
     $fieldConfig = is_array($jenisSurat->field_config) ? $jenisSurat->field_config : (json_decode($jenisSurat->field_config, true) ?? []);
+
+    // ════════════════════════════════════════════════════════════════
+    //  FIELD PIHAK KEDUA - struktur tetap untuk template C
+    //  Hardcoded supaya konsisten meskipun config tidak ada.
+    // ════════════════════════════════════════════════════════════════
+    $pihakKeduaFields = [
+        ['key' => 'nama_pihak2',      'label' => 'Nama Lengkap Pihak Kedua',         'type' => 'text',     'required' => true],
+        ['key' => 'nik_pihak2',       'label' => 'NIK Pihak Kedua',                  'type' => 'text',     'required' => true],
+        ['key' => 'ttl_pihak2',       'label' => 'Tempat/Tanggal Lahir Pihak Kedua', 'type' => 'text',     'required' => false],
+        ['key' => 'pekerjaan_pihak2', 'label' => 'Pekerjaan Pihak Kedua',            'type' => 'text',     'required' => false],
+        ['key' => 'alamat_pihak2',    'label' => 'Alamat Pihak Kedua',               'type' => 'textarea', 'required' => true],
+        ['key' => 'hubungan',         'label' => 'Hubungan dengan Pemohon',          'type' => 'text',     'required' => true],
+    ];
+
+    // Batas maksimum file pendukung (sinkron dengan controller)
+    $maxPendukung = 3;
 @endphp
 
 <div class="form-page">
@@ -83,11 +109,14 @@
           method="POST" enctype="multipart/form-data" novalidate>
         @csrf
 
-        {{-- ══ DATA PEMOHON (semua template) ══ --}}
+        {{-- ══ DATA PEMOHON ══ --}}
         <div class="sec">
             <div class="sec-head">
                 <div class="sec-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-person-fill"></i></div>
                 <div class="sec-title">Data Pemohon</div>
+                @if($template === 'C')
+                <div class="sec-sub">Pihak Pertama</div>
+                @endif
             </div>
             <div class="sec-body">
                 <div class="row g-3">
@@ -177,91 +206,39 @@
             </div>
         </div>
 
-        {{-- ══ TEMPLATE B: Data Khusus Tambahan ══ --}}
-        @if($template === 'B' && !empty($fieldConfig))
-        <div class="sec">
-            <div class="sec-head">
-                <div class="sec-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-clipboard-data-fill"></i></div>
-                <div class="sec-title">Data Tambahan</div>
-            </div>
-            <div class="sec-body">
-                <div class="row g-3">
-                    @foreach($fieldConfig as $field)
-                    @php
-                        $fieldKey  = $field['key'];
-                        $fieldLabel = $field['label'];
-                        $fieldType  = $field['type'] ?? 'text';
-                        $isRequired = $field['required'] ?? false;
-                    @endphp
-                    <div class="{{ $fieldType === 'textarea' ? 'col-12' : 'col-md-6' }}">
-                        <label class="form-label-custom">
-                            {{ $fieldLabel }}
-                            @if($isRequired)<span class="req">*</span>@endif
-                        </label>
-                        @if($fieldType === 'textarea')
-                            <textarea name="field_{{ $fieldKey }}"
-                                class="form-control {{ $errors->has('field_'.$fieldKey) ? 'is-invalid' : '' }}"
-                                rows="3" placeholder="{{ $fieldLabel }}">{{ old('field_'.$fieldKey) }}</textarea>
-                        @elseif($fieldType === 'date')
-                            <input type="date" name="field_{{ $fieldKey }}"
-                                class="form-control {{ $errors->has('field_'.$fieldKey) ? 'is-invalid' : '' }}"
-                                value="{{ old('field_'.$fieldKey) }}">
-                        @elseif($fieldType === 'number')
-                            <input type="number" name="field_{{ $fieldKey }}"
-                                class="form-control {{ $errors->has('field_'.$fieldKey) ? 'is-invalid' : '' }}"
-                                value="{{ old('field_'.$fieldKey) }}" placeholder="{{ $fieldLabel }}">
-                        @else
-                            <input type="text" name="field_{{ $fieldKey }}"
-                                class="form-control {{ $errors->has('field_'.$fieldKey) ? 'is-invalid' : '' }}"
-                                value="{{ old('field_'.$fieldKey) }}" placeholder="{{ $fieldLabel }}">
-                        @endif
-                        @error('field_'.$fieldKey)<div class="invalid-feedback"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
-
-        {{-- ══ TEMPLATE C: Data Pihak Kedua ══ --}}
+        {{-- ══ TEMPLATE C: DATA PIHAK KEDUA (BUILT-IN) ══ --}}
         @if($template === 'C')
         <div class="sec">
             <div class="sec-head">
                 <div class="sec-icon" style="background:#fff1f2;color:#f43f5e"><i class="bi bi-people-fill"></i></div>
                 <div class="sec-title">Data Pihak Kedua</div>
+                <div class="sec-sub">Pihak yang terkait dengan pemohon</div>
             </div>
             <div class="sec-body">
                 <div class="row g-3">
-                    @foreach($fieldConfig as $field)
+                    @foreach($pihakKeduaFields as $field)
                     @php
-                        $fieldKey   = $field['key'];
-                        $fieldLabel = $field['label'];
-                        $fieldType  = $field['type'] ?? 'text';
-                        $isRequired = $field['required'] ?? false;
+                        $fk = $field['key'];
+                        $fl = $field['label'];
+                        $ft = $field['type'];
+                        $fr = $field['required'];
                     @endphp
-                    <div class="{{ $fieldType === 'textarea' ? 'col-12' : 'col-md-6' }}">
+                    <div class="{{ $ft === 'textarea' ? 'col-12' : 'col-md-6' }}">
                         <label class="form-label-custom">
-                            {{ $fieldLabel }}
-                            @if($isRequired)<span class="req">*</span>@endif
+                            {{ $fl }}
+                            @if($fr)<span class="req">*</span>@endif
                         </label>
-                        @if($fieldType === 'textarea')
-                            <textarea name="field_{{ $fieldKey }}"
-                                class="form-control {{ $errors->has('field_'.$fieldKey) ? 'is-invalid' : '' }}"
-                                rows="3" placeholder="{{ $fieldLabel }}">{{ old('field_'.$fieldKey) }}</textarea>
-                        @elseif($fieldType === 'date')
-                            <input type="date" name="field_{{ $fieldKey }}"
-                                class="form-control {{ $errors->has('field_'.$fieldKey) ? 'is-invalid' : '' }}"
-                                value="{{ old('field_'.$fieldKey) }}">
-                        @elseif($fieldType === 'number')
-                            <input type="number" name="field_{{ $fieldKey }}"
-                                class="form-control {{ $errors->has('field_'.$fieldKey) ? 'is-invalid' : '' }}"
-                                value="{{ old('field_'.$fieldKey) }}" placeholder="{{ $fieldLabel }}">
+                        @if($ft === 'textarea')
+                            <textarea name="field_{{ $fk }}"
+                                class="form-control {{ $errors->has('field_'.$fk) ? 'is-invalid' : '' }}"
+                                rows="2" placeholder="{{ $fl }}">{{ old('field_'.$fk) }}</textarea>
                         @else
-                            <input type="text" name="field_{{ $fieldKey }}"
-                                class="form-control {{ $errors->has('field_'.$fieldKey) ? 'is-invalid' : '' }}"
-                                value="{{ old('field_'.$fieldKey) }}" placeholder="{{ $fieldLabel }}">
+                            <input type="{{ $ft }}" name="field_{{ $fk }}"
+                                class="form-control {{ $errors->has('field_'.$fk) ? 'is-invalid' : '' }}"
+                                value="{{ old('field_'.$fk) }}" placeholder="{{ $fl }}"
+                                @if($fk === 'nik_pihak2') maxlength="16" @endif>
                         @endif
-                        @error('field_'.$fieldKey)<div class="invalid-feedback"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
+                        @error('field_'.$fk)<div class="invalid-feedback"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
                     </div>
                     @endforeach
                 </div>
@@ -269,7 +246,58 @@
         </div>
         @endif
 
-        {{-- ══ KEPERLUAN (semua template) ══ --}}
+        {{-- ══ TEMPLATE B & C: DATA TAMBAHAN ══ --}}
+        @if(($template === 'B' || $template === 'C') && !empty($fieldConfig))
+        <div class="sec">
+            <div class="sec-head">
+                <div class="sec-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-clipboard-data-fill"></i></div>
+                <div class="sec-title">
+                    {{ $template === 'B' ? 'Data Tambahan' : 'Data Konteks Tambahan' }}
+                </div>
+                @if($template === 'C')
+                <div class="sec-sub">Informasi pendukung surat</div>
+                @endif
+            </div>
+            <div class="sec-body">
+                <div class="row g-3">
+                    @foreach($fieldConfig as $field)
+                    @php
+                        $fk = $field['key'];
+                        $fl = $field['label'];
+                        $ft = $field['type'] ?? 'text';
+                        $fr = $field['required'] ?? false;
+                    @endphp
+                    <div class="{{ $ft === 'textarea' ? 'col-12' : 'col-md-6' }}">
+                        <label class="form-label-custom">
+                            {{ $fl }}
+                            @if($fr)<span class="req">*</span>@endif
+                        </label>
+                        @if($ft === 'textarea')
+                            <textarea name="field_{{ $fk }}"
+                                class="form-control {{ $errors->has('field_'.$fk) ? 'is-invalid' : '' }}"
+                                rows="3" placeholder="{{ $fl }}">{{ old('field_'.$fk) }}</textarea>
+                        @elseif($ft === 'date')
+                            <input type="date" name="field_{{ $fk }}"
+                                class="form-control {{ $errors->has('field_'.$fk) ? 'is-invalid' : '' }}"
+                                value="{{ old('field_'.$fk) }}">
+                        @elseif($ft === 'number')
+                            <input type="number" name="field_{{ $fk }}"
+                                class="form-control {{ $errors->has('field_'.$fk) ? 'is-invalid' : '' }}"
+                                value="{{ old('field_'.$fk) }}" placeholder="{{ $fl }}">
+                        @else
+                            <input type="text" name="field_{{ $fk }}"
+                                class="form-control {{ $errors->has('field_'.$fk) ? 'is-invalid' : '' }}"
+                                value="{{ old('field_'.$fk) }}" placeholder="{{ $fl }}">
+                        @endif
+                        @error('field_'.$fk)<div class="invalid-feedback"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
+
+        {{-- ══ KEPERLUAN ══ --}}
         <div class="sec">
             <div class="sec-head">
                 <div class="sec-icon" style="background:#f0fdf4;color:#10b981"><i class="bi bi-chat-square-text-fill"></i></div>
@@ -292,6 +320,7 @@
             </div>
             <div class="sec-body">
                 <div class="row g-3">
+                    {{-- KTP (wajib) --}}
                     <div class="col-md-6">
                         <label class="form-label-custom">Foto/Scan KTP <span class="req">*</span></label>
                         <div class="file-wrap">
@@ -304,6 +333,8 @@
                         </div>
                         @error('dokumen_ktp')<div class="invalid-feedback" style="display:flex"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
                     </div>
+
+                    {{-- KK (wajib) --}}
                     <div class="col-md-6">
                         <label class="form-label-custom">Foto/Scan Kartu Keluarga <span class="req">*</span></label>
                         <div class="file-wrap">
@@ -315,6 +346,33 @@
                             <div class="file-name" id="fname_kk"></div>
                         </div>
                         @error('dokumen_kk')<div class="invalid-feedback" style="display:flex"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
+                    </div>
+
+                    {{-- DOKUMEN PENDUKUNG (opsional, max 3 file) --}}
+                    <div class="col-12">
+                        <label class="form-label-custom">
+                            Dokumen Pendukung
+                            <span class="opt">(Opsional — maks. {{ $maxPendukung }} file)</span>
+                        </label>
+                        <div class="file-wrap">
+                            <input type="file" name="dokumen_pendukung[]" id="inputPendukung"
+                                accept=".jpg,.jpeg,.png,.pdf" multiple
+                                onchange="showMultipleFiles(this)">
+                            <div class="file-icon"><i class="bi bi-files"></i></div>
+                            <div class="file-label">Klik atau drag untuk pilih beberapa file sekaligus</div>
+                            <div class="file-hint">JPG, PNG, atau PDF. Maks 10MB per file. Bisa pilih hingga {{ $maxPendukung }} file.</div>
+                        </div>
+                        <div class="file-list" id="listPendukung"></div>
+                        <div class="file-warn" id="warnPendukung" style="display:none">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span id="warnPendukungText"></span>
+                        </div>
+                        @error('dokumen_pendukung')<div class="invalid-feedback" style="display:flex"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>@enderror
+                        @foreach($errors->get('dokumen_pendukung.*') as $msgs)
+                            @foreach($msgs as $m)
+                                <div class="invalid-feedback" style="display:flex"><i class="bi bi-exclamation-circle"></i> {{ $m }}</div>
+                            @endforeach
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -328,6 +386,9 @@
 
 @include('partials.footer')
 <script>
+const MAX_PENDUKUNG = {{ $maxPendukung }};
+const MAX_SIZE_MB   = 10;
+
 function showFileName(input, id) {
     const el = document.getElementById(id);
     if (input.files && input.files[0]) {
@@ -335,6 +396,61 @@ function showFileName(input, id) {
         el.style.display = 'block';
     }
 }
+
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+function showMultipleFiles(input) {
+    const list = document.getElementById('listPendukung');
+    const warn = document.getElementById('warnPendukung');
+    const warnText = document.getElementById('warnPendukungText');
+    list.innerHTML = '';
+    warn.style.display = 'none';
+
+    if (!input.files || input.files.length === 0) return;
+
+    const files = Array.from(input.files);
+    const problems = [];
+
+    // Cek jumlah file
+    if (files.length > MAX_PENDUKUNG) {
+        problems.push(`Anda memilih ${files.length} file, hanya ${MAX_PENDUKUNG} pertama yang akan diunggah.`);
+    }
+
+    // Tampilkan max N file pertama
+    files.slice(0, MAX_PENDUKUNG).forEach((file) => {
+        const sizeMB = file.size / (1024 * 1024);
+        const oversized = sizeMB > MAX_SIZE_MB;
+        if (oversized) {
+            problems.push(`File "${file.name}" melebihi ${MAX_SIZE_MB}MB.`);
+        }
+
+        const item = document.createElement('div');
+        item.className = 'file-list-item';
+        item.innerHTML = `
+            <i class="bi bi-file-earmark-check-fill"></i>
+            <span class="fn">${file.name}</span>
+            <span class="fs">${formatSize(file.size)}</span>
+        `;
+        if (oversized) {
+            item.style.background = '#fef2f2';
+            item.style.borderColor = '#fecaca';
+            item.style.color = '#991b1b';
+            item.querySelector('i').style.color = '#dc2626';
+            item.querySelector('i').className = 'bi bi-file-earmark-x-fill';
+        }
+        list.appendChild(item);
+    });
+
+    if (problems.length > 0) {
+        warnText.textContent = problems.join(' ');
+        warn.style.display = 'flex';
+    }
+}
+
 function isiOtomatis() {
     @auth
     const f = document.querySelector('[name="nama_pemohon"]');

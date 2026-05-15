@@ -9,27 +9,90 @@ use Illuminate\Support\Str;
 
 class JenisSuratController extends Controller
 {
-    // Field preset yang tersedia untuk Template B dan C
-    public static array $presetFields = [
-        // Template B & C
-        ['key' => 'tanggal_kejadian',   'label' => 'Tanggal Kejadian',        'type' => 'date'],
-        ['key' => 'tempat_kejadian',    'label' => 'Tempat Kejadian',         'type' => 'text'],
-        ['key' => 'nama_instansi',      'label' => 'Nama Instansi/Perusahaan','type' => 'text'],
-        ['key' => 'lama_waktu',         'label' => 'Lama Waktu (hari)',       'type' => 'number'],
-        ['key' => 'alasan',             'label' => 'Alasan/Sebab',            'type' => 'text'],
-        ['key' => 'nama_pihak_terkait', 'label' => 'Nama Pihak Terkait',     'type' => 'text'],
-        ['key' => 'nomor_dokumen',      'label' => 'Nomor Dokumen',          'type' => 'text'],
-        ['key' => 'tanggal_mulai',      'label' => 'Tanggal Mulai',          'type' => 'date'],
-        ['key' => 'tanggal_selesai',    'label' => 'Tanggal Selesai',        'type' => 'date'],
-        ['key' => 'keterangan_tambahan','label' => 'Keterangan Tambahan',    'type' => 'textarea'],
-        // Template C (pihak kedua)
-        ['key' => 'nama_pihak2',        'label' => 'Nama Pihak Kedua',       'type' => 'text'],
-        ['key' => 'nik_pihak2',         'label' => 'NIK Pihak Kedua',        'type' => 'text'],
-        ['key' => 'ttl_pihak2',         'label' => 'Tempat/Tgl Lahir Pihak Kedua','type' => 'text'],
-        ['key' => 'pekerjaan_pihak2',   'label' => 'Pekerjaan Pihak Kedua', 'type' => 'text'],
-        ['key' => 'alamat_pihak2',      'label' => 'Alamat Pihak Kedua',    'type' => 'textarea'],
-        ['key' => 'hubungan',           'label' => 'Hubungan dengan Pemohon','type' => 'text'],
+    /**
+     * ════════════════════════════════════════════════════════════════
+     *  PRESET FIELDS — DIPISAH PER TEMPLATE
+     * ════════════════════════════════════════════════════════════════
+     *  - Template A: tidak ada preset (form biodata standar saja)
+     *  - Template B: field konteks/peristiwa
+     *  - Template C: field konteks tambahan (Pihak Kedua sudah built-in)
+     *
+     *  Field Pihak Kedua TIDAK ADA di preset list karena sudah otomatis
+     *  muncul sebagai struktur tetap di template C (lihat form_template.blade.php).
+     * ════════════════════════════════════════════════════════════════
+     */
+
+    // Preset untuk Template B - field konteks/peristiwa
+    public static array $presetFieldsB = [
+        ['key' => 'tanggal_kejadian',    'label' => 'Tanggal Kejadian',         'type' => 'date'],
+        ['key' => 'tempat_kejadian',     'label' => 'Tempat Kejadian',          'type' => 'text'],
+        ['key' => 'nama_instansi',       'label' => 'Nama Instansi/Perusahaan', 'type' => 'text'],
+        ['key' => 'lama_waktu',          'label' => 'Lama Waktu (hari)',        'type' => 'number'],
+        ['key' => 'alasan',              'label' => 'Alasan/Sebab',             'type' => 'text'],
+        ['key' => 'nama_pihak_terkait',  'label' => 'Nama Pihak Terkait',       'type' => 'text'],
+        ['key' => 'nomor_dokumen',       'label' => 'Nomor Dokumen',            'type' => 'text'],
+        ['key' => 'tanggal_mulai',       'label' => 'Tanggal Mulai',            'type' => 'date'],
+        ['key' => 'tanggal_selesai',     'label' => 'Tanggal Selesai',          'type' => 'date'],
+        ['key' => 'keterangan_tambahan', 'label' => 'Keterangan Tambahan',      'type' => 'textarea'],
     ];
+
+    // Preset untuk Template C - field konteks opsional (Pihak Kedua sudah built-in)
+    public static array $presetFieldsC = [
+        ['key' => 'tanggal_kejadian',    'label' => 'Tanggal Kejadian',         'type' => 'date'],
+        ['key' => 'tempat_kejadian',     'label' => 'Tempat Kejadian',          'type' => 'text'],
+        ['key' => 'nama_instansi',       'label' => 'Nama Instansi/Perusahaan', 'type' => 'text'],
+        ['key' => 'lama_waktu',          'label' => 'Lama Waktu (hari)',        'type' => 'number'],
+        ['key' => 'alasan',              'label' => 'Alasan/Sebab',             'type' => 'text'],
+        ['key' => 'nomor_dokumen',       'label' => 'Nomor Dokumen',            'type' => 'text'],
+        ['key' => 'tanggal_mulai',       'label' => 'Tanggal Mulai',            'type' => 'date'],
+        ['key' => 'tanggal_selesai',     'label' => 'Tanggal Selesai',          'type' => 'date'],
+        ['key' => 'keterangan_tambahan', 'label' => 'Keterangan Tambahan',      'type' => 'textarea'],
+    ];
+
+    /**
+     * Field "Pihak Kedua" yang OTOMATIS muncul di Template C.
+     * Tidak ditampilkan di preset list — ini adalah struktur built-in.
+     * Disimpan di sini sebagai referensi (juga dipakai di form_template.blade.php).
+     */
+    public static array $pihakKeduaFields = [
+        ['key' => 'nama_pihak2',      'label' => 'Nama Lengkap Pihak Kedua',     'type' => 'text',     'required' => true],
+        ['key' => 'nik_pihak2',       'label' => 'NIK Pihak Kedua',              'type' => 'text',     'required' => true],
+        ['key' => 'ttl_pihak2',       'label' => 'Tempat/Tanggal Lahir Pihak Kedua', 'type' => 'text', 'required' => false],
+        ['key' => 'pekerjaan_pihak2', 'label' => 'Pekerjaan Pihak Kedua',        'type' => 'text',     'required' => false],
+        ['key' => 'alamat_pihak2',    'label' => 'Alamat Pihak Kedua',           'type' => 'textarea', 'required' => true],
+        ['key' => 'hubungan',         'label' => 'Hubungan dengan Pemohon',      'type' => 'text',     'required' => true],
+    ];
+
+    /**
+     * Helper untuk ambil preset berdasarkan template.
+     */
+    public static function getPresetsByTemplate(string $template): array
+    {
+        return match ($template) {
+            'B'     => self::$presetFieldsB,
+            'C'     => self::$presetFieldsC,
+            default => [],
+        };
+    }
+
+    /**
+     * Helper untuk ambil semua preset (B + C merged unik) — dipakai di create/edit
+     * agar admin bisa lihat semua opsi saat memilih template.
+     */
+    public static function getAllPresets(): array
+    {
+        $merged = [];
+        foreach ([self::$presetFieldsB, self::$presetFieldsC] as $list) {
+            foreach ($list as $f) {
+                $merged[$f['key']] = $f;
+            }
+        }
+        return array_values($merged);
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    //  CRUD METHODS
+    // ════════════════════════════════════════════════════════════════
 
     public function index()
     {
@@ -39,8 +102,11 @@ class JenisSuratController extends Controller
 
     public function create()
     {
-        $presets = self::$presetFields;
-        return view('admin.jenis_surat.create', compact('presets'));
+        return view('admin.jenis_surat.create', [
+            'presetsB'        => self::$presetFieldsB,
+            'presetsC'        => self::$presetFieldsC,
+            'pihakKeduaFields'=> self::$pihakKeduaFields,
+        ]);
     }
 
     public function store(Request $request)
@@ -62,7 +128,6 @@ class JenisSuratController extends Controller
             $slug = $originalSlug . '-' . $counter++;
         }
 
-        // Susun field_config dari preset + custom fields
         $fieldConfig = $this->buildFieldConfig($request);
 
         JenisSurat::create([
@@ -83,9 +148,13 @@ class JenisSuratController extends Controller
 
     public function edit($id)
     {
-        $data    = JenisSurat::findOrFail($id);
-        $presets = self::$presetFields;
-        return view('admin.jenis_surat.edit', compact('data', 'presets'));
+        $data = JenisSurat::findOrFail($id);
+        return view('admin.jenis_surat.edit', [
+            'data'             => $data,
+            'presetsB'         => self::$presetFieldsB,
+            'presetsC'         => self::$presetFieldsC,
+            'pihakKeduaFields' => self::$pihakKeduaFields,
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -103,7 +172,6 @@ class JenisSuratController extends Controller
             'deskripsi'  => $request->deskripsi,
         ];
 
-        // Surat custom: update slug, template, field_config
         if ($data->is_custom) {
             $slug = Str::slug($request->nama_surat);
             $originalSlug = $slug;
@@ -137,24 +205,43 @@ class JenisSuratController extends Controller
             ->with('success', 'Jenis surat berhasil dihapus.');
     }
 
-    // ── Bangun field_config dari request ────────────────────
+    /**
+     * ════════════════════════════════════════════════════════════════
+     *  BUILD FIELD CONFIG
+     * ════════════════════════════════════════════════════════════════
+     *  Hanya menyimpan field yang VALID untuk template terpilih.
+     *  - Template A: tidak ada field (kembalikan array kosong)
+     *  - Template B: hanya field dari preset B + custom
+     *  - Template C: hanya field dari preset C + custom
+     *    (Pihak Kedua TIDAK disimpan di sini — sudah hardcoded di form view)
+     * ════════════════════════════════════════════════════════════════
+     */
     private function buildFieldConfig(Request $request): array
     {
+        $template = $request->input('template');
+
+        // Template A: tidak ada field tambahan
+        if ($template === 'A') {
+            return [];
+        }
+
+        // Ambil preset yang valid untuk template ini
+        $validPresets = self::getPresetsByTemplate($template);
+        $validKeys    = array_column($validPresets, 'key');
+        $labels       = array_column($validPresets, 'label', 'key');
+        $types        = array_column($validPresets, 'type',  'key');
+
         $fields = [];
 
-        // 1. Field preset yang dicentang
-        $presetKeys   = array_column(self::$presetFields, 'key');
-        $presetLabels = array_column(self::$presetFields, 'label', 'key');
-        $presetTypes  = array_column(self::$presetFields, 'type', 'key');
-
+        // 1. Field preset yang dicentang DAN valid untuk template ini
         foreach ($request->input('preset_fields', []) as $key) {
-            if (in_array($key, $presetKeys)) {
+            if (in_array($key, $validKeys)) {
                 $fields[] = [
-                    'key'      => $key,
-                    'label'    => $presetLabels[$key],
-                    'type'     => $presetTypes[$key],
-                    'required' => in_array($key, $request->input('required_fields', [])),
-                    'is_preset'=> true,
+                    'key'       => $key,
+                    'label'     => $labels[$key],
+                    'type'      => $types[$key],
+                    'required'  => in_array($key, $request->input('required_fields', [])),
+                    'is_preset' => true,
                 ];
             }
         }
@@ -171,11 +258,11 @@ class JenisSuratController extends Controller
             $key = Str::slug($label, '_') ?: 'field_' . $i;
 
             $fields[] = [
-                'key'      => $key,
-                'label'    => $label,
-                'type'     => $customTypes[$i] ?? 'text',
-                'required' => isset($customReq[$i]),
-                'is_preset'=> false,
+                'key'       => $key,
+                'label'     => $label,
+                'type'      => $customTypes[$i] ?? 'text',
+                'required'  => isset($customReq[$i]),
+                'is_preset' => false,
             ];
         }
 
