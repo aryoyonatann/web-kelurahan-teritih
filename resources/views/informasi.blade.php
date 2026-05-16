@@ -451,7 +451,7 @@
         </div>
     </div>
 
-    {{-- ══ PETA WILAYAH (gambar, bukan Google Maps) ══ --}}
+    {{-- ══ PETA WILAYAH ══ --}}
     <div class="sec-title mb-1"><i class="bi bi-geo-alt-fill" style="color:var(--red)"></i> Peta Wilayah</div>
     <div class="sec-sub">Pembagian lingkungan, batas wilayah, dan fasilitas umum Kelurahan Teritih.</div>
 

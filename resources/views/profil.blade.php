@@ -659,7 +659,7 @@
                 @endforeach
             </div>
         </div>
-        </div>{{-- /pkk-tree-wrap --}}
+        </div>
     </div>
 
     <!-- ══ GALERI ══ -->
@@ -735,11 +735,11 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ═══════════════════════════════════════════════════════════════
-//  AUTO CONNECTOR — gambar garis penghubung antar node pakai SVG
+//  AUTO CONNECTOR
 // ═══════════════════════════════════════════════════════════════
 const LINE_COLOR = '#94a3b8';
 const LINE_WIDTH = 2;
-const VERTICAL_DROP = 18; // jarak vertikal dari node ke garis horizontal
+const VERTICAL_DROP = 18; 
 
 function getCenter(el, containerRect) {
     const r = el.getBoundingClientRect();
@@ -754,10 +754,7 @@ function getCenter(el, containerRect) {
     };
 }
 
-/**
- * Gambar garis vertikal (parent.bottom → child.top) dengan elbow di tengah.
- * Style: parent bottom turun lurus, lalu belok kanan/kiri ke kolom child, lalu turun ke child top.
- */
+
 function drawVerticalConnector(svg, parent, child, containerRect) {
     const p = getCenter(parent, containerRect);
     const c = getCenter(child, containerRect);
