@@ -251,13 +251,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                             </div>
                         </div>
                     </div>
-
-                    {{-- Ringkasan live --}}
-                    <div id="jk-summary" style="margin-top:10px;padding:10px 14px;border-radius:9px;background:#f8fafc;border:1px solid #e2e8f0;font-size:12px;color:#475569;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                        <span><strong>Total L+P:</strong> <span id="jk-total">{{ number_format($nilaiLaki + $nilaiPrmp) }}</span> jiwa</span>
-                        <span style="color:#cbd5e1">|</span>
-                        <span>Dari setiap 100 perempuan terdapat <strong id="jk-rasio">{{ $nilaiPrmp > 0 ? round($nilaiLaki / $nilaiPrmp * 100) : 0 }}</strong> laki-laki</span>
-                    </div>
+                    {{-- Ringkasan live total L+P & rasio DIHILANGKAN --}}
                 </div>
 
             </div>
@@ -427,23 +421,16 @@ function hitungAgama() {
     });
 }
 
-// Hitung persentase & rasio jenis kelamin live
+// Hitung persentase jenis kelamin live (ringkasan total & rasio sudah dihapus)
 function hitungJK() {
     const l = parseFloat(document.getElementById('input_jiwa_lakilaki')?.value) || 0;
     const p = parseFloat(document.getElementById('input_jiwa_perempuan')?.value) || 0;
     const tot = l + p;
 
-    // Update pct note
     const pctLEl = document.getElementById('pct_laki');
     const pctPEl = document.getElementById('pct_perempuan');
     if (pctLEl) pctLEl.textContent = (tot > 0 ? (Math.round(l/tot*1000)/10) : 0) + '% dari total';
     if (pctPEl) pctPEl.textContent = (tot > 0 ? (Math.round(p/tot*1000)/10) : 0) + '% dari total';
-
-    // Update summary
-    const totEl   = document.getElementById('jk-total');
-    const rasioEl = document.getElementById('jk-rasio');
-    if (totEl)   totEl.textContent   = tot.toLocaleString('id-ID');
-    if (rasioEl) rasioEl.textContent = p > 0 ? Math.round(l/p*100) : 0;
 }
 </script>
 @endpush

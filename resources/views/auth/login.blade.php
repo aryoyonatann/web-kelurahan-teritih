@@ -287,6 +287,10 @@
         font-size: 15px; transition: all .18s;
     }
     .footer-social:hover { background: var(--blue); color: white; }
+    .footer-social.ig:hover {
+        background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+        color: white;
+    }
 
     .footer-heading {
         font-size: 12px; font-weight: 700; color: #cbd5e1;
@@ -301,6 +305,8 @@
     .footer-contact      { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
     .footer-contact li   { display: flex; gap: 10px; font-size: 12.5px; color: #94a3b8; align-items: flex-start; }
     .footer-contact li i { color: #60a5fa; flex-shrink: 0; margin-top: 2px; }
+    .footer-contact a    { color: #94a3b8; text-decoration: none; transition: color .18s; }
+    .footer-contact a:hover { color: #60a5fa; }
 
     .footer-map { border-radius: 10px; overflow: hidden; border: 1px solid #1e293b; }
 
@@ -470,13 +476,15 @@
                     Mewujudkan tata kelola pemerintahan yang baik, bersih, dan melayani masyarakat dengan sepenuh hati.
                 </p>
                 <div class="d-flex gap-2">
-                    <a href="#" class="footer-social"><i class="bi bi-globe2"></i></a>
-                    <a href="#" class="footer-social"><i class="bi bi-envelope-fill"></i></a>
-                    <a href="#" class="footer-social"><i class="bi bi-telephone-fill"></i></a>
+                    <a href="https://www.instagram.com/kelurahanteritih/" target="_blank" rel="noopener" class="footer-social ig" title="@kelurahanteritih">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="mailto:kel.teritih@serangkota.go.id" class="footer-social" title="Email">
+                        <i class="bi bi-envelope-fill"></i>
+                    </a>
                 </div>
             </div>
 
-            {{-- TAUTAN CEPAT: route disesuaikan dengan web.php --}}
             <div class="col-lg-2 col-md-6">
                 <div class="footer-heading">Tautan Cepat</div>
                 <ul class="footer-links">
@@ -494,10 +502,10 @@
                 <ul class="footer-contact">
                     <li>
                         <i class="bi bi-geo-alt-fill"></i>
-                        <span>Jl. Raya Teritih No. 123, Kecamatan Walantaka, Kota Serang, Banten 42183</span>
+                        <span>Jl. Raya Kalodran - Sidapurna No. 1 Teritih, Kecamatan Walantaka, Kota Serang, Banten 42183</span>
                     </li>
-                    <li><i class="bi bi-telephone-fill"></i><span>(0254) 123456</span></li>
-                    <li><i class="bi bi-envelope-fill"></i><span>admin@teritih.go.id</span></li>
+                    <li><i class="bi bi-envelope-fill"></i><a href="mailto:kel.teritih@serangkota.go.id">kel.teritih@serangkota.go.id</a></li>
+                    <li><i class="bi bi-instagram"></i><a href="https://www.instagram.com/kelurahanteritih/" target="_blank" rel="noopener">@kelurahanteritih</a></li>
                     <li><i class="bi bi-clock-fill"></i><span>Senin–Jumat: 08.00–16.00</span></li>
                 </ul>
             </div>

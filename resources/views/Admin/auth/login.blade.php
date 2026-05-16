@@ -39,6 +39,7 @@
         flex-direction: column;
     }
 
+    /* ── NAVBAR ── */
     .admin-nav {
         background: #0d1b3e;
         border-bottom: 1px solid #1e3a5f;
@@ -53,12 +54,10 @@
         box-shadow: 0 2px 12px rgba(0,0,0,.25);
         flex-shrink: 0;
     }
-
     .admin-nav-brand {
         display: flex; align-items: center; gap: 10px;
         text-decoration: none;
     }
-
     .admin-nav-icon {
         width: 40px; height: 40px;
         border-radius: 8px;
@@ -66,15 +65,10 @@
         flex-shrink: 0; overflow: hidden;
         background: transparent;
     }
-    .admin-nav-icon img {
-        width: 100%; height: 100%;
-        object-fit: contain;
-    }
-
+    .admin-nav-icon img { width: 100%; height: 100%; object-fit: contain; }
     .admin-nav-text { display: flex; flex-direction: column; line-height: 1.15; }
     .admin-nav-sub  { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: rgba(255,255,255,.6); text-transform: uppercase; }
     .admin-nav-name { font-size: 18px; font-weight: 800; color: #ffffff; }
-
     .btn-back-home {
         display: inline-flex; align-items: center; gap: 7px;
         padding: 8px 16px; border-radius: 8px;
@@ -89,6 +83,7 @@
         background: rgba(255,255,255,.2);
     }
 
+    /* ── PAGE BODY ── */
     .page-body {
         flex: 1;
         display: flex;
@@ -97,6 +92,7 @@
         padding: 36px 20px;
     }
 
+    /* ── LOGIN CARD ── */
     .login-card {
         width: 100%;
         max-width: 980px;
@@ -117,7 +113,6 @@
         justify-content: space-between;
         padding: 36px 32px 28px;
     }
-
     .left-panel::before {
         content: '';
         position: absolute; inset: 0;
@@ -126,9 +121,7 @@
             url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80') center/cover no-repeat;
         z-index: 0;
     }
-
     .lp-top, .lp-bot { position: relative; z-index: 1; }
-
     .lp-badge {
         display: inline-flex; align-items: center; gap: 7px;
         background: rgba(28,100,242,.25);
@@ -137,30 +130,15 @@
         font-size: 11px; font-weight: 700;
         color: #93c5fd; margin-bottom: 20px;
     }
-
     .lp-title {
         font-size: 30px; font-weight: 800;
         color: white; line-height: 1.2; margin-bottom: 14px;
     }
-
-    .lp-desc {
-        font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.7;
-    }
-
-    .lp-features {
-        display: flex; gap: 20px; flex-wrap: wrap;
-        margin-bottom: 14px;
-    }
-    .lp-feat {
-        display: flex; align-items: center; gap: 6px;
-        font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8);
-    }
+    .lp-desc { font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.7; }
+    .lp-features { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 14px; }
+    .lp-feat { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8); }
     .lp-feat i { color: #60a5fa; font-size: 14px; }
-
-    .lp-copy {
-        font-size: 11px; color: rgba(255,255,255,.3);
-        border-top: 1px solid rgba(255,255,255,.1); padding-top: 12px;
-    }
+    .lp-copy { font-size: 11px; color: rgba(255,255,255,.3); border-top: 1px solid rgba(255,255,255,.1); padding-top: 12px; }
 
     .right-panel {
         flex: 1;
@@ -169,13 +147,10 @@
         flex-direction: column;
         justify-content: center;
     }
-
     .rp-title    { font-size: 26px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
     .rp-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
 
-    .label-row {
-        display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
-    }
+    .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .label-row label { font-size: 13px; font-weight: 600; color: var(--navy); margin: 0; }
     .label-row a     { font-size: 12px; font-weight: 600; color: var(--blue); text-decoration: none; }
     .label-row a:hover { text-decoration: underline; }
@@ -196,7 +171,6 @@
         cursor: pointer; transition: color .18s;
     }
     .input-wrap .ico-r:hover { color: var(--navy); }
-
     .input-wrap input {
         display: block; width: 100%; height: 46px;
         padding: 0 42px; border-radius: 9px;
@@ -210,7 +184,6 @@
         box-shadow: 0 0 0 3px rgba(13,27,62,.1);
     }
     .input-wrap input.is-invalid { border-color: var(--red); }
-
     .invalid-feedback { font-size: 12px; color: var(--red); margin-top: 5px; display: block; }
 
     .btn-login {
@@ -223,10 +196,7 @@
     }
     .btn-login:hover { background: var(--dark2); }
 
-    .divider-row {
-        text-align: center; font-size: 13px;
-        color: var(--muted); margin: 16px 0 10px;
-    }
+    .divider-row { text-align: center; font-size: 13px; color: var(--muted); margin: 16px 0 10px; }
     .divider-row a { font-weight: 700; color: var(--blue); text-decoration: none; }
     .divider-row a:hover { text-decoration: underline; }
 
@@ -237,7 +207,7 @@
         margin-top: 4px;
     }
 
-    /* FOOTER */
+    /* ── FOOTER ── */
     .main-footer { background: #0f172a; flex-shrink: 0; padding: 48px 32px 0; }
 
     .footer-logo {
@@ -251,7 +221,6 @@
     .footer-brand-name { font-size: 15px; font-weight: 800; color: white; line-height: 1.2; }
     .footer-brand-sub  { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
     .footer-desc       { font-size: 12.5px; color: #94a3b8; line-height: 1.75; margin-bottom: 16px; }
-
     .footer-social {
         width: 32px; height: 32px; background: #1e293b;
         border-radius: 7px; display: inline-flex;
@@ -260,7 +229,6 @@
         font-size: 15px; transition: all .18s;
     }
     .footer-social:hover { background: #334155; color: white; }
-
     .footer-heading {
         font-size: 12px; font-weight: 700; color: #cbd5e1;
         text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px;
@@ -268,22 +236,34 @@
 
     /* Info Sistem */
     .footer-info-item {
-        display: flex; align-items: flex-start; gap: 8px;
-        font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 14px;
+        display: flex; align-items: flex-start; gap: 10px;
+        font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 16px;
     }
     .footer-info-item:last-child { margin-bottom: 0; }
-    .footer-info-item i { color: #475569; flex-shrink: 0; margin-top: 2px; font-size: 12px; }
+    .footer-info-item i { color: #475569; flex-shrink: 0; margin-top: 2px; font-size: 13px; }
     .footer-badge {
         display: inline-flex; align-items: center; gap: 5px;
         padding: 3px 9px; border-radius: 999px;
-        font-size: 10.5px; font-weight: 600; letter-spacing: .02em;
+        font-size: 10.5px; font-weight: 600; letter-spacing: .02em; margin-top: 4px;
     }
     .footer-badge-green { background: #052e16; color: #4ade80; border: 1px solid #166534; }
     .footer-badge-blue  { background: #0c1a3a; color: #60a5fa; border: 1px solid #1e40af; }
 
-    .footer-contact      { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
-    .footer-contact li   { display: flex; gap: 10px; font-size: 12.5px; color: #94a3b8; align-items: flex-start; }
-    .footer-contact li i { color: #60a5fa; flex-shrink: 0; margin-top: 2px; }
+    /* Kontak */
+    .footer-contact     { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+    .footer-contact li  { display: flex; gap: 12px; align-items: flex-start; }
+    .footer-contact li i {
+        color: #60a5fa; flex-shrink: 0;
+        margin-top: 2px; font-size: 13px;
+        width: 16px; text-align: center;
+    }
+    .footer-contact li span,
+    .footer-contact li a {
+        font-size: 12.5px; color: #94a3b8;
+        line-height: 1.6; text-decoration: none;
+        transition: color .18s;
+    }
+    .footer-contact li a:hover { color: #60a5fa; }
 
     .footer-map { border-radius: 10px; overflow: hidden; border: 1px solid #1e293b; }
 
@@ -419,6 +399,7 @@
     <div class="container-fluid px-0">
         <div class="row g-4 pb-2">
 
+            {{-- Brand --}}
             <div class="col-lg-3 col-md-6">
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <div class="footer-logo"><i class="bi bi-shield-fill"></i></div>
@@ -427,31 +408,24 @@
                         <div class="footer-brand-sub">Kota Serang</div>
                     </div>
                 </div>
-                <p class="footer-desc">
-                    Mewujudkan tata kelola pemerintahan yang baik, bersih, dan melayani masyarakat dengan sepenuh hati.
-                </p>
-                <div class="d-flex gap-2">
-                    <a href="#" class="footer-social"><i class="bi bi-globe2"></i></a>
-                    <a href="#" class="footer-social"><i class="bi bi-envelope-fill"></i></a>
-                    <a href="#" class="footer-social"><i class="bi bi-telephone-fill"></i></a>
-                </div>
+                <p class="footer-desc">Mewujudkan tata kelola pemerintahan yang baik, bersih, dan melayani masyarakat dengan sepenuh hati.</p>
+            <div class="d-flex gap-2">
+                <a href="https://www.instagram.com/kelurahanteritih/" target="_blank" rel="noopener" class="footer-social ig" aria-label="Instagram Kelurahan Teritih" title="@kelurahanteritih">
+                    <i class="bi bi-instagram"></i>
+                </a>
+                <a href="mailto:kel.teritih@serangkota.go.id" class="footer-social" aria-label="Email Kelurahan Teritih" title="Email">
+                    <i class="bi bi-envelope-fill"></i>
+                </a>
             </div>
-
-            {{-- INFO SISTEM: menggantikan Tautan Internal yang tidak relevan --}}
+        </div>
+            {{-- Info Sistem --}}
             <div class="col-lg-2 col-md-6">
                 <div class="footer-heading">Info Sistem</div>
                 <div class="footer-info-item">
-                    <i class="bi bi-layers"></i>
-                    <div>
-                        <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Versi Aplikasi</div>
-                        <span class="footer-badge footer-badge-blue mt-1">SIMPEKA v2.0</span>
-                    </div>
-                </div>
-                <div class="footer-info-item">
-                    <i class="bi bi-circle-fill" style="color:#4ade80;font-size:8px;margin-top:4px;"></i>
+                    <i class="bi bi-circle-fill" style="color:#4ade80;font-size:8px;margin-top:5px;"></i>
                     <div>
                         <div style="color:#94a3b8;font-size:11.5px;font-weight:600;">Status Sistem</div>
-                        <span class="footer-badge footer-badge-green mt-1">Beroperasi Normal</span>
+                        <span class="footer-badge footer-badge-green">Beroperasi Normal</span>
                     </div>
                 </div>
                 <div class="footer-info-item">
@@ -470,18 +444,26 @@
                 </div>
             </div>
 
+            {{-- Kontak --}}
             <div class="col-lg-4 col-md-6">
-                <div class="footer-heading">Kontak Dukungan</div>
+                <div class="footer-heading">Kontak Kami</div>
                 <ul class="footer-contact">
                     <li>
                         <i class="bi bi-geo-alt-fill"></i>
-                        <span>Jl. Raya Teritih No. 123, Kecamatan Walantaka, Kota Serang, Banten 42183</span>
+                        <span>Jl. Raya Kalodran - Sidapurna No. 1 Teritih,<br>Kecamatan Walantaka, Kota Serang, Banten 42183</span>
                     </li>
-                    <li><i class="bi bi-telephone-fill"></i><span>(0254) 123456 (Ext. 101)</span></li>
-                    <li><i class="bi bi-envelope-fill"></i><span>it.support@teritih.go.id</span></li>
+                    <li>
+                        <i class="bi bi-envelope-fill"></i>
+                        <a href="mailto:kel.teritih@serangkota.go.id">kel.teritih@serangkota.go.id</a>
+                    </li>
+                    <li>
+                        <i class="bi bi-instagram"></i>
+                        <a href="https://www.instagram.com/kelurahanteritih/" target="_blank" rel="noopener">@kelurahanteritih</a>
+                    </li>
                 </ul>
             </div>
 
+            {{-- Peta --}}
             <div class="col-lg-3 col-md-6">
                 <div class="footer-heading">Lokasi Kantor</div>
                 <div class="footer-map">
