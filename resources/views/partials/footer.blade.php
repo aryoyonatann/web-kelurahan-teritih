@@ -317,12 +317,12 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('informasi') }}">
+                    <a href="{{ route('demografi') }}">
                         <i class="bi bi-chevron-right"></i> Informasi
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('informasi.berita') }}">
+                    <a href="{{ route('berita') }}">
                         <i class="bi bi-chevron-right"></i> Berita Kelurahan
                     </a>
                 </li>
@@ -582,21 +582,31 @@
                 body: JSON.stringify({ message: message }),
             });
 
-            var data = await response.json();
-
             var typingEl = document.getElementById('chat-typing-indicator');
             if (typingEl) typingEl.remove();
 
+            var replyText;
+            var contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                var data = await response.json();
+                if (response.status === 429) {
+                    replyText = data.reply || '⏳ Terlalu banyak pertanyaan. Coba lagi beberapa saat.';
+                } else if (!response.ok || !data.success) {
+                    replyText = data.reply || '🤖 Asisten sedang tidak tersedia. Silakan coba lagi atau hubungi kantor via WhatsApp.';
+                } else {
+                    replyText = data.reply || 'Maaf, tidak ada jawaban.';
+                }
+            } else {
+                replyText = '🤖 Asisten sedang sibuk. Silakan coba beberapa saat lagi.';
+            }
+
             var bubbleBot = document.createElement('div');
             bubbleBot.className = 'chat-bubble-bot';
-
-            var replyText = data.reply || 'Maaf, terjadi kesalahan.';
             var safeText = escapeHtml(replyText)
                 .replace(/\n/g, '<br>')
                 .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
             bubbleBot.innerHTML = safeText;
             msgs.appendChild(bubbleBot);
-
             appendBackButton(msgs);
 
         } catch (err) {
@@ -605,7 +615,7 @@
 
             var bubbleErr = document.createElement('div');
             bubbleErr.className = 'chat-bubble-bot';
-            bubbleErr.innerHTML = '⚠️ Gagal terhubung ke asisten. Periksa koneksi internet Anda.';
+            bubbleErr.innerHTML = '⚠️ Gagal terhubung. Periksa koneksi internet Anda atau hubungi kantor via WhatsApp.';
             msgs.appendChild(bubbleErr);
         } finally {
             sendBtn.disabled = false;
@@ -631,3 +641,5 @@
     }, 5000);
 })();
 </script>
+
+@include('partials.toast')

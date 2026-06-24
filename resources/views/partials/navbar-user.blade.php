@@ -229,7 +229,7 @@
         <li><a href="{{ route('home') }}"      class="{{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a></li>
         <li><a href="{{ route('profil') }}"    class="{{ request()->routeIs('profil') ? 'active' : '' }}">Profil</a></li>
         <li><a href="{{ route('layanan') }}"   class="{{ request()->routeIs('layanan') ? 'active' : '' }}">Layanan</a></li>
-        <li><a href="{{ route('informasi') }}" class="{{ request()->routeIs('informasi', 'informasi.berita') ? 'active' : '' }}">Informasi</a></li>
+        <li><a href="{{ route('demografi') }}" class="{{ request()->routeIs('demografi') ? 'active' : '' }}">Demografi</a></li>
     </ul>
 
     <div class="user-chip" id="userChipNav">
@@ -279,7 +279,7 @@
         <a href="{{ route('home') }}"      class="drawer-nav-link {{ request()->routeIs('home') ? 'active' : '' }}"><i class="bi bi-house-fill"></i> Beranda</a>
         <a href="{{ route('profil') }}"    class="drawer-nav-link {{ request()->routeIs('profil') ? 'active' : '' }}"><i class="bi bi-building"></i> Profil</a>
         <a href="{{ route('layanan') }}"   class="drawer-nav-link {{ request()->routeIs('layanan') ? 'active' : '' }}"><i class="bi bi-file-earmark-text"></i> Layanan</a>
-        <a href="{{ route('informasi') }}" class="drawer-nav-link {{ request()->routeIs('informasi', 'informasi.berita') ? 'active' : '' }}"><i class="bi bi-newspaper"></i> Informasi</a>
+        <a href="{{ route('demografi') }}" class="drawer-nav-link {{ request()->routeIs('demografi') ? 'active' : '' }}"><i class="bi bi-bar-chart-fill"></i> Demografi</a>
 
         <div class="drawer-divider"></div>
         <a href="{{ route('profile.edit') }}"          class="drawer-action-link"><i class="bi bi-person-circle"></i> Profil Saya</a>

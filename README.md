@@ -2,15 +2,15 @@
 
 Sistem informasi dan layanan administrasi digital **Kelurahan Teritih**, Kecamatan Walantaka, Kota Serang, Banten.
 
-Dibangun dengan **Laravel 12**, **MySQL**, **Bootstrap 5**, dan dilengkapi **Chatbot AI** berbasis **Google Gemini** untuk membantu warga mendapatkan informasi layanan kelurahan secara interaktif.
+Dibangun dengan **Laravel 12**, **PostgreSQL**, **Bootstrap 5**, dan dilengkapi **Chatbot AI** berbasis **Google Gemini** untuk membantu warga mendapatkan informasi layanan kelurahan secara interaktif.
 
 ---
 
 ## ✨ Fitur Utama
 
-- **Permohonan Surat Online** — warga dapat mengajukan berbagai jenis surat (SKTM, Kematian, Suami/Istri, Beda Nama, Izin Cuti) secara online
-- **Manajemen Jenis Surat** — admin dapat membuat jenis surat kustom dengan template A/B/C
-- **Cetak Surat Resmi** — admin mencetak surat dengan kop kelurahan langsung dari browser
+- **Permohonan Surat Online** — warga dapat mengajukan berbagai jenis surat (SKTM, SKU, SKD, SKB, Beda Nama) secara online
+- **Master Data Surat Dinamis** — admin dapat membuat jenis surat baru lengkap dengan template dan field kustom dari dashboard tanpa coding
+- **Cetak Surat Resmi** — admin mencetak surat dengan kop kelurahan langsung dari browser, penomoran otomatis per jenis surat per tahun
 - **Data Kependudukan** — manajemen akun warga, blokir, export CSV, filter RT/RW
 - **Statistik Demografi** — data populasi dan agama yang dikelola admin
 - **Informasi Kelurahan** — berita dan pengumuman untuk masyarakat
@@ -27,7 +27,7 @@ Dibangun dengan **Laravel 12**, **MySQL**, **Bootstrap 5**, dan dilengkapi **Cha
 | PHP | 8.2 |
 | Composer | 2.x |
 | Node.js | 18.x |
-| MySQL | 8.0 |
+| PostgreSQL | 14+ |
 | Laravel | 12.x |
 | Google Gemini API Key | Free tier (Gemini 2.5 Flash-Lite) |
 
@@ -340,7 +340,7 @@ php artisan tinker
 
 ### Backend
 - **Laravel 12** — PHP Framework
-- **MySQL 8** — Database
+- **PostgreSQL 14+** — Database
 - **PHP 8.2** — Server-side language
 
 ### Frontend

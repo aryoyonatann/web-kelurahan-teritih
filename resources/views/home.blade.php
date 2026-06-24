@@ -66,6 +66,17 @@
     .link-baca i{transition:transform .18s}
     .berita-grid-card:hover .link-baca i{transform:translateX(4px)}
 
+    /* ── OVERLAY BERITA CARD ── */
+    .berita-ov-card{position:relative;border-radius:16px;overflow:hidden;text-decoration:none;display:block;height:240px;background:linear-gradient(135deg,var(--navy) 0%,#1e3a5f 100%);transition:transform .22s,box-shadow .22s}
+    .berita-ov-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+    .berita-ov-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+    .berita-ov-card:hover img{transform:scale(1.05)}
+    .berita-ov-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,20,50,.88) 0%,rgba(10,20,50,.3) 55%,transparent 100%)}
+    .berita-ov-body{position:absolute;bottom:0;left:0;right:0;padding:16px}
+    .berita-ov-cat{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:var(--blue);color:white;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px}
+    .berita-ov-title{font-size:14px;font-weight:700;color:white;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px}
+    .berita-ov-date{font-size:11px;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:5px}
+
     /* ── SIDEBAR CARDS ── */
     .sidebar-card{background:white;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
     .sidebar-card:last-child{margin-bottom:0}
@@ -102,6 +113,10 @@
     .status-dot-buka{background:#16a34a;animation:pulse-green 1.5s ease-in-out infinite}
     .status-dot-tutup{background:#dc2626}
     @keyframes pulse-green{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(0.85)}}
+    .jam-date{font-size:11px;color:#1e293b;font-weight:600;padding:8px 0 2px;display:flex;align-items:center;gap:5px}
+    .jam-holiday{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:#fff7ed;border-radius:8px;margin:6px 0 2px;border:1px solid #fed7aa}
+    .jam-holiday-icon{color:#ea580c;font-size:13px;flex-shrink:0;margin-top:1px}
+    .jam-holiday-text{font-size:11px;color:#9a3412;font-weight:600;line-height:1.4}
 
     /* ── PENGUMUMAN ── */
     .pengumuman-body{padding:16px 18px}
@@ -120,9 +135,14 @@
     /* ── EMPTY STATE ── */
     .berita-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:var(--fs-base);border:1px solid var(--border);border-radius:14px;background:white}
 
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-    .fade-up{animation:fadeUp .5s ease both}
+    /* ── HERO ENTRANCE (CSS — tidak bergantung GSAP) ── */
+    @keyframes heroFadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    .hero-badge{animation:heroFadeUp .55s ease both;animation-delay:.05s}
+    .hero-title{animation:heroFadeUp .7s ease both;animation-delay:.2s}
+    .hero-desc{animation:heroFadeUp .65s ease both;animation-delay:.38s}
+    .btn-hero-detail{animation:heroFadeUp .55s ease both;animation-delay:.55s}
+
+    /* ── ANIMATIONS (GSAP handles scroll animations) ── */
     .fade-up-1{animation-delay:.08s}
     .fade-up-2{animation-delay:.18s}
     .fade-up-3{animation-delay:.28s}
@@ -145,7 +165,7 @@
 @include('partials.navbar')
 
 {{-- ═══ HERO ═══ --}}
-<div class="hero-section fade-up">
+<div class="hero-section">
     <div style="position:relative;z-index:2;max-width:580px">
         <div class="hero-badge">
             <i class="bi bi-star-fill" style="font-size:10px"></i>
@@ -172,46 +192,46 @@
         <div class="col-lg-8">
 
             {{-- Akses Cepat --}}
-            <div id="layanan" class="mb-4 fade-up fade-up-1">
+            <div id="layanan" class="mb-4">
                 <div class="section-label">
                     <i class="bi bi-grid-fill"></i> Akses Cepat
                 </div>
                 <div class="row g-3">
                     <div class="col-md-4 col-6">
-                        <a href="{{ route('informasi.berita') }}" class="akses-card">
-                            <div class="akses-icon" style="background:#fef3c7;color:#d97706"><i class="bi bi-calendar-event-fill"></i></div>
-                            <div class="akses-title">Berita &amp;<br>Pengumuman</div>
-                            <div class="akses-desc">Informasi kegiatan dan pengumuman terbaru.</div>
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-6">
-                        <a href="{{ route('layanan') }}" class="akses-card">
-                            <div class="akses-icon" style="background:#eff6ff;color:var(--blue)"><i class="bi bi-people-fill"></i></div>
-                            <div class="akses-title">Layanan<br>Administrasi</div>
-                            <div class="akses-desc">Panduan lengkap pengurusan dokumen.</div>
+                        <a href="{{ route('layanan') }}#pilih-jenis-surat" class="akses-card">
+                            <div class="akses-icon" style="background:#eff6ff;color:var(--blue)"><i class="bi bi-file-earmark-plus-fill"></i></div>
+                            <div class="akses-title">Ajukan Surat</div>
+                            <div class="akses-desc">Buat permohonan surat keterangan secara online.</div>
                         </a>
                     </div>
                     <div class="col-md-4 col-6">
                         @auth
-                            <a href="{{ route('layanan') }}" class="akses-card">
+                            <a href="{{ route('user.permohonan.index') }}" class="akses-card">
                         @else
                             <a href="{{ route('login') }}" class="akses-card">
                         @endauth
-                            <div class="akses-icon" style="background:#eff6ff;color:var(--blue)"><i class="bi bi-file-earmark-text-fill"></i></div>
-                            <div class="akses-title">Permohonan Surat</div>
-                            <div class="akses-desc">Buat surat keterangan secara online.</div>
+                            <div class="akses-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-clipboard2-check-fill"></i></div>
+                            <div class="akses-title">Cek Status Surat</div>
+                            <div class="akses-desc">Pantau status permohonan surat kamu.</div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <a href="{{ route('demografi') }}#statistik" class="akses-card">
+                            <div class="akses-icon" style="background:#fdf4ff;color:#9333ea"><i class="bi bi-bar-chart-fill"></i></div>
+                            <div class="akses-title">Statistik Kelurahan</div>
+                            <div class="akses-desc">Data demografi dan kependudukan warga.</div>
                         </a>
                     </div>
                 </div>
             </div>
 
             {{-- ══ BERITA ══ --}}
-            <div class="fade-up fade-up-2">
+            <div class="">
                 <div class="berita-section-header">
                     <div class="section-label mb-0">
                         <i class="bi bi-newspaper"></i> Kabar Kelurahan Terkini
                     </div>
-                    <a href="{{ route('informasi.berita') }}" class="link-semua">
+                    <a href="{{ route('berita') }}" class="link-semua">
                         Lihat Semua <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
@@ -222,61 +242,33 @@
                         Belum ada berita yang dipublikasikan.
                     </div>
                 @else
-                    {{-- Baris 1: 2 kartu besar --}}
-                    <div class="row g-3 mb-3">
-                        @foreach($beritaTerbaru->take(2) as $b)
-                        <div class="col-sm-6">
-                            <a href="{{ route('informasi.berita.detail', $b->slug) }}" class="berita-grid-card">
-                                <div class="berita-grid-img" style="height:200px">
-                                    @if($b->gambar)
-                                        <img src="{{ asset('storage/'.$b->gambar) }}" alt="{{ $b->judul }}">
-                                    @else
-                                        <i class="bi bi-image"></i>
-                                    @endif
-                                    <span class="date-pill">
-                                        {{ $b->tanggal_publish ? \Carbon\Carbon::parse($b->tanggal_publish)->format('d M Y') : '-' }}
-                                    </span>
-                                </div>
-                                <div class="berita-grid-body">
-                                    @if($b->kategori)<span class="cat">{{ $b->kategori }}</span>@endif
-                                    <div class="berita-grid-title">{{ Str::limit($b->judul, 70) }}</div>
-                                    <div class="berita-grid-desc">{{ Str::limit(strip_tags($b->ringkasan ?? $b->isi), 100) }}</div>
-                                    <span class="link-baca">Baca Selengkapnya <i class="bi bi-arrow-right"></i></span>
-                                </div>
-                            </a>
-                        </div>
+                @php $beritaAll = $beritaTerbaru->take(3); $featured = $beritaAll->first(); $rest = $beritaAll->skip(1); @endphp
+                <div class="row g-3 align-items-stretch">
+                    <div class="col-md-7" style="min-height:420px">
+                        <a href="{{ route('berita.detail', $featured->slug) }}" class="berita-ov-card" style="height:420px">
+                            @if($featured->gambar)<img src="{{ asset('storage/'.$featured->gambar) }}" alt="{{ $featured->judul }}">@endif
+                            <div class="berita-ov-grad"></div>
+                            <div class="berita-ov-body">
+                                @if($featured->kategori)<span class="berita-ov-cat">{{ $featured->kategori }}</span>@endif
+                                <div class="berita-ov-title" style="font-size:15px;-webkit-line-clamp:3">{{ Str::limit($featured->judul, 80) }}</div>
+                                <div class="berita-ov-date"><i class="bi bi-calendar3" style="font-size:10px"></i> {{ $featured->tanggal_publish ? \Carbon\Carbon::parse($featured->tanggal_publish)->translatedFormat('d M Y') : '-' }}</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-5 d-flex flex-column gap-3" style="height:420px">
+                        @foreach($rest as $b)
+                        <a href="{{ route('berita.detail', $b->slug) }}" class="berita-ov-card" style="flex:1;min-height:180px">
+                            @if($b->gambar)<img src="{{ asset('storage/'.$b->gambar) }}" alt="{{ $b->judul }}">@endif
+                            <div class="berita-ov-grad"></div>
+                            <div class="berita-ov-body">
+                                @if($b->kategori)<span class="berita-ov-cat">{{ $b->kategori }}</span>@endif
+                                <div class="berita-ov-title" style="-webkit-line-clamp:2">{{ Str::limit($b->judul, 60) }}</div>
+                                <div class="berita-ov-date"><i class="bi bi-calendar3" style="font-size:10px"></i> {{ $b->tanggal_publish ? \Carbon\Carbon::parse($b->tanggal_publish)->translatedFormat('d M Y') : '-' }}</div>
+                            </div>
+                        </a>
                         @endforeach
                     </div>
-
-                    {{-- Baris 2: 2 kartu sedang --}}
-                    @php $beritaBawah = $beritaTerbaru->skip(2)->take(2); @endphp
-                    @if($beritaBawah->count() > 0)
-                    <div class="row g-3">
-                        @foreach($beritaBawah as $b)
-                        <div class="col-sm-6">
-                            <a href="{{ route('informasi.berita.detail', $b->slug) }}" class="berita-grid-card">
-                                <div class="berita-grid-img" style="height:150px">
-                                    @if($b->gambar)
-                                        <img src="{{ asset('storage/'.$b->gambar) }}" alt="{{ $b->judul }}">
-                                    @else
-                                        <i class="bi bi-image" style="font-size:28px"></i>
-                                    @endif
-                                    <span class="date-pill">
-                                        {{ $b->tanggal_publish ? \Carbon\Carbon::parse($b->tanggal_publish)->format('d M Y') : '-' }}
-                                    </span>
-                                </div>
-                                <div class="berita-grid-body">
-                                    @if($b->kategori)<span class="cat">{{ $b->kategori }}</span>@endif
-                                    <div class="berita-grid-title" style="-webkit-line-clamp:2">{{ Str::limit($b->judul, 65) }}</div>
-                                    <div class="berita-grid-desc">{{ Str::limit(strip_tags($b->ringkasan ?? $b->isi), 80) }}</div>
-                                    <span class="link-baca">Baca Selengkapnya <i class="bi bi-arrow-right"></i></span>
-                                </div>
-                            </a>
-                        </div>
-                        @endforeach
-                    </div>
-                    @endif
-
+                </div>
                 @endif
             </div>
 
@@ -284,7 +276,7 @@
         {{-- /LEFT --}}
 
         {{-- ══ RIGHT COLUMN ══ --}}
-        <div class="col-lg-4 fade-up fade-up-3">
+        <div class="col-lg-4">
 
             {{-- SAMBUTAN LURAH --}}
             <div class="kepala-card">
@@ -295,17 +287,15 @@
                 <div class="kepala-card-body">
                     <div class="d-flex align-items-center gap-3">
                         <div class="kepala-photo-outer">
-                            {{--
-                                Untuk memasang foto lurah, uncomment baris berikut:
-                                <img src="{{ asset('storage/foto-lurah.jpg') }}" alt="Lurah">
-                                Atau dari database:
-                                <img src="{{ asset('storage/'.$lurah->foto) }}" alt="{{ $lurah->nama }}">
-                            --}}
-                            <i class="bi bi-person-fill"></i>
+                            @if($fotoLurah)
+                                <img src="{{ asset('storage/'.$fotoLurah) }}" alt="{{ $namaLurah }}">
+                            @else
+                                <img src="{{ asset('images/PP_LURAH.png') }}" alt="{{ $namaLurah }}">
+                            @endif
                         </div>
                         <div>
-                            <div class="kepala-info-name">H. Ahmad Fauzi, S.Sos</div>
-                            <div class="kepala-info-jabat">Lurah Teritih</div>
+                            <div class="kepala-info-name">{{ $namaLurah }}</div>
+                            <div class="kepala-info-jabat">{{ $jabatLurah }}</div>
                         </div>
                     </div>
                     <hr class="kepala-divider">
@@ -342,6 +332,9 @@
                         <span class="jam-day" style="font-size:13px;font-weight:600">Status Sekarang</span>
                         <span id="jam-status-home"></span>
                     </div>
+                    {{-- TANGGAL & HARI LIBUR --}}
+                    <div id="jam-date-home" class="jam-date"></div>
+                    <div id="jam-holiday-home"></div>
                 </div>
             </div>
 
@@ -367,39 +360,117 @@
 
 @include('partials.footer')
 
-{{-- ═══ SCRIPT: STATUS JAM OPERASIONAL REAL-TIME (WIB) ═══ --}}
+{{-- ═══ SCRIPT: STATUS JAM OPERASIONAL + HARI LIBUR NASIONAL ═══ --}}
 <script>
 (function () {
-    /*
-     * JAM OPERASIONAL:
-     *   Senin – Kamis : 08:00 – 16:00  (menit: 480 s/d < 960)
-     *   Jumat         : 08:00 – 15:30  (menit: 480 s/d < 930)
-     *   Sabtu & Minggu: TUTUP
-     */
+    var HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    var BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
     var now  = new Date();
-    var wib  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
-    var day  = wib.getDay();        // 0=Minggu,1=Senin,2=Selasa,3=Rabu,4=Kamis,5=Jumat,6=Sabtu
-    var tot  = wib.getHours() * 60 + wib.getMinutes(); // total menit dari 00:00
+    var wib  = new Date(now.toLocaleString('en-US', {timeZone:'Asia/Jakarta'}));
+    var day  = wib.getDay();
+    var tot  = wib.getHours() * 60 + wib.getMinutes();
+    var year = wib.getFullYear();
+    var mm   = String(wib.getMonth()+1).padStart(2,'0');
+    var dd   = String(wib.getDate()).padStart(2,'0');
+    var todayStr = year + '-' + mm + '-' + dd;
 
-    var isOpen = false;
+    // Tampilkan tanggal hari ini
+    var dateLabel = HARI[day] + ', ' + wib.getDate() + ' ' + BULAN[wib.getMonth()] + ' ' + year;
+    var elDate = document.getElementById('jam-date-home');
+    if (elDate) elDate.innerHTML = '<i class="bi bi-calendar3"></i> ' + dateLabel;
 
-    if (day >= 1 && day <= 4) {
-        // Senin – Kamis: 08:00 (480) s/d 16:00 (960, tidak termasuk)
-        isOpen = tot >= 480 && tot < 960;
-    } else if (day === 5) {
-        // Jumat: 08:00 (480) s/d 15:30 (930, tidak termasuk)
-        isOpen = tot >= 480 && tot < 930;
+    function setStatus(isOpen, isHoliday) {
+        var elStatus = document.getElementById('jam-status-home');
+        if (!elStatus) return;
+        if (isOpen && !isHoliday) {
+            elStatus.innerHTML = '<span class="status-buka"><span class="status-dot status-dot-buka"></span>Sedang Buka</span>';
+        } else {
+            elStatus.innerHTML = '<span class="status-tutup"><span class="status-dot status-dot-tutup"></span>Sedang Tutup</span>';
+        }
     }
-    // Sabtu (6) & Minggu (0): isOpen tetap false
 
-    var htmlBuka  = '<span class="status-buka"><span class="status-dot status-dot-buka"></span>Sedang Buka</span>';
-    var htmlTutup = '<span class="status-tutup"><span class="status-dot status-dot-tutup"></span>Sedang Tutup</span>';
+    function showHoliday(name) {
+        var el = document.getElementById('jam-holiday-home');
+        if (!el) return;
+        el.innerHTML = '<div class="jam-holiday"><span class="jam-holiday-icon"><i class="bi bi-calendar-x-fill"></i></span><span class="jam-holiday-text">Hari Libur Nasional: ' + name + '</span></div>';
+    }
 
-    var el = document.getElementById('jam-status-home');
-    if (el) el.innerHTML = isOpen ? htmlBuka : htmlTutup;
+    // Cek jam operasional (tanpa hari libur dulu)
+    var isOpenByTime = (day >= 1 && day <= 4 && tot >= 480 && tot < 960)
+                    || (day === 5 && tot >= 480 && tot < 930);
+
+    // Fetch API hari libur
+    fetch('https://api-harilibur.vercel.app/api?year=' + year)
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+            var holiday = null;
+            if (Array.isArray(data)) {
+                for (var i = 0; i < data.length; i++) {
+                    var h = data[i];
+                    // Format API: holiday_date = "YYYY-MM-DD"
+                    if (h.holiday_date === todayStr) {
+                        holiday = h.holiday_name;
+                        break;
+                    }
+                }
+            }
+            if (holiday) {
+                showHoliday(holiday);
+                setStatus(false, true); // Hari libur = tutup
+            } else {
+                setStatus(isOpenByTime, false);
+            }
+        })
+        .catch(function() {
+            // Fallback jika API gagal: gunakan logika waktu saja
+            setStatus(isOpenByTime, false);
+        });
 })();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+function onScroll(trigger, fn) {
+    ScrollTrigger.create({trigger:trigger, start:'top 88%', once:true, onEnter:fn});
+}
+
+// ── Hero: emblem only via GSAP, rest via CSS ──
+gsap.from('.hero-emblem',{opacity:0,scale:.4,rotation:-20,duration:1.2,delay:.3,ease:'elastic.out(1,.5)'});
+
+// ── Akses Cepat cards ──
+(function(){
+    const cards = document.querySelectorAll('.akses-card');
+    if (!cards.length) return;
+    gsap.set(cards, {opacity:0, y:30, scale:.95});
+    onScroll(cards[0], ()=> gsap.to(cards, {opacity:1, y:0, scale:1, duration:.5, stagger:.07, ease:'back.out(1.4)'}));
+})();
+
+// ── Berita cards ──
+(function(){
+    const cards = document.querySelectorAll('.berita-ov-card');
+    if (!cards.length) return;
+    gsap.set(cards, {opacity:0, y:35});
+    onScroll(cards[0], ()=> gsap.to(cards, {opacity:1, y:0, duration:.55, stagger:.1, ease:'power2.out'}));
+})();
+
+// ── Sidebar cards ──
+(function(){
+    const cards = document.querySelectorAll('.sidebar-card, .kepala-card');
+    if (!cards.length) return;
+    gsap.set(cards, {opacity:0, x:30});
+    onScroll(cards[0], ()=> gsap.to(cards, {opacity:1, x:0, duration:.6, stagger:.12, ease:'power3.out'}));
+})();
+
+// ── Section labels ──
+document.querySelectorAll('.section-label').forEach(t => {
+    gsap.set(t, {opacity:0, x:-18});
+    onScroll(t, ()=> gsap.to(t, {opacity:1, x:0, duration:.45, ease:'power2.out'}));
+});
+</script>
 </body>
 </html>

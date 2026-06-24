@@ -137,7 +137,7 @@
                 <h1><i class="bi bi-newspaper me-2"></i>Manajemen Berita</h1>
                 <p>Kelola semua berita dan informasi Kelurahan Teritih</p>
             </div>
-            <a href="{{ route('informasi-admin.create') }}" class="btn-tulis">
+            <a href="{{ route('berita-admin.create') }}" class="btn-tulis">
                 <i class="bi bi-plus-lg"></i> Tulis Berita Baru
             </a>
         </div>
@@ -181,7 +181,7 @@
                 <div class="empty-icon"><i class="bi bi-newspaper"></i></div>
                 <h3>Belum ada berita</h3>
                 <p>Tulis berita pertama untuk menginformasikan warga.</p>
-                <a href="{{ route('informasi-admin.create') }}" class="btn-tulis" style="display:inline-flex;">
+                <a href="{{ route('berita-admin.create') }}" class="btn-tulis" style="display:inline-flex;">
                     <i class="bi bi-plus-lg"></i> Tulis Sekarang
                 </a>
             </div>
@@ -232,11 +232,11 @@
                         </td>
                         <td>
                             <div class="d-flex gap-2 justify-content-center">
-                                <a href="{{ route('informasi-admin.edit', $item->id_informasi) }}" class="act-btn act-edit">
+                                <a href="{{ route('berita-admin.edit', $item->id_berita) }}" class="act-btn act-edit">
                                     <i class="bi bi-pencil"></i> Edit
                                 </a>
                                 <button type="button" class="act-btn act-del"
-                                    onclick="showDeleteModal('{{ $item->id_informasi }}', '{{ addslashes($item->judul) }}')">
+                                    onclick="showDeleteModal('{{ $item->id_berita }}', '{{ addslashes($item->judul) }}')">
                                     <i class="bi bi-trash"></i> Hapus
                                 </button>
                             </div>
@@ -278,7 +278,7 @@
 <script>
 function showDeleteModal(id, name) {
     document.getElementById('modalBeritaName').textContent = name;
-    document.getElementById('deleteForm').action = `/admin/informasi-admin/${id}`;
+    document.getElementById('deleteForm').action = `/admin/berita-admin/${id}`;
     document.getElementById('deleteModal').classList.add('show');
 }
 function hideDeleteModal() {

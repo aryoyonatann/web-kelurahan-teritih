@@ -12,32 +12,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PermohonanUserController extends Controller
 {
-    /**
-     * Mapping slug ke ID jenis surat di database
-     */
-    private array $slugMap = [
-        'sktm'        => 1,
-        'kematian'    => 2,
-        'suami-istri' => 3,
-        'beda-nama'   => 4,
-        'izin-cuti'   => 5,
-    ];
-
-    /**
-     * Mapping slug ke nama view form
-     */
-    private array $viewMap = [
-        'sktm'        => 'User.permohonan.form_sktm',
-        'kematian'    => 'User.permohonan.form_kematian',
-        'suami-istri' => 'User.permohonan.form_suami_istri',
-        'beda-nama'   => 'User.permohonan.form_beda_nama',
-        'izin-cuti'   => 'User.permohonan.form_izin_cuti',
-    ];
-
-    /**
-     * Aturan validasi untuk dokumen wajib (KTP & KK)
-     * + Dokumen Pendukung opsional max 3 file.
-     */
     private const MAX_DOKUMEN_PENDUKUNG = 3;
 
     private function dokumenRules(): array
@@ -62,17 +36,11 @@ class PermohonanUserController extends Controller
             'dokumen_pendukung.max'       => 'Maksimal ' . self::MAX_DOKUMEN_PENDUKUNG . ' dokumen pendukung.',
             'dokumen_pendukung.*.mimes'   => 'Format dokumen pendukung harus JPG, PNG, atau PDF.',
             'dokumen_pendukung.*.max'     => 'Ukuran dokumen pendukung maksimal 10MB per file.',
-            'dokumen_pendukung.*.file'    => 'Dokumen pendukung tidak valid.',
         ];
     }
 
-    /**
-     * Helper: simpan semua dokumen (KTP wajib, KK wajib, pendukung opsional max 3)
-     * ke tabel persyaratan untuk permohonan yang diberikan.
-     */
     private function simpanDokumen(Request $request, PermohonanSurat $permohonan): void
     {
-        // KTP
         if ($request->hasFile('dokumen_ktp') && $request->file('dokumen_ktp')->isValid()) {
             $file = $request->file('dokumen_ktp');
             Persyaratan::create([
@@ -84,7 +52,6 @@ class PermohonanUserController extends Controller
             ]);
         }
 
-        // KK
         if ($request->hasFile('dokumen_kk') && $request->file('dokumen_kk')->isValid()) {
             $file = $request->file('dokumen_kk');
             Persyaratan::create([
@@ -96,16 +63,10 @@ class PermohonanUserController extends Controller
             ]);
         }
 
-        // Dokumen Pendukung (opsional, max 3 file)
         if ($request->hasFile('dokumen_pendukung')) {
             $files = $request->file('dokumen_pendukung');
-            // Pastikan iterable array (input multiple selalu array kalau name="dokumen_pendukung[]")
-            if (!is_array($files)) {
-                $files = [$files];
-            }
-            // Batasi defensive di sisi server juga, jaga-jaga
+            if (!is_array($files)) $files = [$files];
             $files = array_slice($files, 0, self::MAX_DOKUMEN_PENDUKUNG);
-
             foreach ($files as $i => $file) {
                 if ($file && $file->isValid()) {
                     Persyaratan::create([
@@ -120,9 +81,6 @@ class PermohonanUserController extends Controller
         }
     }
 
-    // =========================================================
-    // DAFTAR PERMOHONAN MILIK USER
-    // =========================================================
     public function index()
     {
         $data = PermohonanSurat::with(['jenisSurat', 'approval'])
@@ -133,246 +91,20 @@ class PermohonanUserController extends Controller
         return view('User.permohonan.index', compact('data'));
     }
 
-    // =========================================================
-    // TAMPILKAN FORM BERDASARKAN SLUG
-    // =========================================================
     public function form(string $slug)
     {
-        // Surat bawaan → form khusus masing-masing
-        if (array_key_exists($slug, $this->viewMap)) {
-            return view($this->viewMap[$slug]);
-        }
-
-        // Surat custom Opsi D → form template dinamis
-        $jenisSurat = \App\Models\JenisSurat::where('slug', $slug)
-            ->where('is_custom', true)
-            ->firstOrFail();
+        $jenisSurat = JenisSurat::where('slug', $slug)->where('aktif', true)->firstOrFail();
 
         return view('User.permohonan.form_template', compact('jenisSurat'));
     }
 
-    // =========================================================
-    // SIMPAN PERMOHONAN (SEMUA JENIS)
-    // =========================================================
     public function storeSurat(Request $request, string $slug)
     {
-        // Surat custom Opsi D
-        if (!array_key_exists($slug, $this->slugMap)) {
-            $jenisSurat = \App\Models\JenisSurat::where('slug', $slug)
-                ->where('is_custom', true)
-                ->firstOrFail();
-            return $this->storeSuratTemplate($request, $jenisSurat);
-        }
+        $jenisSurat = JenisSurat::where('slug', $slug)->where('aktif', true)->firstOrFail();
 
-        // Validasi dasar semua surat
-        $rules = array_merge([
-            'jenis_pengajuan' => 'required|in:sendiri,orang_lain',
-            'nama_pemohon'    => 'required|string|max:255',
-            'nik_pemohon'     => 'required|string|size:16',
-            'tempat_lahir'    => 'required|string|max:100',
-            'tanggal_lahir'   => 'required|date',
-            'jenis_kelamin'   => 'required|in:Laki-Laki,Perempuan',
-            'alamat_pemohon'  => 'required|string|max:500',
-        ], $this->dokumenRules());
-
-        $messages = array_merge([
-            'nama_pemohon.required'  => 'Nama pemohon wajib diisi.',
-            'nik_pemohon.required'   => 'NIK wajib diisi.',
-            'nik_pemohon.size'       => 'NIK harus 16 digit.',
-            'tempat_lahir.required'  => 'Tempat lahir wajib diisi.',
-            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
-            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
-            'alamat_pemohon.required'=> 'Alamat wajib diisi.',
-        ], $this->dokumenMessages());
-
-        // Validasi tambahan per jenis surat
-        $extraRules    = [];
-        $extraMessages = [];
-
-        switch ($slug) {
-            case 'sktm':
-                $extraRules = ['keperluan_sktm' => 'required|string'];
-                $extraMessages = ['keperluan_sktm.required' => 'Tujuan SKTM wajib dipilih.'];
-                break;
-
-            case 'kematian':
-                $extraRules = [
-                    'hari_meninggal'    => 'required|string',
-                    'tanggal_meninggal' => 'required|date',
-                    'sebab_meninggal'   => 'required|string|max:255',
-                ];
-                $extraMessages = [
-                    'hari_meninggal.required'    => 'Hari meninggal wajib dipilih.',
-                    'tanggal_meninggal.required' => 'Tanggal meninggal wajib diisi.',
-                    'sebab_meninggal.required'   => 'Sebab meninggal wajib diisi.',
-                ];
-                break;
-
-            case 'suami-istri':
-                $extraRules = [
-                    'nama_istri'    => 'required|string|max:255',
-                    'ttl_istri'     => 'required|string|max:100',
-                    'tahun_menikah' => 'required|digits:4',
-                ];
-                $extraMessages = [
-                    'nama_istri.required'    => 'Nama istri wajib diisi.',
-                    'ttl_istri.required'     => 'Tempat/tanggal lahir istri wajib diisi.',
-                    'tahun_menikah.required' => 'Tahun menikah wajib diisi.',
-                    'tahun_menikah.digits'   => 'Tahun menikah harus 4 digit.',
-                ];
-                break;
-
-            case 'beda-nama':
-                $extraRules = [
-                    'nama_dokumen_1'   => 'required|string|max:255',
-                    'nama_dokumen_2'   => 'required|string|max:255',
-                    'jenis_dokumen_2'  => 'required|string',
-                    'keperluan'        => 'required|string|max:500',
-                ];
-                $extraMessages = [
-                    'nama_dokumen_1.required'  => 'Nama di KTP wajib diisi.',
-                    'nama_dokumen_2.required'  => 'Nama di dokumen lain wajib diisi.',
-                    'jenis_dokumen_2.required' => 'Jenis dokumen pembanding wajib dipilih.',
-                    'keperluan.required'       => 'Keperluan surat wajib diisi.',
-                ];
-                break;
-
-            case 'izin-cuti':
-                $extraRules = [
-                    'nama_perusahaan'     => 'required|string|max:255',
-                    'tanggal_mulai_cuti'  => 'required|date',
-                    'tanggal_selesai_cuti'=> 'required|date|after_or_equal:tanggal_mulai_cuti',
-                    'keperluan'           => 'required|string|max:500',
-                ];
-                $extraMessages = [
-                    'nama_perusahaan.required'       => 'Nama perusahaan/instansi wajib diisi.',
-                    'tanggal_mulai_cuti.required'    => 'Tanggal mulai cuti wajib diisi.',
-                    'tanggal_selesai_cuti.required'  => 'Tanggal selesai cuti wajib diisi.',
-                    'tanggal_selesai_cuti.after_or_equal' => 'Tanggal selesai harus sama atau setelah tanggal mulai.',
-                    'keperluan.required'             => 'Keperluan cuti wajib diisi.',
-                ];
-                break;
-        }
-
-        $request->validate(
-            array_merge($rules, $extraRules),
-            array_merge($messages, $extraMessages)
-        );
-
-        // ── Susun keperluan teks ──────────────────────────────
-        $keperluan = match ($slug) {
-            'sktm'        => $request->keperluan_sktm . ($request->keterangan_tambahan ? ' — ' . $request->keterangan_tambahan : ''),
-            'kematian'    => $request->keperluan ?? '',
-            'suami-istri' => $request->keperluan ?? '',
-            'beda-nama'   => $request->keperluan ?? '',
-            'izin-cuti'   => $request->keperluan ?? '',
-            default       => $request->keperluan ?? '',
-        };
-
-        // ── Susun data_tambahan (JSON) ──────────────────────────
-        $dataTambahan = match ($slug) {
-            'sktm' => [
-                'jenis'              => 'sktm',
-                'tempat_lahir'       => $request->tempat_lahir,
-                'tanggal_lahir'      => $request->tanggal_lahir,
-                'jenis_kelamin'      => $request->jenis_kelamin,
-                'agama'              => $request->agama,
-                'status_kawin'       => $request->status_kawin,
-                'pekerjaan'          => $request->pekerjaan,
-                'rt'                 => $request->rt,
-                'rw'                 => $request->rw,
-                'keperluan_sktm'     => $request->keperluan_sktm,
-                'keterangan_tambahan'=> $request->keterangan_tambahan,
-            ],
-            'kematian' => [
-                'jenis'              => 'kematian',
-                'tempat_lahir'       => $request->tempat_lahir,
-                'tanggal_lahir'      => $request->tanggal_lahir,
-                'jenis_kelamin'      => $request->jenis_kelamin,
-                'agama'              => $request->agama,
-                'status_kawin'       => $request->status_kawin,
-                'pekerjaan'          => $request->pekerjaan,
-                'umur'               => $request->umur,
-                'hari_meninggal'     => $request->hari_meninggal,
-                'tanggal_meninggal'  => $request->tanggal_meninggal,
-                'tempat_meninggal'   => $request->tempat_meninggal,
-                'sebab_meninggal'    => $request->sebab_meninggal,
-                'rt'                 => $request->rt,
-                'rw'                 => $request->rw,
-            ],
-            'suami-istri' => [
-                'jenis'          => 'suami-istri',
-                'tempat_lahir'   => $request->tempat_lahir,
-                'tanggal_lahir'  => $request->tanggal_lahir,
-                'jenis_kelamin'  => $request->jenis_kelamin,
-                'agama'          => $request->agama,
-                'status_kawin'   => 'Kawin',
-                'pekerjaan'      => $request->pekerjaan,
-                'rt'             => $request->rt,
-                'rw'             => $request->rw,
-                'nama_istri'     => $request->nama_istri,
-                'nik_istri'      => $request->nik_istri,
-                'ttl_istri'      => $request->ttl_istri,
-                'agama_istri'    => $request->agama_istri,
-                'pekerjaan_istri'=> $request->pekerjaan_istri,
-                'alamat_istri'   => $request->alamat_istri,
-                'tahun_menikah'  => $request->tahun_menikah,
-            ],
-            'beda-nama' => [
-                'jenis'            => 'beda-nama',
-                'tempat_lahir'     => $request->tempat_lahir,
-                'tanggal_lahir'    => $request->tanggal_lahir,
-                'jenis_kelamin'    => $request->jenis_kelamin,
-                'agama'            => $request->agama,
-                'status_kawin'     => $request->status_kawin,
-                'pekerjaan'        => $request->pekerjaan,
-                'rt'               => $request->rt,
-                'rw'               => $request->rw,
-                'nama_dokumen_1'   => $request->nama_dokumen_1,
-                'nama_dokumen_2'   => $request->nama_dokumen_2,
-                'jenis_dokumen_2'  => $request->jenis_dokumen_2,
-            ],
-            'izin-cuti' => [
-                'jenis'                => 'izin-cuti',
-                'tempat_lahir'         => $request->tempat_lahir,
-                'tanggal_lahir'        => $request->tanggal_lahir,
-                'jenis_kelamin'        => $request->jenis_kelamin,
-                'agama'                => $request->agama,
-                'status_kawin'         => $request->status_kawin,
-                'pekerjaan'            => $request->pekerjaan,
-                'rt'                   => $request->rt,
-                'rw'                   => $request->rw,
-                'nama_perusahaan'      => $request->nama_perusahaan,
-                'lama_cuti'            => $request->lama_cuti,
-                'tanggal_mulai_cuti'   => $request->tanggal_mulai_cuti,
-                'tanggal_selesai_cuti' => $request->tanggal_selesai_cuti,
-            ],
-            default => [],
-        };
-
-        // ── Simpan permohonan ────────────────────────────────────
-        $permohonan = PermohonanSurat::create([
-            'id_user'           => Auth::id(),
-            'id_jenis_surat'    => $this->slugMap[$slug],
-            'nama_pemohon'      => $request->nama_pemohon,
-            'nik_pemohon'       => $request->nik_pemohon,
-            'alamat_pemohon'    => $request->alamat_pemohon,
-            'keperluan'         => $keperluan,
-            'data_tambahan'     => $dataTambahan,
-            'tanggal_pengajuan' => now(),
-        ]);
-
-        // ── Simpan semua dokumen (KTP + KK + Pendukung) ─────────
-        $this->simpanDokumen($request, $permohonan);
-
-        return redirect()
-            ->route('user.permohonan.index')
-            ->with('success', 'Permohonan berhasil dikirim! Silakan tunggu konfirmasi dari admin kelurahan.');
+        return $this->storeSuratTemplate($request, $jenisSurat);
     }
 
-    // =========================================================
-    // DETAIL PERMOHONAN
-    // =========================================================
     public function show($id)
     {
         $permohonan = PermohonanSurat::with(['jenisSurat', 'approval', 'persyaratan'])
@@ -382,9 +114,6 @@ class PermohonanUserController extends Controller
         return view('User.permohonan.show', compact('permohonan'));
     }
 
-    // =========================================================
-    // HAPUS PERMOHONAN (hanya jika masih pending)
-    // =========================================================
     public function destroy($id)
     {
         $permohonan = PermohonanSurat::with(['approval', 'persyaratan'])
@@ -408,86 +137,109 @@ class PermohonanUserController extends Controller
             ->with('success', 'Permohonan berhasil dihapus.');
     }
 
-    // =========================================================
-    // SIMPAN SURAT TEMPLATE OPSI D (custom jenis surat)
-    // =========================================================
-    private function storeSuratTemplate(Request $request, \App\Models\JenisSurat $jenisSurat)
+    private function storeSuratTemplate(Request $request, JenisSurat $jenisSurat)
     {
-        $fieldConfig = is_array($jenisSurat->field_config)
-            ? $jenisSurat->field_config
-            : (json_decode($jenisSurat->field_config, true) ?? []);
+        $fieldsConfig = $jenisSurat->fields_config ?? [];
+        $bioFields    = collect($fieldsConfig)->where('group', 'biodata')->pluck('key')->toArray();
+        $suamiFields  = collect($fieldsConfig)->where('group', 'suami')->where('type', '!=', 'section')->values();
+        $istriFields  = collect($fieldsConfig)->where('group', 'istri')->where('type', '!=', 'section')->values();
+        $extraFields  = collect($fieldsConfig)->where('group', 'extra')->values();
+        $isPasangan   = $suamiFields->count() > 0;
 
-        $rules = array_merge([
-            'nama_pemohon'   => 'required|string|max:255',
-            'nik_pemohon'    => 'required|string|size:16',
-            'tempat_lahir'   => 'required|string|max:100',
-            'tanggal_lahir'  => 'required|date',
-            'jenis_kelamin'  => 'required|in:Laki-Laki,Perempuan',
-            'alamat_pemohon' => 'required|string|max:500',
-            'keperluan'      => 'required|string|max:500',
-        ], $this->dokumenRules());
+        // Build validation rules
+        $rules = $this->dokumenRules();
+        $rules['jenis_pengajuan'] = 'required|in:sendiri,orang_lain';
 
-        $messages = $this->dokumenMessages();
-
-        foreach ($fieldConfig as $field) {
-            if (!empty($field['required'])) {
-                $rules['field_' . $field['key']] = 'required';
+        if (!$isPasangan) {
+            // Standard biodata validation
+            if (in_array('nama', $bioFields))            $rules['nama_pemohon']   = 'required|string|max:255';
+            if (in_array('nik', $bioFields))             $rules['nik_pemohon']    = 'required|string|size:16';
+            if (in_array('tempat_tgl_lahir', $bioFields)){ $rules['tempat_lahir'] = 'required|string|max:100'; $rules['tanggal_lahir'] = 'required|date'; }
+            if (in_array('jenis_kelamin', $bioFields))   $rules['jenis_kelamin']  = 'required|in:Laki-Laki,Perempuan';
+            if (in_array('agama', $bioFields))           $rules['agama']          = 'required|string';
+            if (in_array('pekerjaan', $bioFields))       $rules['pekerjaan']      = 'required|string|max:100';
+            if (in_array('umur', $bioFields))            $rules['umur']           = 'required|integer|min:0|max:150';
+            if (in_array('alamat', $bioFields))          $rules['alamat_pemohon'] = 'required|string|max:500';
+        } else {
+            // Pasangan fields — each field key already includes suffix
+            foreach ($suamiFields->merge($istriFields) as $f) {
+                if ($f['required'] ?? false) {
+                    $rules[$f['key']] = match($f['type']) {
+                        'ttl'    => null, // handled below
+                        default  => 'required|string|max:500',
+                    };
+                    if ($f['type'] === 'ttl') {
+                        $suffix = explode('_', $f['key']);
+                        $suffix = end($suffix);
+                        $rules['tempat_lahir_'.$suffix]  = 'required|string|max:100';
+                        $rules['tanggal_lahir_'.$suffix] = 'required|date';
+                        unset($rules[$f['key']]);
+                    }
+                }
             }
         }
 
-        // Template C: Pihak Kedua hardcoded — field nama_pihak2, nik_pihak2, alamat_pihak2, hubungan wajib
-        if (($jenisSurat->template ?? null) === 'C') {
-            $rules['field_nama_pihak2']   = 'required|string|max:255';
-            $rules['field_nik_pihak2']    = 'required|string|size:16';
-            $rules['field_alamat_pihak2'] = 'required|string|max:500';
-            $rules['field_hubungan']      = 'required|string|max:100';
-
-            $messages['field_nama_pihak2.required']   = 'Nama Pihak Kedua wajib diisi.';
-            $messages['field_nik_pihak2.required']    = 'NIK Pihak Kedua wajib diisi.';
-            $messages['field_nik_pihak2.size']        = 'NIK Pihak Kedua harus 16 digit.';
-            $messages['field_alamat_pihak2.required'] = 'Alamat Pihak Kedua wajib diisi.';
-            $messages['field_hubungan.required']      = 'Hubungan dengan Pemohon wajib diisi.';
-        }
-
-        $request->validate($rules, $messages);
-
-        $dataTambahan = [
-            'jenis'         => $jenisSurat->slug,
-            'template'      => $jenisSurat->template,
-            'tempat_lahir'  => $request->tempat_lahir,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'agama'         => $request->agama,
-            'status_kawin'  => $request->status_kawin,
-            'pekerjaan'     => $request->pekerjaan,
-            'rt'            => $request->rt,
-            'rw'            => $request->rw,
-        ];
-
-        // Simpan field dari config (preset + custom)
-        foreach ($fieldConfig as $field) {
-            $dataTambahan[$field['key']] = $request->input('field_' . $field['key']);
-        }
-
-        // Simpan field Pihak Kedua (built-in untuk template C)
-        if (($jenisSurat->template ?? null) === 'C') {
-            foreach (['nama_pihak2','nik_pihak2','ttl_pihak2','pekerjaan_pihak2','alamat_pihak2','hubungan'] as $k) {
-                $dataTambahan[$k] = $request->input('field_' . $k);
+        foreach ($extraFields as $ef) {
+            if (($ef['required'] ?? false) && ($ef['type'] ?? '') !== 'section') {
+                $rules['extra_'.$ef['key']] = 'required|string';
             }
         }
+
+        $request->validate($rules, $this->dokumenMessages());
+
+        // Build data_tambahan
+        $dataTambahan = ['jenis' => $jenisSurat->slug, 'jenis_pengajuan' => $request->jenis_pengajuan];
+
+        if (!$isPasangan) {
+            if (in_array('tempat_tgl_lahir', $bioFields)) { $dataTambahan['tempat_lahir'] = $request->tempat_lahir; $dataTambahan['tanggal_lahir'] = $request->tanggal_lahir; }
+            foreach (['jenis_kelamin','agama','status_kawin','kewarganegaraan','pekerjaan','pendidikan','kelurahan','kecamatan','no_hp','umur'] as $k) {
+                if (in_array($k, $bioFields)) $dataTambahan[$k] = $request->input($k);
+            }
+            if (in_array('rt_rw', $bioFields)) { $dataTambahan['rt'] = $request->rt; $dataTambahan['rw'] = $request->rw; }
+        } else {
+            // Collect all pasangan fields directly from request
+            foreach ($suamiFields->merge($istriFields) as $f) {
+                if ($f['type'] === 'ttl') {
+                    $suffix = explode('_', $f['key']); $suffix = end($suffix);
+                    $dataTambahan['tempat_lahir_'.$suffix]  = $request->input('tempat_lahir_'.$suffix);
+                    $dataTambahan['tanggal_lahir_'.$suffix] = $request->input('tanggal_lahir_'.$suffix);
+                } else {
+                    $dataTambahan[$f['key']] = $request->input($f['key']);
+                }
+            }
+        }
+
+        foreach ($extraFields as $ef) {
+            if (($ef['type'] ?? '') === 'section') continue;
+            $dataTambahan[$ef['key']] = $request->input('extra_'.$ef['key']);
+        }
+
+        // Gunakan nilai field center_bold pertama sebagai keperluan, fallback ke nama surat
+        $cbField = $extraFields->firstWhere('print_style', 'center_bold');
+        $keperluan = $cbField ? $request->input('extra_'.$cbField['key']) : $jenisSurat->nama_surat;
+
+        // For pasangan: use suami name as nama_pemohon
+        $namaPemohon = $isPasangan
+            ? ($request->input('nama_suami') ?? Auth::user()->nama)
+            : ($request->nama_pemohon ?? Auth::user()->nama);
+        $nikPemohon = $isPasangan
+            ? ($request->input('nik_suami') ?? Auth::user()->nik ?? '-')
+            : ($request->nik_pemohon ?? Auth::user()->nik ?? '-');
+        $alamatPemohon = $isPasangan
+            ? ($request->input('alamat_suami') ?? Auth::user()->alamat ?? '-')
+            : ($request->alamat_pemohon ?? Auth::user()->alamat ?? '-');
 
         $permohonan = PermohonanSurat::create([
             'id_user'           => Auth::id(),
             'id_jenis_surat'    => $jenisSurat->id_jenis_surat,
-            'nama_pemohon'      => $request->nama_pemohon,
-            'nik_pemohon'       => $request->nik_pemohon,
-            'alamat_pemohon'    => $request->alamat_pemohon,
-            'keperluan'         => $request->keperluan,
+            'nama_pemohon'      => $namaPemohon,
+            'nik_pemohon'       => $nikPemohon,
+            'alamat_pemohon'    => $alamatPemohon,
+            'keperluan'         => $keperluan,
             'data_tambahan'     => $dataTambahan,
             'tanggal_pengajuan' => now(),
         ]);
 
-        // Simpan semua dokumen (KTP + KK + Pendukung)
         $this->simpanDokumen($request, $permohonan);
 
         return redirect()

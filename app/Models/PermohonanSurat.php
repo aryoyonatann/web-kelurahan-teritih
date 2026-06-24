@@ -51,4 +51,14 @@ class PermohonanSurat extends Model
     {
         return $this->hasOne(Approval::class, 'id_permohonan');
     }
+
+    public function isPerwakilan(): bool
+    {
+        return ($this->data_tambahan['jenis_pengajuan'] ?? '') === 'orang_lain';
+    }
+
+    public function dt(string $key, mixed $default = null): mixed
+    {
+        return $this->data_tambahan[$key] ?? $default;
+    }
 }

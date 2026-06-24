@@ -175,10 +175,9 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
                             </a>
                             {{-- Hapus (hanya jika masih pending) --}}
                             @if(!$d->approval || $d->approval->status === 'pending')
-                            <form action="{{ route('user.permohonan.destroy', $d->id_permohonan) }}" method="POST" style="display:inline"
-                                  onsubmit="return confirm('Hapus permohonan ini? Tindakan tidak dapat dibatalkan.')">
+                            <form action="{{ route('user.permohonan.destroy', $d->id_permohonan) }}" method="POST" style="display:inline" id="form-del-{{ $d->id_permohonan }}">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn-sm btn-delete">
+                                <button type="button" class="btn-sm btn-delete" onclick="showConfirm('Hapus permohonan ini? Tindakan tidak dapat dibatalkan.', () => document.getElementById('form-del-{{ $d->id_permohonan }}').submit(), {confirmText:'Ya, Hapus', type:'danger'})">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="3 6 5 6 21 6"/>
                                         <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
@@ -201,5 +200,32 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
 
 @include('partials.footer')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function showConfirm(message, onConfirm, { confirmText='Ya, Lanjutkan', cancelText='Batal', type='warning' } = {}) {
+    const existing = document.getElementById('customConfirmOverlay');
+    if (existing) existing.remove();
+    const cfg = { warning:{icon:'⚠️',color:'#f59e0b',bg:'#fffbeb'}, danger:{icon:'🗑️',color:'#ef4444',bg:'#fef2f2'}, success:{icon:'✅',color:'#10b981',bg:'#ecfdf5'}, info:{icon:'ℹ️',color:'#1c64f2',bg:'#eff6ff'} };
+    const c = cfg[type] || cfg.warning;
+    const overlay = document.createElement('div');
+    overlay.id = 'customConfirmOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:99999;padding:16px';
+    overlay.innerHTML = `<div style="background:white;border-radius:18px;max-width:380px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.2);overflow:hidden">
+        <div style="background:${c.bg};padding:24px 28px 20px;text-align:center;border-bottom:1px solid ${c.color}22">
+            <div style="font-size:38px;margin-bottom:8px">${c.icon}</div>
+            <p style="font-size:15px;font-weight:600;color:#0f172a;margin:0;line-height:1.6">${message}</p>
+        </div>
+        <div style="display:flex;gap:10px;padding:16px 20px">
+            <button id="ccCancel" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #e2e8f0;background:white;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit">${cancelText}</button>
+            <button id="ccOk" style="flex:1;padding:10px;border-radius:10px;border:none;background:${c.color};color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">${confirmText}</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const close = () => overlay.remove();
+    overlay.querySelector('#ccOk').addEventListener('click', () => { close(); onConfirm(); });
+    overlay.querySelector('#ccCancel').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }});
+}
+</script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Data Kependudukan')
+@section('title', 'Kelola Akun Masyarakat')
 
 @push('styles')
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
@@ -191,12 +191,12 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 <div class="kp-hero">
     <div class="kp-hero-content">
         <div>
-            <h1><i class="bi bi-people-fill me-2"></i>Data Kependudukan</h1>
-            <p>Kelola akun warga dan status kependudukan Kelurahan Teritih</p>
+            <h1><i class="bi bi-people-fill me-2"></i>Kelola Akun Masyarakat</h1>
+            <p>Kelola akun masyarakat yang terdaftar di sistem layanan Kelurahan Teritih</p>
         </div>
         <div class="hero-actions">
             {{-- Export CSV — bawa filter yang aktif --}}
-            <a href="{{ route('kependudukan.export', request()->query()) }}"
+            <a href="{{ route('kelola-akun.export', request()->query()) }}"
                class="btn-export">
                 <i class="bi bi-download"></i> Export CSV
             </a>
@@ -266,7 +266,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
     </div>
 
     {{-- ── TOOLBAR ── --}}
-    <form method="GET" action="{{ route('kependudukan.index') }}" id="filterForm">
+    <form method="GET" action="{{ route('kelola-akun.index') }}" id="filterForm">
         <div class="toolbar mb-3">
             {{-- Baris 1: Pencarian + Status + Sort + tombol --}}
             <div class="toolbar-row">
@@ -292,7 +292,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                     <i class="bi bi-funnel"></i> Filter
                 </button>
                 @if(request()->hasAny(['search','status','rt','rw','sort']))
-                <a href="{{ route('kependudukan.index') }}" class="btn-reset">
+                <a href="{{ route('kelola-akun.index') }}" class="btn-reset">
                     <i class="bi bi-x-lg"></i> Reset
                 </a>
                 @endif
@@ -349,14 +349,14 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                         <th>NIK</th>
                         <th>Kontak</th>
                         <th>
-                            <a href="{{ route('kependudukan.index', array_merge(request()->query(), ['sort'=>'permohonan'])) }}"
+                            <a href="{{ route('kelola-akun.index', array_merge(request()->query(), ['sort'=>'permohonan'])) }}"
                                class="th-sort" style="color:inherit;text-decoration:none">
                                 Permohonan <i class="bi bi-arrow-down-up"></i>
                             </a>
                         </th>
                         <th>Tgl Daftar</th>
                         <th>
-                            <a href="{{ route('kependudukan.index', array_merge(request()->query(), ['sort'=>'last_login'])) }}"
+                            <a href="{{ route('kelola-akun.index', array_merge(request()->query(), ['sort'=>'last_login'])) }}"
                                class="th-sort" style="color:inherit;text-decoration:none">
                                 Terakhir Login <i class="bi bi-arrow-down-up"></i>
                             </a>
@@ -443,10 +443,8 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                         <td>
                             @if($status === 'aktif')
                                 <span class="bdg bdg-aktif">Aktif</span>
-                            @elseif($status === 'blokir')
+                            @else($status === 'blokir')
                                 <span class="bdg bdg-blokir">Blokir</span>
-                            @else
-                                <span class="bdg bdg-nonaktif">Non-Aktif</span>
                             @endif
                         </td>
 
@@ -457,11 +455,11 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <div class="dropdown-menu-custom">
-                                    <a href="{{ route('kependudukan.show', $user->id_user) }}" class="dd-item">
+                                    <a href="{{ route('kelola-akun.show', $user->id_user) }}" class="dd-item">
                                         <i class="bi bi-eye"></i> Lihat Detail
                                     </a>
                                     <hr class="dd-divider">
-                                    <form method="POST" action="{{ route('kependudukan.toggle', $user->id_user) }}">
+                                    <form method="POST" action="{{ route('kelola-akun.toggle', $user->id_user) }}">
                                         @csrf @method('PATCH')
                                         @if($status === 'aktif')
                                         <button type="submit" class="dd-item warning">
@@ -528,7 +526,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
             <div class="modal-title"><i class="bi bi-person-plus-fill me-2" style="color:var(--blue)"></i>Tambah Data Warga</div>
             <button class="modal-close" onclick="closeModal('modalTambah')"><i class="bi bi-x-lg"></i></button>
         </div>
-        <form method="POST" action="{{ route('kependudukan.store') }}">
+        <form method="POST" action="{{ route('kelola-akun.store') }}">
             @csrf
             <div class="form-grid">
                 <div class="form-group">
@@ -623,7 +621,7 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 });
 function openModalHapus(id, nama) {
     document.getElementById('modalNama').textContent = nama;
-    document.getElementById('formHapus').action = `/admin/kependudukan/${id}`;
+    document.getElementById('formHapus').action = `/admin/kelola-akun/${id}`;
     openModal('modalHapus');
 }
 

@@ -89,9 +89,7 @@
     <div class="breadcrumb-custom">
         <a href="{{ route('home') }}">Beranda</a>
         <i class="bi bi-chevron-right" style="font-size:10px"></i>
-        <a href="{{ route('informasi') }}">Informasi</a>
-        <i class="bi bi-chevron-right" style="font-size:10px"></i>
-        <a href="{{ route('informasi.berita') }}">Berita &amp; Pengumuman</a>
+        <a href="{{ route('berita') }}">Berita &amp; Pengumuman</a>
         <i class="bi bi-chevron-right" style="font-size:10px"></i>
         <span class="current">{{ Str::limit($berita->judul, 50) }}</span>
     </div>
@@ -103,7 +101,7 @@
         {{-- ARTIKEL UTAMA --}}
         <div class="col-lg-8">
 
-            <a href="{{ route('informasi.berita') }}" class="btn-back">
+            <a href="{{ route('berita') }}" class="btn-back">
                 <i class="bi bi-arrow-left"></i> Kembali ke Berita
             </a>
 
@@ -171,7 +169,7 @@
                 <div class="row g-3">
                     @foreach($beritaLainnya->take(3) as $b)
                     <div class="col-6">
-                        <a href="{{ route('informasi.berita.detail', $b->slug) }}" class="related-card">
+                        <a href="{{ route('berita.detail', $b->slug) }}" class="related-card">
                             <div class="related-img">
                                 @if($b->gambar)<img src="{{ asset('storage/'.$b->gambar) }}" alt="">@else<i class="bi bi-image"></i>@endif
                             </div>
@@ -198,7 +196,7 @@
                     <i class="bi bi-newspaper"></i> Berita Lainnya
                 </div>
                 @foreach($beritaLainnya as $b)
-                <a href="{{ route('informasi.berita.detail', $b->slug) }}" class="sidebar-item">
+                <a href="{{ route('berita.detail', $b->slug) }}" class="sidebar-item">
                     <div class="sidebar-thumb">
                         @if($b->gambar)
                             <img src="{{ asset('storage/'.$b->gambar) }}" alt="">
@@ -223,7 +221,7 @@
 
             {{-- Kembali ke Semua Berita --}}
             <div class="sidebar-card" style="text-align:center">
-                <a href="{{ route('informasi.berita') }}" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--blue);text-decoration:none">
+                <a href="{{ route('berita') }}" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--blue);text-decoration:none">
                     <i class="bi bi-grid-3x3-gap"></i> Lihat Semua Berita
                 </a>
             </div>
@@ -236,7 +234,14 @@
 @include('partials.footer')
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script>
+gsap.registerPlugin(ScrollTrigger);
+gsap.from('.page-header',{opacity:0,y:30,duration:.8,ease:'power3.out'});
+gsap.from('.article-hero',{opacity:0,scale:.97,duration:1,delay:.2,ease:'power2.out'});
+gsap.from('.article-title',{opacity:0,y:20,duration:.7,delay:.4,ease:'power2.out'});
+gsap.from('.article-body',{opacity:0,y:20,duration:.7,delay:.6,ease:'power2.out'});
 function copyLink() {
     navigator.clipboard.writeText(window.location.href).then(() => {
         const el = document.getElementById('copy-label');

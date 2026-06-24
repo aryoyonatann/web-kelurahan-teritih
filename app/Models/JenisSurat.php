@@ -20,12 +20,19 @@ class JenisSurat extends Model
         'icon',
         'warna',
         'aktif',
+        'kode_klasifikasi',
+        'kode_surat',
+        'template_pembuka',
+        'template_isi',
+        'template_penutup',
+        'fields_config',
     ];
 
     protected $casts = [
-        'field_config' => 'array',   // otomatis encode/decode JSON
-        'is_custom'    => 'boolean',
-        'aktif'        => 'boolean',
+        'field_config'  => 'array',
+        'fields_config' => 'array',
+        'is_custom'     => 'boolean',
+        'aktif'         => 'boolean',
     ];
 
     public function permohonan()

@@ -221,25 +221,22 @@
            class="nav-pill {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-        <a href="{{ route('jenis-surat.index') }}"
-           class="nav-pill {{ request()->routeIs('jenis-surat.*') ? 'active' : '' }}">
-            <i class="bi bi-file-earmark-text"></i> Jenis Surat
-        </a>
         <a href="{{ route('permohonan.index') }}"
            class="nav-pill {{ request()->routeIs('permohonan.*') ? 'active' : '' }}">
             <i class="bi bi-envelope-open"></i> Permohonan
         </a>
-        <a href="{{ route('informasi-admin.index') }}"
-           class="nav-pill {{ request()->routeIs('informasi-admin.*') ? 'active' : '' }}">
+        <a href="{{ route('berita-admin.index') }}"
+           class="nav-pill {{ request()->routeIs('berita-admin.*') ? 'active' : '' }}">
             <i class="bi bi-newspaper"></i> Berita
-        </a>
-        <a href="{{ route('kependudukan.index') }}"
-           class="nav-pill {{ request()->routeIs('kependudukan.*') ? 'active' : '' }}">
-            <i class="bi bi-people"></i> Kependudukan
         </a>
         <a href="{{ route('admin.statistik.edit') }}"
            class="nav-pill {{ request()->routeIs('admin.statistik.*') ? 'active' : '' }}">
-            <i class="bi bi-bar-chart-fill"></i> Statistik
+            <i class="bi bi-bar-chart-fill"></i> Demografi
+        </a>
+
+        <a href="{{ route('admin.master-data') }}"
+           class="nav-pill {{ request()->routeIs('admin.master-data','jenis-surat.*','kelola-akun.*','admin.pengaturan.*') ? 'active' : '' }}">
+            <i class="bi bi-database-fill"></i> Master Data
         </a>
     </nav>
 
@@ -297,6 +294,10 @@
                     </div>
                 </div>
                 <div class="admin-dd-divider"></div>
+                <a href="{{ route('admin.password.form') }}" class="admin-dd-item">
+                    <i class="bi bi-shield-lock"></i> Ganti Password
+                </a>
+                <div class="admin-dd-divider"></div>
                 <form action="{{ route('admin.logout') }}" method="POST" class="m-0" id="form-logout-dropdown">
                     @csrf
                     <button type="button" class="admin-dd-item admin-dd-logout" onclick="showLogoutModal()">
@@ -339,25 +340,21 @@
        class="nav-pill {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
         <i class="bi bi-speedometer2"></i> Dashboard
     </a>
-    <a href="{{ route('jenis-surat.index') }}"
-       class="nav-pill {{ request()->routeIs('jenis-surat.*') ? 'active' : '' }}">
-        <i class="bi bi-file-earmark-text"></i> Jenis Surat
-    </a>
     <a href="{{ route('permohonan.index') }}"
        class="nav-pill {{ request()->routeIs('permohonan.*') ? 'active' : '' }}">
         <i class="bi bi-envelope-open"></i> Permohonan
     </a>
-    <a href="{{ route('informasi-admin.index') }}"
-       class="nav-pill {{ request()->routeIs('informasi-admin.*') ? 'active' : '' }}">
+    <a href="{{ route('berita-admin.index') }}"
+       class="nav-pill {{ request()->routeIs('berita-admin.*') ? 'active' : '' }}">
         <i class="bi bi-newspaper"></i> Berita
-    </a>
-    <a href="{{ route('kependudukan.index') }}"
-       class="nav-pill {{ request()->routeIs('kependudukan.*') ? 'active' : '' }}">
-        <i class="bi bi-people"></i> Kependudukan
     </a>
     <a href="{{ route('admin.statistik.edit') }}"
        class="nav-pill {{ request()->routeIs('admin.statistik.*') ? 'active' : '' }}">
-        <i class="bi bi-bar-chart-fill"></i> Statistik
+        <i class="bi bi-bar-chart-fill"></i> Demografi
+    </a>
+    <a href="{{ route('admin.master-data') }}"
+       class="nav-pill {{ request()->routeIs('admin.master-data','jenis-surat.*','kelola-akun.*','admin.pengaturan.*') ? 'active' : '' }}">
+        <i class="bi bi-database-fill"></i> Master Data
     </a>
 </div>
 

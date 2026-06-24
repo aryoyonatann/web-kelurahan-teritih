@@ -9,151 +9,77 @@ use Illuminate\Support\Str;
 
 class JenisSuratController extends Controller
 {
-    /**
-     * ════════════════════════════════════════════════════════════════
-     *  PRESET FIELDS — DIPISAH PER TEMPLATE
-     * ════════════════════════════════════════════════════════════════
-     *  - Template A: tidak ada preset (form biodata standar saja)
-     *  - Template B: field konteks/peristiwa
-     *  - Template C: field konteks tambahan (Pihak Kedua sudah built-in)
-     *
-     *  Field Pihak Kedua TIDAK ADA di preset list karena sudah otomatis
-     *  muncul sebagai struktur tetap di template C (lihat form_template.blade.php).
-     * ════════════════════════════════════════════════════════════════
-     */
-
-    // Preset untuk Template B - field konteks/peristiwa
-    public static array $presetFieldsB = [
-        ['key' => 'tanggal_kejadian',    'label' => 'Tanggal Kejadian',         'type' => 'date'],
-        ['key' => 'tempat_kejadian',     'label' => 'Tempat Kejadian',          'type' => 'text'],
-        ['key' => 'nama_instansi',       'label' => 'Nama Instansi/Perusahaan', 'type' => 'text'],
-        ['key' => 'lama_waktu',          'label' => 'Lama Waktu (hari)',        'type' => 'number'],
-        ['key' => 'alasan',              'label' => 'Alasan/Sebab',             'type' => 'text'],
-        ['key' => 'nama_pihak_terkait',  'label' => 'Nama Pihak Terkait',       'type' => 'text'],
-        ['key' => 'nomor_dokumen',       'label' => 'Nomor Dokumen',            'type' => 'text'],
-        ['key' => 'tanggal_mulai',       'label' => 'Tanggal Mulai',            'type' => 'date'],
-        ['key' => 'tanggal_selesai',     'label' => 'Tanggal Selesai',          'type' => 'date'],
-        ['key' => 'keterangan_tambahan', 'label' => 'Keterangan Tambahan',      'type' => 'textarea'],
+    // Field biodata standar yang bisa dipilih admin
+    public static array $standardFields = [
+        ['key' => 'nama', 'label' => 'Nama Lengkap', 'type' => 'text', 'print_label' => 'N a m a'],
+        ['key' => 'nik', 'label' => 'NIK', 'type' => 'text', 'print_label' => 'NIK'],
+        ['key' => 'tempat_tgl_lahir', 'label' => 'Tempat / Tanggal Lahir', 'type' => 'ttl', 'print_label' => 'Tempat Tgl Lahir'],
+        ['key' => 'umur', 'label' => 'Umur', 'type' => 'number', 'print_label' => 'Umur'],
+        ['key' => 'jenis_kelamin', 'label' => 'Jenis Kelamin', 'type' => 'select', 'print_label' => 'Jenis Kelamin'],
+        ['key' => 'agama', 'label' => 'Bangsa / Agama', 'type' => 'agama', 'print_label' => 'Bangsa/ Agama'],
+        ['key' => 'status_kawin', 'label' => 'Status Perkawinan', 'type' => 'status_kawin', 'print_label' => 'Status Perkawinan'],
+        ['key' => 'kewarganegaraan', 'label' => 'Kewarganegaraan', 'type' => 'kewarganegaraan', 'print_label' => 'Kewarganegaraan'],
+        ['key' => 'pekerjaan', 'label' => 'Pekerjaan', 'type' => 'text', 'print_label' => 'Pekerjaan'],
+        ['key' => 'pendidikan', 'label' => 'Pendidikan Terakhir', 'type' => 'pendidikan', 'print_label' => 'Pendidikan'],
+        ['key' => 'alamat', 'label' => 'Alamat', 'type' => 'textarea', 'print_label' => 'Alamat'],
+        ['key' => 'rt_rw', 'label' => 'RT / RW', 'type' => 'rt_rw', 'print_label' => 'RT/RW'],
+        ['key' => 'kelurahan', 'label' => 'Kelurahan', 'type' => 'text', 'print_label' => 'Kelurahan'],
+        ['key' => 'kecamatan', 'label' => 'Kecamatan', 'type' => 'text', 'print_label' => 'Kecamatan'],
+        ['key' => 'no_hp', 'label' => 'No. HP / Telepon', 'type' => 'text', 'print_label' => 'No. HP'],
     ];
-
-    // Preset untuk Template C - field konteks opsional (Pihak Kedua sudah built-in)
-    public static array $presetFieldsC = [
-        ['key' => 'tanggal_kejadian',    'label' => 'Tanggal Kejadian',         'type' => 'date'],
-        ['key' => 'tempat_kejadian',     'label' => 'Tempat Kejadian',          'type' => 'text'],
-        ['key' => 'nama_instansi',       'label' => 'Nama Instansi/Perusahaan', 'type' => 'text'],
-        ['key' => 'lama_waktu',          'label' => 'Lama Waktu (hari)',        'type' => 'number'],
-        ['key' => 'alasan',              'label' => 'Alasan/Sebab',             'type' => 'text'],
-        ['key' => 'nomor_dokumen',       'label' => 'Nomor Dokumen',            'type' => 'text'],
-        ['key' => 'tanggal_mulai',       'label' => 'Tanggal Mulai',            'type' => 'date'],
-        ['key' => 'tanggal_selesai',     'label' => 'Tanggal Selesai',          'type' => 'date'],
-        ['key' => 'keterangan_tambahan', 'label' => 'Keterangan Tambahan',      'type' => 'textarea'],
-    ];
-
-    /**
-     * Field "Pihak Kedua" yang OTOMATIS muncul di Template C.
-     * Tidak ditampilkan di preset list — ini adalah struktur built-in.
-     * Disimpan di sini sebagai referensi (juga dipakai di form_template.blade.php).
-     */
-    public static array $pihakKeduaFields = [
-        ['key' => 'nama_pihak2',      'label' => 'Nama Lengkap Pihak Kedua',     'type' => 'text',     'required' => true],
-        ['key' => 'nik_pihak2',       'label' => 'NIK Pihak Kedua',              'type' => 'text',     'required' => true],
-        ['key' => 'ttl_pihak2',       'label' => 'Tempat/Tanggal Lahir Pihak Kedua', 'type' => 'text', 'required' => false],
-        ['key' => 'pekerjaan_pihak2', 'label' => 'Pekerjaan Pihak Kedua',        'type' => 'text',     'required' => false],
-        ['key' => 'alamat_pihak2',    'label' => 'Alamat Pihak Kedua',           'type' => 'textarea', 'required' => true],
-        ['key' => 'hubungan',         'label' => 'Hubungan dengan Pemohon',      'type' => 'text',     'required' => true],
-    ];
-
-    /**
-     * Helper untuk ambil preset berdasarkan template.
-     */
-    public static function getPresetsByTemplate(string $template): array
-    {
-        return match ($template) {
-            'B'     => self::$presetFieldsB,
-            'C'     => self::$presetFieldsC,
-            default => [],
-        };
-    }
-
-    /**
-     * Helper untuk ambil semua preset (B + C merged unik) — dipakai di create/edit
-     * agar admin bisa lihat semua opsi saat memilih template.
-     */
-    public static function getAllPresets(): array
-    {
-        $merged = [];
-        foreach ([self::$presetFieldsB, self::$presetFieldsC] as $list) {
-            foreach ($list as $f) {
-                $merged[$f['key']] = $f;
-            }
-        }
-        return array_values($merged);
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  CRUD METHODS
-    // ════════════════════════════════════════════════════════════════
 
     public function index()
     {
-        $data = JenisSurat::orderBy('is_custom')->orderBy('id_jenis_surat')->get();
+        $data = JenisSurat::orderBy('id_jenis_surat')->get();
         return view('admin.jenis_surat.index', compact('data'));
     }
 
     public function create()
     {
         return view('admin.jenis_surat.create', [
-            'presetsB'        => self::$presetFieldsB,
-            'presetsC'        => self::$presetFieldsC,
-            'pihakKeduaFields'=> self::$pihakKeduaFields,
+            'standardFields' => self::$standardFields,
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nama_surat' => 'required|string|max:255',
-            'deskripsi'  => 'nullable|string|max:500',
-            'template'   => 'required|in:A,B,C',
-        ], [
-            'nama_surat.required' => 'Nama surat wajib diisi.',
-            'template.required'   => 'Template wajib dipilih.',
+            'nama_surat'       => 'required|string|max:255',
+            'deskripsi'        => 'nullable|string|max:500',
+            'kode_klasifikasi' => 'required|string|max:20',
+            'kode_surat'       => 'required|string|max:20',
+            'template_pembuka' => 'required|string',
+            'template_isi'     => 'nullable|string',
+            'template_penutup' => 'required|string',
         ]);
 
-        // Generate slug unik
-        $slug = Str::slug($request->nama_surat);
-        $originalSlug = $slug;
-        $counter = 1;
-        while (JenisSurat::where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $counter++;
-        }
-
-        $fieldConfig = $this->buildFieldConfig($request);
+        $slug = $this->generateSlug($request->nama_surat);
 
         JenisSurat::create([
-            'nama_surat'   => $request->nama_surat,
-            'deskripsi'    => $request->deskripsi,
-            'slug'         => $slug,
-            'is_custom'    => true,
-            'template'     => $request->template,
-            'field_config' => $fieldConfig,
-            'icon'         => 'bi-file-earmark-text',
-            'warna'        => '#64748b',
-            'aktif'        => 1,
+            'nama_surat'       => $request->nama_surat,
+            'deskripsi'        => $request->deskripsi,
+            'slug'             => $slug,
+            'is_custom'        => true,
+            'icon'             => $request->icon ?? 'bi-file-earmark-text',
+            'warna'            => $request->warna ?? '#64748b',
+            'aktif'            => 1,
+            'kode_klasifikasi' => $request->kode_klasifikasi,
+            'kode_surat'       => $request->kode_surat,
+            'template_pembuka' => $request->template_pembuka,
+            'template_isi'     => $request->template_isi,
+            'template_penutup' => $request->template_penutup,
+            'fields_config'    => $this->buildFieldsConfig($request),
         ]);
 
-        return redirect()->route('jenis-surat.index')
-            ->with('success', 'Jenis surat berhasil ditambahkan.');
+        return redirect()->route('jenis-surat.index')->with('success', 'Jenis surat berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $data = JenisSurat::findOrFail($id);
         return view('admin.jenis_surat.edit', [
-            'data'             => $data,
-            'presetsB'         => self::$presetFieldsB,
-            'presetsC'         => self::$presetFieldsC,
-            'pihakKeduaFields' => self::$pihakKeduaFields,
+            'data' => $data,
+            'standardFields' => self::$standardFields,
         ]);
     }
 
@@ -162,108 +88,131 @@ class JenisSuratController extends Controller
         $data = JenisSurat::findOrFail($id);
 
         $request->validate([
-            'nama_surat' => 'required|string|max:255',
-            'deskripsi'  => 'nullable|string|max:500',
-            'template'   => $data->is_custom ? 'required|in:A,B,C' : 'nullable',
+            'nama_surat'       => 'required|string|max:255',
+            'deskripsi'        => 'nullable|string|max:500',
+            'kode_klasifikasi' => 'required|string|max:20',
+            'kode_surat'       => 'required|string|max:20',
+            'template_pembuka' => 'required|string',
+            'template_isi'     => 'nullable|string',
+            'template_penutup' => 'required|string',
         ]);
 
-        $updateData = [
-            'nama_surat' => $request->nama_surat,
-            'deskripsi'  => $request->deskripsi,
-        ];
+        $slug = $this->generateSlug($request->nama_surat, $id);
 
-        if ($data->is_custom) {
-            $slug = Str::slug($request->nama_surat);
-            $originalSlug = $slug;
-            $counter = 1;
-            while (JenisSurat::where('slug', $slug)->where('id_jenis_surat', '!=', $id)->exists()) {
-                $slug = $originalSlug . '-' . $counter++;
+        // Preserve print_style & template_text dari existing fields_config
+        $existingFc = $data->fields_config ?? [];
+        if (is_string($existingFc)) $existingFc = json_decode($existingFc, true) ?? [];
+        $existingExtra = collect($existingFc)->where('group','extra')->keyBy('key');
+
+        $newFieldsConfig = $this->buildFieldsConfig($request);
+        foreach ($newFieldsConfig as &$f) {
+            if (($f['group'] ?? '') === 'extra') {
+                $existing = $existingExtra->get($f['key']);
+                if ($existing) {
+                    if (!isset($f['print_style'])    && isset($existing['print_style']))    $f['print_style']    = $existing['print_style'];
+                    if (!isset($f['template_text'])  && isset($existing['template_text']))  $f['template_text']  = $existing['template_text'];
+                }
             }
-            $updateData['slug']         = $slug;
-            $updateData['template']     = $request->template;
-            $updateData['field_config'] = $this->buildFieldConfig($request);
         }
 
-        $data->update($updateData);
+        $data->update([
+            'nama_surat'       => $request->nama_surat,
+            'deskripsi'        => $request->deskripsi,
+            'slug'             => $slug,
+            'icon'             => $request->icon ?? $data->icon,
+            'warna'            => $request->warna ?? $data->warna,
+            'kode_klasifikasi' => $request->kode_klasifikasi,
+            'kode_surat'       => $request->kode_surat,
+            'template_pembuka' => $request->template_pembuka,
+            'template_isi'     => $request->template_isi,
+            'template_penutup' => $request->template_penutup,
+            'fields_config'    => $newFieldsConfig,
+        ]);
 
-        return redirect()->route('jenis-surat.index')
-            ->with('success', 'Jenis surat berhasil diperbarui.');
+        return redirect()->route('jenis-surat.index')->with('success', 'Jenis surat berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
         $data = JenisSurat::findOrFail($id);
-
-        if (!$data->is_custom) {
-            return redirect()->route('jenis-surat.index')
-                ->with('error', 'Surat bawaan sistem tidak dapat dihapus.');
-        }
-
         $data->delete();
-
-        return redirect()->route('jenis-surat.index')
-            ->with('success', 'Jenis surat berhasil dihapus.');
+        return redirect()->route('jenis-surat.index')->with('success', 'Jenis surat berhasil dihapus.');
     }
 
-    /**
-     * ════════════════════════════════════════════════════════════════
-     *  BUILD FIELD CONFIG
-     * ════════════════════════════════════════════════════════════════
-     *  Hanya menyimpan field yang VALID untuk template terpilih.
-     *  - Template A: tidak ada field (kembalikan array kosong)
-     *  - Template B: hanya field dari preset B + custom
-     *  - Template C: hanya field dari preset C + custom
-     *    (Pihak Kedua TIDAK disimpan di sini — sudah hardcoded di form view)
-     * ════════════════════════════════════════════════════════════════
-     */
-    private function buildFieldConfig(Request $request): array
+    private function generateSlug(string $name, ?int $excludeId = null): string
     {
-        $template = $request->input('template');
-
-        // Template A: tidak ada field tambahan
-        if ($template === 'A') {
-            return [];
+        $base = Str::slug($name);
+        $slug = $base;
+        $counter = 1;
+        $query = JenisSurat::where('slug', $slug);
+        if ($excludeId) $query->where('id_jenis_surat', '!=', $excludeId);
+        while ($query->clone()->exists()) {
+            $slug = $base . '-' . $counter++;
         }
+        return $slug;
+    }
 
-        // Ambil preset yang valid untuk template ini
-        $validPresets = self::getPresetsByTemplate($template);
-        $validKeys    = array_column($validPresets, 'key');
-        $labels       = array_column($validPresets, 'label', 'key');
-        $types        = array_column($validPresets, 'type',  'key');
-
+    private function buildFieldsConfig(Request $request): array
+    {
         $fields = [];
 
-        // 1. Field preset yang dicentang DAN valid untuk template ini
-        foreach ($request->input('preset_fields', []) as $key) {
-            if (in_array($key, $validKeys)) {
+        // Section label di atas biodata (opsional)
+        $sectionLabel = trim($request->input('bio_section_label', ''));
+        if ($sectionLabel) {
+            $fields[] = [
+                'key'         => 'section_ektp',
+                'label'       => $sectionLabel,
+                'type'        => 'section',
+                'print_label' => $sectionLabel,
+                'group'       => 'biodata',
+                'required'    => false,
+            ];
+        }
+
+        // Field biodata standar yang dicentang
+        $bioFields = $request->input('bio_fields', []);
+        foreach (self::$standardFields as $sf) {
+            if (in_array($sf['key'], $bioFields)) {
                 $fields[] = [
-                    'key'       => $key,
-                    'label'     => $labels[$key],
-                    'type'      => $types[$key],
-                    'required'  => in_array($key, $request->input('required_fields', [])),
-                    'is_preset' => true,
+                    'key'         => $sf['key'],
+                    'label'       => $sf['label'],
+                    'type'        => $sf['type'],
+                    'print_label' => $sf['print_label'],
+                    'group'       => 'biodata',
+                    'required'    => true,
                 ];
             }
         }
 
-        // 2. Field custom yang diketik admin
-        $customLabels = $request->input('custom_label', []);
-        $customTypes  = $request->input('custom_type', []);
-        $customReq    = $request->input('custom_required', []);
+        // Field tambahan custom (untuk form warga, tidak masuk tabel biodata cetak)
+        $extraKeys       = $request->input('extra_key', []);
+        $extraLabels     = $request->input('extra_label', []);
+        $extraTypes      = $request->input('extra_type', []);
+        $extraReq        = $request->input('extra_required', []);
+        $extraPrint      = $request->input('extra_on_print', []);
+        $extraPrintStyle = $request->input('extra_print_style', []);
+        $extraTmplText   = $request->input('extra_template_text', []);
 
-        foreach ($customLabels as $i => $label) {
+        foreach ($extraLabels as $i => $label) {
             $label = trim($label);
             if (!$label) continue;
+            $key        = $extraKeys[$i] ?? Str::slug($label, '_');
+            $printStyle = $extraPrintStyle[$i] ?? '';
+            $tmplText   = $extraTmplText[$i] ?? '';
+            $isCenterBold = $printStyle === 'center_bold';
 
-            $key = Str::slug($label, '_') ?: 'field_' . $i;
-
-            $fields[] = [
-                'key'       => $key,
-                'label'     => $label,
-                'type'      => $customTypes[$i] ?? 'text',
-                'required'  => isset($customReq[$i]),
-                'is_preset' => false,
+            $f = [
+                'key'         => $key,
+                'label'       => $label,
+                'type'        => $extraTypes[$i] ?? 'text',
+                'print_label' => $label,
+                'group'       => 'extra',
+                'required'    => ($extraReq[$i] ?? '0') === '1',
+                'on_print'    => $isCenterBold ? false : (($extraPrint[$i] ?? '0') === '1'),
             ];
+            if ($printStyle !== '') $f['print_style']   = $printStyle;
+            if ($tmplText   !== '') $f['template_text'] = $tmplText;
+            $fields[] = $f;
         }
 
         return $fields;

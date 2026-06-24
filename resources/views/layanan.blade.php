@@ -56,6 +56,10 @@
     .status-dot-buka{background:#16a34a;animation:pulse-green 1.5s ease-in-out infinite}
     .status-dot-tutup{background:#dc2626}
     @keyframes pulse-green{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+    .jam-date{font-size:11px;color:#1e293b;font-weight:600;padding:8px 0 2px;display:flex;align-items:center;gap:5px}
+    .jam-holiday{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:#fff7ed;border-radius:8px;margin:6px 0 2px;border:1px solid #fed7aa}
+    .jam-holiday-icon{color:#ea580c;font-size:13px;flex-shrink:0;margin-top:1px}
+    .jam-holiday-text{font-size:11px;color:#9a3412;font-weight:600;line-height:1.4}
     .info-body{padding:16px 18px}
     .info-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--orange);margin-bottom:10px}
     .info-text{font-size:12.5px;color:var(--slate);line-height:1.65}
@@ -101,7 +105,7 @@
             </div>
             @endif
 
-            <div class="layanan-main-card">
+            <div id="pilih-jenis-surat" class="layanan-main-card">
                 <div class="layanan-card-header">
                     <div class="layanan-card-title"><i class="bi bi-list-ul"></i> Pilih Jenis Surat</div>
                     <span class="count-badge">{{ \App\Models\JenisSurat::count() }} Layanan Tersedia</span>
@@ -110,24 +114,18 @@
                 <div class="surat-grid">
 
                     @php
-                    $suratConfig = [
-                        'sktm'        => ['icon'=>'bi-currency-dollar',         'bg'=>'#fdf4ff','color'=>'#a855f7'],
-                        'kematian'    => ['icon'=>'bi-file-earmark-medical-fill','bg'=>'#f0fdf4','color'=>'#059669'],
-                        'suami-istri' => ['icon'=>'bi-people-fill',             'bg'=>'#fff1f2','color'=>'#f43f5e'],
-                        'beda-nama'   => ['icon'=>'bi-person-badge-fill',       'bg'=>'#fffbeb','color'=>'#f59e0b'],
-                        'izin-cuti'   => ['icon'=>'bi-calendar-check-fill',    'bg'=>'#eff6ff','color'=>'#1c64f2'],
-                    ];
                     $semuaSurat = \App\Models\JenisSurat::orderBy('is_custom')->orderBy('id_jenis_surat')->get();
                     @endphp
 
                     @foreach($semuaSurat as $surat)
                     @php
-                        $cfg   = $suratConfig[$surat->slug] ?? ['icon'=>'bi-file-earmark-text','bg'=>'#f1f5f9','color'=>'#64748b'];
+                        $warna = $surat->warna ?? '#1c64f2';
+                        $bg    = $warna . '18'; // ~10% opacity hex approximation using inline rgba below
                         $route = auth()->check() ? route('user.permohonan.form', $surat->slug) : route('login');
                     @endphp
                     <a href="{{ $route }}" class="surat-card">
-                        <div class="surat-icon" style="background:{{ $cfg['bg'] }};color:{{ $cfg['color'] }}">
-                            <i class="bi {{ $cfg['icon'] }}"></i>
+                        <div class="surat-icon" style="background:{{ $warna }}18;color:{{ $warna }}">
+                            <i class="bi {{ $surat->icon ?? 'bi-file-earmark-text' }}"></i>
                         </div>
                         <div style="flex:1">
                             @if($surat->is_custom)
@@ -175,6 +173,9 @@
                         <span class="jam-day" style="font-size:12px;font-weight:600">Status Sekarang</span>
                         <span id="jam-status-layanan"></span>
                     </div>
+                    {{-- TANGGAL & HARI LIBUR --}}
+                    <div id="jam-date-layanan" class="jam-date"></div>
+                    <div id="jam-holiday-layanan"></div>
                 </div>
             </div>
             <div class="sidebar-card" style="border-left:3px solid var(--orange)">
@@ -191,15 +192,100 @@
 @include('partials.footer')
 <script>
 (function(){
-    var now=new Date(),wib=new Date(now.toLocaleString('en-US',{timeZone:'Asia/Jakarta'}));
-    var day=wib.getDay(),tot=wib.getHours()*60+wib.getMinutes();
-    var isOpen=(day>=1&&day<=4&&tot>=480&&tot<960)||(day===5&&tot>=480&&tot<930);
-    var el=document.getElementById('jam-status-layanan');
-    if(el)el.innerHTML=isOpen
-        ?'<span class="status-buka"><span class="status-dot status-dot-buka"></span>Sedang Buka</span>'
-        :'<span class="status-tutup"><span class="status-dot status-dot-tutup"></span>Sedang Tutup</span>';
+    var HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    var BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    var now  = new Date();
+    var wib  = new Date(now.toLocaleString('en-US', {timeZone:'Asia/Jakarta'}));
+    var day  = wib.getDay();
+    var tot  = wib.getHours() * 60 + wib.getMinutes();
+    var year = wib.getFullYear();
+    var mm   = String(wib.getMonth()+1).padStart(2,'0');
+    var dd   = String(wib.getDate()).padStart(2,'0');
+    var todayStr = year + '-' + mm + '-' + dd;
+
+    var dateLabel = HARI[day] + ', ' + wib.getDate() + ' ' + BULAN[wib.getMonth()] + ' ' + year;
+    var elDate = document.getElementById('jam-date-layanan');
+    if (elDate) elDate.innerHTML = '<i class="bi bi-calendar3"></i> ' + dateLabel;
+
+    function setStatus(isOpen, isHoliday) {
+        var el = document.getElementById('jam-status-layanan');
+        if (!el) return;
+        if (isOpen && !isHoliday) {
+            el.innerHTML = '<span class="status-buka"><span class="status-dot status-dot-buka"></span>Sedang Buka</span>';
+        } else {
+            el.innerHTML = '<span class="status-tutup"><span class="status-dot status-dot-tutup"></span>Sedang Tutup</span>';
+        }
+    }
+
+    function showHoliday(name) {
+        var el = document.getElementById('jam-holiday-layanan');
+        if (!el) return;
+        el.innerHTML = '<div class="jam-holiday"><span class="jam-holiday-icon"><i class="bi bi-calendar-x-fill"></i></span><span class="jam-holiday-text">Hari Libur Nasional: ' + name + '</span></div>';
+    }
+
+    var isOpenByTime = (day >= 1 && day <= 4 && tot >= 480 && tot < 960)
+                    || (day === 5 && tot >= 480 && tot < 930);
+
+    fetch('https://api-harilibur.vercel.app/api?year=' + year)
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+            var holiday = null;
+            if (Array.isArray(data)) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].holiday_date === todayStr) {
+                        holiday = data[i].holiday_name;
+                        break;
+                    }
+                }
+            }
+            if (holiday) {
+                showHoliday(holiday);
+                setStatus(false, true);
+            } else {
+                setStatus(isOpenByTime, false);
+            }
+        })
+        .catch(function() {
+            setStatus(isOpenByTime, false);
+        });
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+function onScroll(trigger, fn) {
+    ScrollTrigger.create({trigger:trigger, start:'top 88%', once:true, onEnter:fn});
+}
+
+// Alert & header: visible on load
+gsap.from('.content-area > *', {opacity:0, y:25, duration:.6, stagger:.1, ease:'power3.out'});
+
+// Surat cards
+(function(){
+    const cards = document.querySelectorAll('.surat-card');
+    if (!cards.length) return;
+    gsap.set(cards, {opacity:0, y:25, scale:.97});
+    onScroll(cards[0], ()=> gsap.to(cards, {opacity:1, y:0, scale:1, duration:.45, stagger:.07, ease:'back.out(1.3)'}));
+})();
+
+// Sidebar
+(function(){
+    const cards = document.querySelectorAll('.sidebar-card');
+    if (!cards.length) return;
+    gsap.set(cards, {opacity:0, x:25});
+    onScroll(cards[0], ()=> gsap.to(cards, {opacity:1, x:0, duration:.5, stagger:.1, ease:'power3.out'}));
+})();
+
+// Scroll to hash on load
+window.addEventListener('load', ()=>{
+    if(window.location.hash){
+        const el = document.querySelector(window.location.hash);
+        if(el) setTimeout(()=> el.scrollIntoView({behavior:'smooth', block:'start'}), 300);
+    }
+});
+</script>
 </html>

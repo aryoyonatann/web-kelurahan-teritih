@@ -110,10 +110,17 @@
     .fi.c2 { grid-column:span 2; }
     .fi.c3 { grid-column:span 3; }
     .fi.c4 { grid-column:span 4; }
-    .fg .fi:nth-last-child(-n+4) { border-bottom:none; }
+    .fg .fi:last-child, .fg .fi:nth-last-child(2) { border-bottom:none; }
     .fl { font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:5px; }
     .fv { font-size:13.5px;color:var(--gray-800);font-weight:500;line-height:1.5; }
     .fv.mono { font-family:'DM Mono',monospace;font-size:13px; }
+    .fv-input { width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13.5px;font-weight:500;color:var(--gray-800);font-family:inherit;transition:border-color .2s; }
+    .fv-input:focus { outline:none;border-color:var(--primary); }
+    .fv-input.mono { font-family:'DM Mono',monospace;font-size:13px; }
+    textarea.fv-input { resize:vertical;min-height:60px; }
+    .fdivider { grid-column:span 4;padding:8px 20px 6px;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;background:#f8fafc; }
+    .fdivider span { font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b; }
+    .fdivider:first-child { border-top:none; }
 
     /* DIFF TABLE (beda nama) */
     .diff-compare { display:grid;grid-template-columns:1fr 50px 1fr; }
@@ -180,8 +187,6 @@
     } else {
         $dt = [];
     }
-    $jenis  = $dt['jenis'] ?? null;
-    $tgl    = fn($t) => $t ? \Carbon\Carbon::parse($t)->isoFormat('D MMMM Y') : '-';
     $nama   = $data->nama_pemohon ?? $data->user->nama ?? '-';
     $nik    = $data->nik_pemohon  ?? $data->user->nik  ?? '-';
     $alamat = $data->alamat_pemohon ?? $data->user->alamat ?? '-';
@@ -232,10 +237,15 @@
 
     <div class="detail-grid">
 
-        {{-- ═══ KIRI ═══ --}}
+        {{-- KIRI --}}
         <div>
 
-            {{-- DATA PEMOHON --}}
+            {{-- DATA PERMOHONAN: biodata + extra fields sesuai fields_config --}}
+            @php
+                $isPerwakilan = $data->isPerwakilan();
+                $allFields = collect($data->jenisSurat->fields_config ?? []);
+                if (is_string($data->jenisSurat->fields_config)) $allFields = collect(json_decode($data->jenisSurat->fields_config, true) ?? []);
+            @endphp
             <div class="section-card">
                 <div class="section-head">
                     <div class="section-head-icon blue">
@@ -243,301 +253,104 @@
                             <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
                         </svg>
                     </div>
-                    <h3>Data Pemohon</h3>
-                    @php $isPerwakilan = !empty($data->nama_pemohon) && $data->nama_pemohon !== $data->user->nama; @endphp
+                    <h3>Data Permohonan</h3>
                     @if($isPerwakilan)
-                    <span style="margin-left:auto;font-size:11px;font-weight:700;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:2px 10px">PERWAKILAN</span>
+                    <span style="font-size:11px;font-weight:700;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:2px 10px">PERWAKILAN</span>
                     @endif
                 </div>
+                <form action="{{ route('permohonan.updateData', $data->id_permohonan) }}" method="POST">
+                    @csrf @method('PUT')
                 <div class="fg">
                     <div class="fi c2">
-                        <div class="fl">Nama Lengkap Pemohon</div>
-                        <div class="fv" style="font-size:15px;font-weight:700">{{ $nama }}</div>
+                        <div class="fl">Nama Lengkap</div>
+                        <input type="text" name="nama_pemohon" value="{{ $nama }}" required class="fv-input">
                     </div>
                     <div class="fi c2">
-                        <div class="fl">NIK Pemohon</div>
-                        <div class="fv mono" style="font-size:14px">{{ $nik }}</div>
+                        <div class="fl">NIK</div>
+                        <input type="text" name="nik_pemohon" value="{{ $nik }}" maxlength="16" required class="fv-input mono">
                     </div>
-                    @if(!empty($dt['tempat_lahir']))
-                    <div class="fi">
-                        <div class="fl">Tempat Lahir</div>
-                        <div class="fv">{{ $dt['tempat_lahir'] }}</div>
+
+                    @foreach($allFields->where('group','biodata')->whereNotIn('key',['nama','nik','alamat'])->where('type','!=','section') as $bf)
+                    <div class="fi c2">
+                        <div class="fl">{{ $bf['print_label'] ?? $bf['label'] }}</div>
+                        @if($bf['key'] === 'tempat_tgl_lahir')
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                            <input type="text" name="tempat_lahir" value="{{ $dt['tempat_lahir'] ?? '' }}" placeholder="Tempat" class="fv-input">
+                            <input type="date" name="tanggal_lahir" value="{{ $dt['tanggal_lahir'] ?? '' }}" class="fv-input">
+                        </div>
+                        @elseif($bf['key'] === 'jenis_kelamin')
+                        <select name="jenis_kelamin" class="fv-input">
+                            <option value="Laki-Laki" {{ ($dt['jenis_kelamin']??'')==='Laki-Laki'?'selected':'' }}>Laki-Laki</option>
+                            <option value="Perempuan" {{ ($dt['jenis_kelamin']??'')==='Perempuan'?'selected':'' }}>Perempuan</option>
+                        </select>
+                        @elseif($bf['key'] === 'agama')
+                        <select name="agama" class="fv-input">
+                            @foreach(['Islam','Kristen','Katolik','Hindu','Buddha','Konghucu'] as $ag)
+                            <option value="{{ $ag }}" {{ ($dt['agama']??'')===$ag?'selected':'' }}>{{ $ag }}</option>
+                            @endforeach
+                        </select>
+                        @elseif($bf['key'] === 'status_kawin')
+                        <select name="status_kawin" class="fv-input">
+                            @foreach(['Belum Menikah','Kawin','Cerai Hidup','Cerai Mati'] as $sk)
+                            <option value="{{ $sk }}" {{ ($dt['status_kawin']??'')===$sk?'selected':'' }}>{{ $sk }}</option>
+                            @endforeach
+                        </select>
+                        @elseif($bf['key'] === 'umur')
+                        <input type="number" name="umur" value="{{ $dt['umur'] ?? '' }}" min="0" max="150" class="fv-input">
+                        @else
+                        <input type="text" name="{{ $bf['key'] }}" value="{{ $dt[$bf['key']] ?? '' }}" class="fv-input">
+                        @endif
                     </div>
-                    <div class="fi">
-                        <div class="fl">Tanggal Lahir</div>
-                        <div class="fv">{{ $tgl($dt['tanggal_lahir'] ?? null) }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Jenis Kelamin</div>
-                        <div class="fv">{{ $dt['jenis_kelamin'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Agama</div>
-                        <div class="fv">{{ $dt['agama'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Status Perkawinan</div>
-                        <div class="fv">{{ $dt['status_kawin'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Pekerjaan</div>
-                        <div class="fv">{{ $dt['pekerjaan'] ?? '-' }}</div>
-                    </div>
-                    @if(!empty($dt['rt']))
-                    <div class="fi">
-                        <div class="fl">RT / RW</div>
-                        <div class="fv">RT {{ $dt['rt'] }} / RW {{ $dt['rw'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi c3">
-                        <div class="fl">Alamat Lengkap</div>
-                        <div class="fv">{{ $alamat }}</div>
-                    </div>
-                    @else
+                    @endforeach
+
                     <div class="fi c4">
-                        <div class="fl">Alamat Lengkap</div>
-                        <div class="fv">{{ $alamat }}</div>
+                        <div class="fl">Alamat</div>
+                        <textarea name="alamat_pemohon" rows="2" required class="fv-input">{{ $alamat }}</textarea>
                     </div>
-                    @endif
-                    @else
-                    <div class="fi c4">
-                        <div class="fl">Alamat Lengkap</div>
-                        <div class="fv">{{ $alamat }}</div>
-                    </div>
-                    @endif
-                    @if($isPerwakilan)
-                    <div class="fi c2">
-                        <div class="fl">Pengaju (Akun)</div>
-                        <div class="fv">{{ $data->user->nama ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">No. HP Pengaju</div>
-                        <div class="fv mono">{{ $data->user->no_hp ?? $data->user->no_telp ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Email Pengaju</div>
-                        <div class="fv" style="font-size:13px;word-break:break-all">{{ $data->user->email ?? '-' }}</div>
-                    </div>
-                    @else
-                    <div class="fi">
-                        <div class="fl">No. HP</div>
-                        <div class="fv mono">{{ $data->user->no_hp ?? $data->user->no_telp ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Email</div>
-                        <div class="fv" style="font-size:13px;word-break:break-all">{{ $data->user->email ?? '-' }}</div>
-                    </div>
-                    @endif
-                </div>
-            </div>
 
-            {{-- DATA KHUSUS PER JENIS SURAT --}}
-            @if($jenis === 'sktm')
-            <div class="section-card">
-                <div class="section-head">
-                    <div class="section-head-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-                    <h3>Keperluan SKTM</h3>
-                </div>
-                <div class="fg">
-                    <div class="fi c2">
-                        <div class="fl">Tujuan / Keperluan</div>
-                        <div class="fv">{{ $dt['keperluan_sktm'] ?? $data->keperluan ?? '-' }}</div>
-                    </div>
-                    <div class="fi c2">
-                        <div class="fl">Keterangan Tambahan</div>
-                        <div class="fv">{{ $dt['keterangan_tambahan'] ?? '-' }}</div>
-                    </div>
-                </div>
-            </div>
-
-            @elseif($jenis === 'kematian')
-            <div class="section-card">
-                <div class="section-head">
-                    <div class="section-head-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-                    <h3>Data Kematian</h3>
-                </div>
-                <div class="fg">
-                    <div class="fi">
-                        <div class="fl">Umur Saat Meninggal</div>
-                        <div class="fv">{{ !empty($dt['umur']) ? $dt['umur'].' Tahun' : '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Hari Meninggal</div>
-                        <div class="fv">{{ $dt['hari_meninggal'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Tanggal Meninggal</div>
-                        <div class="fv">{{ $tgl($dt['tanggal_meninggal'] ?? null) }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Tempat Meninggal</div>
-                        <div class="fv">{{ $dt['tempat_meninggal'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi c2">
-                        <div class="fl">Sebab Meninggal</div>
-                        <div class="fv">{{ $dt['sebab_meninggal'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi c2">
-                        <div class="fl">Keperluan Surat</div>
-                        <div class="fv">{{ $data->keperluan ?? '-' }}</div>
-                    </div>
-                </div>
-            </div>
-
-            @elseif($jenis === 'suami-istri')
-            <div class="section-card">
-                <div class="section-head">
-                    <div class="section-head-icon rose"><i class="bi bi-people-fill" style="font-size:14px"></i></div>
-                    <h3>Data Istri & Pernikahan</h3>
-                </div>
-                <div class="fg">
-                    <div class="fi c2">
-                        <div class="fl">Nama Lengkap Istri</div>
-                        <div class="fv" style="font-weight:700">{{ $dt['nama_istri'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi c2">
-                        <div class="fl">NIK Istri</div>
-                        <div class="fv mono">{{ $dt['nik_istri'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Tempat / Tgl Lahir Istri</div>
-                        <div class="fv">{{ $dt['ttl_istri'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Agama Istri</div>
-                        <div class="fv">{{ $dt['agama_istri'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Pekerjaan Istri</div>
-                        <div class="fv">{{ $dt['pekerjaan_istri'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Tahun Menikah</div>
-                        <div class="fv" style="font-weight:700">{{ $dt['tahun_menikah'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi c4">
-                        <div class="fl">Alamat Istri</div>
-                        <div class="fv">{{ !empty($dt['alamat_istri']) ? $dt['alamat_istri'] : 'Sama dengan alamat suami' }}</div>
-                    </div>
-                </div>
-            </div>
-
-            @elseif($jenis === 'beda-nama')
-            <div class="section-card">
-                <div class="section-head">
-                    <div class="section-head-icon amber"><i class="bi bi-arrow-left-right" style="font-size:14px"></i></div>
-                    <h3>Detail Perbedaan Nama</h3>
-                </div>
-                <div class="diff-compare">
-                    <div class="dc-head">Nama di KTP</div>
-                    <div class="dc-mid head" style="font-size:11px;font-weight:700;color:var(--gray-400)">VS</div>
-                    <div class="dc-head">Nama di {{ $dt['jenis_dokumen_2'] ?? 'Dokumen Lain' }}</div>
-                    <div class="dc-val">{{ $dt['nama_dokumen_1'] ?? $nama }}</div>
-                    <div class="dc-mid"><i class="bi bi-arrow-left-right" style="font-size:16px;color:var(--gray-300)"></i></div>
-                    <div class="dc-val">{{ $dt['nama_dokumen_2'] ?? '-' }}</div>
-                </div>
-                <div class="diff-note">
-                    <i class="bi bi-info-circle-fill" style="flex-shrink:0"></i>
-                    Kedua nama di atas adalah satu orang yang sama.
-                </div>
-                <div class="fg" style="border-top:1px solid var(--gray-200)">
-                    <div class="fi c2">
-                        <div class="fl">Jenis Dokumen Pembanding</div>
-                        <div class="fv">{{ $dt['jenis_dokumen_2'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi c2">
-                        <div class="fl">Keperluan Surat</div>
-                        <div class="fv">{{ $data->keperluan ?? '-' }}</div>
-                    </div>
-                </div>
-            </div>
-
-            @elseif($jenis === 'izin-cuti')
-            <div class="section-card">
-                <div class="section-head">
-                    <div class="section-head-icon blue"><i class="bi bi-calendar-check-fill" style="font-size:14px"></i></div>
-                    <h3>Detail Izin Cuti</h3>
-                </div>
-                <div class="fg">
-                    <div class="fi c2">
-                        <div class="fl">Nama Perusahaan / Instansi</div>
-                        <div class="fv" style="font-weight:700;font-size:15px">{{ $dt['nama_perusahaan'] ?? '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Lama Cuti</div>
-                        <div class="fv">{{ !empty($dt['lama_cuti']) ? $dt['lama_cuti'].' Hari' : '-' }}</div>
-                    </div>
-                    <div class="fi">
-                        <div class="fl">Keperluan / Alasan</div>
-                        <div class="fv">{{ $data->keperluan ?? '-' }}</div>
-                    </div>
-                    <div class="fi c2">
-                        <div class="fl">Tanggal Mulai Cuti</div>
-                        <div class="fv" style="font-weight:700">{{ $tgl($dt['tanggal_mulai_cuti'] ?? null) }}</div>
-                    </div>
-                    <div class="fi c2">
-                        <div class="fl">Tanggal Selesai Cuti</div>
-                        <div class="fv" style="font-weight:700">{{ $tgl($dt['tanggal_selesai_cuti'] ?? null) }}</div>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            {{-- TEMPLATE OPSI D: tampilkan field dinamis dari field_config --}}
-            @if(!in_array($jenis, ['sktm','kematian','suami-istri','beda-nama','izin-cuti']))
-            @php
-                $fieldConfig  = is_array($data->jenisSurat->field_config)
-                    ? $data->jenisSurat->field_config
-                    : (json_decode($data->jenisSurat->field_config ?? '[]', true) ?? []);
-                $templateType = $data->jenisSurat->template ?? 'A';
-                $templateLabel = [
-                    'A' => 'Surat Keterangan Biasa',
-                    'B' => 'Surat Keterangan dengan Data Khusus',
-                    'C' => 'Surat Keterangan Dua Pihak',
-                ][$templateType] ?? 'Surat Keterangan';
-            @endphp
-            <div class="section-card">
-                <div class="section-head">
-                    <div class="section-head-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-                    <h3>Detail Permohonan</h3>
-                    <span style="margin-left:auto;font-size:11px;font-weight:700;background:#eff6ff;color:#1c64f2;border:1px solid #bfdbfe;border-radius:20px;padding:3px 10px">
-                        Template {{ $templateType }}: {{ $templateLabel }}
-                    </span>
-                </div>
-                <div class="fg">
+                    <div class="fdivider"><span>Keperluan &amp; Data Surat</span></div>
                     <div class="fi c2">
                         <div class="fl">Keperluan / Tujuan Surat</div>
-                        <div class="fv">{{ $data->keperluan ?? '-' }}</div>
+                        <input type="text" name="keperluan" value="{{ $data->keperluan ?? '' }}" class="fv-input">
                     </div>
                     <div class="fi c2">
                         <div class="fl">Tanggal Pengajuan</div>
-                        <div class="fv mono">{{ \Carbon\Carbon::parse($data->tanggal_pengajuan)->isoFormat('D MMMM Y') }}</div>
+                        <div class="fv mono">{{ \Carbon\Carbon::parse($data->tanggal_pengajuan)->locale('id')->isoFormat('D MMMM Y') }}</div>
                     </div>
 
-                    {{-- Field dinamis dari field_config --}}
-                    @if(!empty($fieldConfig))
-                        @foreach($fieldConfig as $field)
+                    @foreach($allFields->where('group','extra') as $ef)
+                        @if(($ef['type'] ?? '') === 'section')
+                        <div class="fdivider"><span>{{ $ef['label'] }}</span></div>
+                        @elseif(($ef['print_style'] ?? '') !== 'center_bold')
                         <div class="fi c2">
-                            <div class="fl">{{ $field['label'] }}</div>
-                            <div class="fv">
-                                @php
-                                    $val = $dt[$field['key']] ?? null;
-                                    // Format tanggal jika tipe date
-                                    if ($field['type'] === 'date' && $val) {
-                                        $val = \Carbon\Carbon::parse($val)->isoFormat('D MMMM Y');
-                                    }
-                                @endphp
-                                {{ $val ?? '-' }}
-                            </div>
+                            <div class="fl">{{ $ef['label'] }}</div>
+                            @if(($ef['type'] ?? '') === 'date')
+                            <input type="date" name="extra_{{ $ef['key'] }}" value="{{ $dt[$ef['key']] ?? '' }}" class="fv-input">
+                            @elseif(($ef['type'] ?? '') === 'textarea')
+                            <textarea name="extra_{{ $ef['key'] }}" rows="2" class="fv-input">{{ $dt[$ef['key']] ?? '' }}</textarea>
+                            @else
+                            <input type="text" name="extra_{{ $ef['key'] }}" value="{{ $dt[$ef['key']] ?? '' }}" class="fv-input">
+                            @endif
                         </div>
-                        @endforeach
-                    @else
-                        <div class="fi c4" style="color:#94a3b8;font-size:13px;font-style:italic">
-                            Tidak ada field tambahan yang dikonfigurasi untuk jenis surat ini.
-                        </div>
+                        @endif
+                    @endforeach
+
+                    @if($isPerwakilan)
+                    <div class="fdivider"><span>Info Pengaju</span></div>
+                    <div class="fi c2">
+                        <div class="fl">Diajukan oleh (Akun)</div>
+                        <div class="fv">{{ $data->user->nama ?? '-' }}</div>
+                    </div>
                     @endif
                 </div>
+                <div style="padding:16px 24px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:10px">
+                    <button type="submit" style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;border:none;background:var(--primary);font-size:13px;font-weight:600;color:white;cursor:pointer;font-family:inherit">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Simpan Perubahan
+                    </button>
+                </div>
+                </form>
             </div>
-            @endif
 
             {{-- DOKUMEN PERSYARATAN --}}
             <div class="section-card">
@@ -598,16 +411,16 @@
                 </h4>
 
                 @if($status === 'pending')
-                <form action="{{ route('permohonan.approve', $data->id_permohonan) }}" method="POST" style="margin-bottom:10px">
+                <form action="{{ route('permohonan.approve', $data->id_permohonan) }}" method="POST" style="margin-bottom:10px" id="form-approve-show">
                     @csrf @method('PUT')
-                    <button type="submit" class="btn-full btn-approve-full" onclick="return confirm('Setujui permohonan ini?')">
+                    <button type="button" class="btn-full btn-approve-full" onclick="showConfirm('Setujui permohonan <strong>{{ addslashes($data->jenisSurat->nama_surat ?? '') }}</strong> dari <strong>{{ addslashes($nama) }}</strong>?', () => document.getElementById('form-approve-show').submit(), {confirmText:'Ya, Setujui', type:'success'})">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Setujui Permohonan
                     </button>
                 </form>
-                <form action="{{ route('permohonan.reject', $data->id_permohonan) }}" method="POST">
+                <form action="{{ route('permohonan.reject', $data->id_permohonan) }}" method="POST" id="form-reject-show">
                     @csrf @method('PUT')
-                    <button type="submit" class="btn-full btn-reject-full" onclick="return confirm('Tolak permohonan ini?')">
+                    <button type="button" class="btn-full btn-reject-full" onclick="showConfirm('Tolak permohonan dari <strong>{{ addslashes($nama) }}</strong>?', () => document.getElementById('form-reject-show').submit(), {confirmText:'Ya, Tolak', type:'danger'})">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                         Tolak Permohonan
                     </button>
@@ -719,6 +532,8 @@
     </div>
 
 </div>
+
+{{-- ── MODAL EDIT DATA ── --}}
 
 @include('admin.partials.footer')
 @endsection

@@ -308,48 +308,48 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         </div>
 
         {{-- ══════════════════════════════════════════ --}}
-        {{-- ④ KELOMPOK UMUR                            --}}
+        {{-- ⑤ KELOMPOK UMUR 4 KATEGORI (DDK)           --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
-                <div class="group-icon" style="background:#fff7ed;color:#f59e0b"><i class="bi bi-people"></i></div>
-                <div class="group-title">Kelompok Umur (Piramida Penduduk)</div>
+                <div class="group-icon" style="background:#f5f3ff;color:#8b5cf6"><i class="bi bi-calendar2-range-fill"></i></div>
+                <div class="group-title">Kelompok Umur – 4 Kategori (Data DDK)</div>
             </div>
             <div class="group-body">
                 <div class="info-box">
                     <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
-                    <div>Isi jumlah Laki-laki dan Perempuan per kelompok umur untuk grafik piramida.</div>
+                    <div>Data dari pemdes.kemendagri.go.id. Isi Laki-laki dan Perempuan per kategori.</div>
                 </div>
                 @php
-                $umurGroups = [
-                    'umur_0_4'   =>'0 – 4 Tahun',  'umur_5_9'   =>'5 – 9 Tahun',
-                    'umur_10_14' =>'10 – 14 Tahun', 'umur_15_19' =>'15 – 19 Tahun',
-                    'umur_20_24' =>'20 – 24 Tahun', 'umur_25_29' =>'25 – 29 Tahun',
-                    'umur_30_34' =>'30 – 34 Tahun', 'umur_35_39' =>'35 – 39 Tahun',
-                    'umur_40_44' =>'40 – 44 Tahun', 'umur_45_49' =>'45 – 49 Tahun',
-                    'umur_50_54' =>'50 – 54 Tahun', 'umur_55_59' =>'55 – 59 Tahun',
-                    'umur_60_64' =>'60 – 64 Tahun', 'umur_65_69' =>'65 – 69 Tahun',
-                    'umur_70_74' =>'70 – 74 Tahun', 'umur_75_plus'=>'75+ Tahun',
-                ];
+                    $umur4Keys = [
+                        'umur4_anak' => 'Anak (< 7 Tahun)',
+                        'umur4_remaja' => 'Remaja (7–18 Tahun)',
+                        'umur4_dewasa' => 'Dewasa (19–55 Tahun)',
+                        'umur4_lansia' => 'Lansia (≥ 56 Tahun)',
+                    ];
                 @endphp
                 <div class="umur-grid">
-                    @foreach($umurGroups as $kunci => $labelGrp)
+                    @foreach($umur4Keys as $kunci => $labelU4)
+                    @php
+                        $su4 = $statistik[$kunci] ?? null;
+                        $su4teks = $su4->nilai_teks ?? '0|0';
+                        $su4parts = explode('|', $su4teks);
+                    @endphp
                     <div class="umur-row">
-                        <div class="umur-row-label">🕐 {{ $labelGrp }}</div>
+                        <div class="umur-row-label">{{ $labelU4 }}</div>
+                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelU4 }}">
                         <div class="umur-sub">
                             <div>
                                 <label>👨 Laki-laki</label>
-                                <input type="hidden" name="statistik[{{ $kunci }}_l][label]" value="{{ $labelGrp }} - Laki-laki">
-                                <input type="number" name="statistik[{{ $kunci }}_l][nilai]" class="stat-input"
-                                       value="{{ $statistik[$kunci.'_l']->nilai ?? 0 }}" min="0" placeholder="0">
+                                <input type="number" class="stat-input umur4-input" data-key="{{ $kunci }}" data-gender="l" value="{{ $su4parts[0] ?? 0 }}" min="0" oninput="hitungUmur4('{{ $kunci }}')">
                             </div>
                             <div>
                                 <label>👩 Perempuan</label>
-                                <input type="hidden" name="statistik[{{ $kunci }}_p][label]" value="{{ $labelGrp }} - Perempuan">
-                                <input type="number" name="statistik[{{ $kunci }}_p][nilai]" class="stat-input"
-                                       value="{{ $statistik[$kunci.'_p']->nilai ?? 0 }}" min="0" placeholder="0">
+                                <input type="number" class="stat-input umur4-input" data-key="{{ $kunci }}" data-gender="p" value="{{ $su4parts[1] ?? 0 }}" min="0" oninput="hitungUmur4('{{ $kunci }}')">
                             </div>
                         </div>
+                        <input type="hidden" name="statistik[{{ $kunci }}][nilai]" id="umur4_nilai_{{ $kunci }}" value="{{ $su4->nilai ?? 0 }}">
+                        <input type="hidden" name="statistik[{{ $kunci }}][nilai_teks]" id="umur4_teks_{{ $kunci }}" value="{{ $su4teks }}">
                     </div>
                     @endforeach
                 </div>
@@ -357,7 +357,187 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         </div>
 
         {{-- ══════════════════════════════════════════ --}}
-        {{-- ⑤ UPDATE TERAKHIR                          --}}
+        {{-- ⑥ MATA PENCAHARIAN                         --}}
+        {{-- ══════════════════════════════════════════ --}}
+        <div class="group-card">
+            <div class="group-header">
+                <div class="group-icon" style="background:#fff7ed;color:#f59e0b"><i class="bi bi-briefcase-fill"></i></div>
+                <div class="group-title">Mata Pencaharian (Data DDK)</div>
+            </div>
+            <div class="group-body">
+                @php
+                    $kerjaKeys = [
+                        'kerja_pelajar' => 'Pelajar',
+                        'kerja_irt' => 'Ibu Rumah Tangga',
+                        'kerja_wiraswasta' => 'Wiraswasta',
+                        'kerja_belum' => 'Belum Bekerja',
+                        'kerja_buruh' => 'Buruh Harian Lepas',
+                        'kerja_swasta' => 'Karyawan Swasta',
+                        'kerja_petani' => 'Petani',
+                        'kerja_pemerintah' => 'Karyawan Pemerintah',
+                        'kerja_pedagang_keliling' => 'Pedagang Keliling',
+                        'kerja_pedagang_kelontong' => 'Pedagang Kelontong',
+                    ];
+                @endphp
+                <div class="agama-grid">
+                    @foreach($kerjaKeys as $kunci => $labelK)
+                    @php $sk = $statistik[$kunci] ?? null; @endphp
+                    <div class="stat-row">
+                        <div class="stat-row-label">{{ $labelK }}</div>
+                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelK }}">
+                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sk->nilai ?? 0 }}" min="0">
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ⑦ STATUS PERKAWINAN                        --}}
+        {{-- ══════════════════════════════════════════ --}}
+        <div class="group-card">
+            <div class="group-header">
+                <div class="group-icon" style="background:#fff1f2;color:#f43f5e"><i class="bi bi-heart-fill"></i></div>
+                <div class="group-title">Status Perkawinan (Data DDK)</div>
+            </div>
+            <div class="group-body">
+                @php
+                    $kawinKeys = [
+                        'kawin_belum' => 'Belum Kawin',
+                        'kawin_kawin' => 'Kawin',
+                        'kawin_janda_duda' => 'Janda/Duda',
+                    ];
+                @endphp
+                @foreach($kawinKeys as $kunci => $labelKw)
+                @php
+                    $skw = $statistik[$kunci] ?? null;
+                    $skwteks = $skw->nilai_teks ?? '0|0';
+                    $skwparts = explode('|', $skwteks);
+                @endphp
+                <div class="stat-row">
+                    <div class="stat-row-label">{{ $labelKw }}</div>
+                    <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelKw }}">
+                    <div class="umur-sub" style="margin-top:8px">
+                        <div>
+                            <label style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:3px;display:block">👨 Laki-laki</label>
+                            <input type="number" class="stat-input kawin-input" data-key="{{ $kunci }}" data-gender="l" value="{{ $skwparts[0] ?? 0 }}" min="0" oninput="hitungKawin('{{ $kunci }}')">
+                        </div>
+                        <div>
+                            <label style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:3px;display:block">👩 Perempuan</label>
+                            <input type="number" class="stat-input kawin-input" data-key="{{ $kunci }}" data-gender="p" value="{{ $skwparts[1] ?? 0 }}" min="0" oninput="hitungKawin('{{ $kunci }}')">
+                        </div>
+                    </div>
+                    <input type="hidden" name="statistik[{{ $kunci }}][nilai]" id="kawin_nilai_{{ $kunci }}" value="{{ $skw->nilai ?? 0 }}">
+                    <input type="hidden" name="statistik[{{ $kunci }}][nilai_teks]" id="kawin_teks_{{ $kunci }}" value="{{ $skwteks }}">
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ⑧ PERTUMBUHAN PENDUDUK PER TAHUN           --}}
+        {{-- ══════════════════════════════════════════ --}}
+        <div class="group-card">
+            <div class="group-header">
+                <div class="group-icon" style="background:#eff6ff;color:#3b82f6"><i class="bi bi-graph-up"></i></div>
+                <div class="group-title">Pertumbuhan Penduduk per Tahun</div>
+            </div>
+            <div class="group-body">
+                <div class="info-box">
+                    <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
+                    <div>Data ini ditampilkan sebagai grafik garis (line chart) di halaman publik. Klik "Tambah Tahun" untuk menambah data tahun baru.</div>
+                </div>
+                <div class="agama-grid" id="tahunGrid">
+                    @php
+                        $tahunKeys = $statistik->keys()->filter(fn($k) => str_starts_with($k, 'penduduk_'))->sort()->values();
+                    @endphp
+                    @foreach($tahunKeys as $kunci)
+                    @php $sp = $statistik[$kunci]; $yr = str_replace('penduduk_', '', $kunci); @endphp
+                    <div class="stat-row" style="position:relative">
+                        <div class="stat-row-label">📈 Tahun {{ $yr }}</div>
+                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="Tahun {{ $yr }}">
+                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sp->nilai ?? 0 }}" min="0">
+                        <button type="button" onclick="hapusTahun(this,'{{ $kunci }}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;border:none;background:#fef2f2;color:#dc2626;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Hapus">✕</button>
+                    </div>
+                    @endforeach
+                </div>
+                <button type="button" onclick="tambahTahun()" style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1.5px dashed #93c5fd;background:#f0f9ff;color:#0284c7;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">➕ Tambah Tahun</button>
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ⑨ FASILITAS KELURAHAN                      --}}
+        {{-- ══════════════════════════════════════════ --}}
+        <div class="group-card">
+            <div class="group-header">
+                <div class="group-icon" style="background:#ecfdf5;color:#10b981"><i class="bi bi-building"></i></div>
+                <div class="group-title">Fasilitas Kelurahan</div>
+            </div>
+            <div class="group-body">
+                @php
+                    $fasKeys = [
+                        'fas_masjid' => 'Masjid',
+                        'fas_musholla' => 'Musholla',
+                        'fas_tpq' => 'TPQ/Madrasah',
+                        'fas_paud' => 'PAUD/TK',
+                        'fas_sd' => 'SD/MI',
+                        'fas_smp' => 'SMP/MTs',
+                        'fas_sma' => 'SMA/SMK/MA',
+                        'fas_posyandu' => 'Posyandu',
+                        'fas_puskesmas' => 'Puskesmas/Klinik',
+                        'fas_lapangan' => 'Lapangan Olahraga',
+                    ];
+                @endphp
+                <div class="agama-grid">
+                    @foreach($fasKeys as $kunci => $labelF)
+                    @php $sf = $statistik[$kunci] ?? null; @endphp
+                    <div class="stat-row">
+                        <div class="stat-row-label">{{ $labelF }}</div>
+                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelF }}">
+                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sf->nilai ?? 0 }}" min="0">
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ⑨ PENDIDIKAN                               --}}
+        {{-- ══════════════════════════════════════════ --}}
+        <div class="group-card">
+            <div class="group-header">
+                <div class="group-icon" style="background:#f5f3ff;color:#8b5cf6"><i class="bi bi-mortarboard-fill"></i></div>
+                <div class="group-title">Tingkat Pendidikan</div>
+            </div>
+            <div class="group-body">
+                @php
+                    $pendKeys = [
+                        'pend_belum_sekolah' => 'Belum Sekolah (PAUD/TK)',
+                        'pend_sma' => 'SMA/Sederajat',
+                        'pend_sd' => 'SD/Sederajat',
+                        'pend_smp' => 'SMP/Sederajat',
+                        'pend_s1' => 'Sarjana (S1)',
+                        'pend_sedang_sekolah' => 'Sedang Sekolah (7-18 Thn)',
+                        'pend_diploma' => 'Diploma (D1-D3)',
+                        'pend_s2' => 'Pascasarjana (S2/S3)',
+                        'pend_tidak_tamat' => 'Tidak Tamat/Lainnya',
+                    ];
+                @endphp
+                <div class="agama-grid">
+                    @foreach($pendKeys as $kunci => $labelPd)
+                    @php $sp = $statistik[$kunci] ?? null; @endphp
+                    <div class="stat-row">
+                        <div class="stat-row-label">{{ $labelPd }}</div>
+                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelPd }}">
+                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sp->nilai ?? 0 }}" min="0">
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ⑩ UPDATE TERAKHIR                          --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
@@ -431,6 +611,60 @@ function hitungJK() {
     const pctPEl = document.getElementById('pct_perempuan');
     if (pctLEl) pctLEl.textContent = (tot > 0 ? (Math.round(l/tot*1000)/10) : 0) + '% dari total';
     if (pctPEl) pctPEl.textContent = (tot > 0 ? (Math.round(p/tot*1000)/10) : 0) + '% dari total';
+}
+
+// Hitung kelompok umur 4 kategori
+function hitungUmur4(key) {
+    const lEl = document.querySelector(`.umur4-input[data-key="${key}"][data-gender="l"]`);
+    const pEl = document.querySelector(`.umur4-input[data-key="${key}"][data-gender="p"]`);
+    const l = parseInt(lEl?.value) || 0;
+    const p = parseInt(pEl?.value) || 0;
+    document.getElementById('umur4_nilai_' + key).value = l + p;
+    document.getElementById('umur4_teks_' + key).value = l + '|' + p;
+}
+
+// Hitung status perkawinan
+function hitungKawin(key) {
+    const lEl = document.querySelector(`.kawin-input[data-key="${key}"][data-gender="l"]`);
+    const pEl = document.querySelector(`.kawin-input[data-key="${key}"][data-gender="p"]`);
+    const l = parseInt(lEl?.value) || 0;
+    const p = parseInt(pEl?.value) || 0;
+    document.getElementById('kawin_nilai_' + key).value = l + p;
+    document.getElementById('kawin_teks_' + key).value = l + '|' + p;
+}
+
+// Hitung hubungan keluarga - removed (replaced by fasilitas)
+
+// Tambah tahun baru untuk pertumbuhan penduduk
+function tambahTahun() {
+    const grid = document.getElementById('tahunGrid');
+    const existing = grid.querySelectorAll('.stat-row:not([style*="display: none"])');
+    let maxYear = 2026;
+    existing.forEach(row => {
+        const label = row.querySelector('.stat-row-label');
+        if (label) {
+            const m = label.textContent.match(/\d{4}/);
+            if (m && parseInt(m[0]) > maxYear) maxYear = parseInt(m[0]);
+        }
+    });
+    const newYear = maxYear + 1;
+    const html = `<div class="stat-row" style="position:relative">
+        <div class="stat-row-label">📈 Tahun ${newYear}</div>
+        <input type="hidden" name="statistik[penduduk_${newYear}][label]" value="Tahun ${newYear}">
+        <input type="number" name="statistik[penduduk_${newYear}][nilai]" class="stat-input" value="0" min="0" placeholder="Isi jumlah penduduk">
+        <button type="button" onclick="hapusTahun(this,'penduduk_${newYear}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;border:none;background:#fef2f2;color:#dc2626;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Hapus">✕</button>
+    </div>`;
+    grid.insertAdjacentHTML('beforeend', html);
+}
+
+function hapusTahun(btn, kunci) {
+    showConfirm('Hapus data statistik tahun ini?', function() {
+        const row = btn.closest('.stat-row');
+        row.style.display = 'none';
+        row.querySelectorAll('input').forEach(inp => inp.disabled = true);
+        const grid = document.getElementById('tahunGrid');
+    grid.insertAdjacentHTML('afterend', `<input type="hidden" name="hapus_statistik[]" value="${kunci}">`);
+    }, {confirmText:'Ya, Hapus', type:'danger'});
 }
 </script>
 @endpush

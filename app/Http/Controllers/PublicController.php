@@ -2,89 +2,84 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InformasiKelurahan;
+use App\Models\Berita;
+use App\Models\Pengaturan;
 use Illuminate\Http\Request;
 
 class PublicController extends Controller
 {
     public function home()
     {
-        // ✅ Tampilkan 4 berita terbaru di homepage
-        // whereNotNull('slug') tetap dipakai agar tidak error saat generate URL
-        $beritaTerbaru = InformasiKelurahan::where('status', 'publish')
+        $beritaTerbaru = Berita::where('status', 'publish')
             ->whereNotNull('slug')
             ->where('slug', '!=', '')
             ->orderBy('tanggal_publish', 'desc')
             ->take(4)
             ->get();
 
-        return view('home', compact('beritaTerbaru'));
+        $fotoLurah  = Pengaturan::getValue('foto_lurah');
+        $namaLurah  = Pengaturan::getValue('nama_lurah', 'Jupran, SE, MM');
+        $jabatLurah = Pengaturan::getValue('jabat_lurah', 'Kepala Kelurahan Teritih');
+
+        return view('home', compact('beritaTerbaru', 'fotoLurah', 'namaLurah', 'jabatLurah'));
     }
 
-    public function informasi()
+    public function demografi()
     {
-        $beritaTerbaru = InformasiKelurahan::where('status', 'publish')
-            ->whereNotNull('slug')
-            ->where('slug', '!=', '')
-            ->orderBy('tanggal_publish', 'desc')
-            ->take(3)
-            ->get();
-
         $statistik = \App\Models\StatistikDemografi::asCollection();
-
-        return view('informasi', compact('beritaTerbaru', 'statistik'));
+        return view('informasi', compact('statistik'));
     }
 
     public function berita(Request $request)
     {
-        // ✅ Query dasar: hanya berita yang slugnya tidak null dan tidak kosong
-        //    agar route('informasi.berita.detail', $b->slug) tidak error
-        //    Berita tanpa slug (misal judul "tes" yang slugnya null) tidak tampil
-        //    di frontend tapi tetap ada di admin — fix slugnya dari admin
-        $query = InformasiKelurahan::where('status', 'publish')
+        $query = Berita::where('status', 'publish')
             ->whereNotNull('slug')
             ->where('slug', '!=', '')
             ->orderBy('tanggal_publish', 'desc');
 
-        // Filter kategori jika ada
+        // Filter kategori
         if ($request->filled('kategori')) {
             $query->where('kategori', $request->kategori);
         }
 
-        // ✅ Total semua berita publish yang punya slug (untuk counter)
+        // Filter search
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(function($qb) use ($q) {
+                $qb->where('judul', 'ilike', "%{$q}%")
+                    ->orWhere('isi', 'ilike', "%{$q}%");
+            });
+        }
+
         $totalBerita = (clone $query)->count();
+        $beritaList = $query->paginate(12);
 
-        // ✅ Featured: 1 berita paling atas
-        $beritaFeatured = (clone $query)->first();
-
-        // ✅ Samping: 3 berita setelah featured
-        $beritaSamping  = (clone $query)->skip(1)->take(3)->get();
-
-        // ✅ Grid: semua sisa berita (skip 4 = 1 featured + 3 samping)
-        //    Dengan 6 berita valid → grid dapat 2 berita
-        //    paginate(9) agar bisa tampung banyak & ada navigasi halaman
-        $beritaGrid = (clone $query)->skip(4)->paginate(9);
+        // Keep backward compat
+        $beritaFeatured = $beritaList->first();
+        $beritaSamping = collect();
+        $beritaGrid = $beritaList;
 
         return view('informasi-berita', compact(
             'beritaFeatured',
             'beritaSamping',
             'beritaGrid',
+            'beritaList',
             'totalBerita'
         ));
     }
 
     public function detailBerita($slug)
     {
-        $berita = InformasiKelurahan::where('slug', $slug)
+        $berita = Berita::where('slug', $slug)
             ->where('status', 'publish')
             ->firstOrFail();
 
         $berita->increment('views');
 
-        $beritaLainnya = InformasiKelurahan::where('status', 'publish')
+        $beritaLainnya = Berita::where('status', 'publish')
             ->whereNotNull('slug')
             ->where('slug', '!=', '')
-            ->where('id_informasi', '!=', $berita->id_informasi)
+            ->where('id_berita', '!=', $berita->id_berita)
             ->orderBy('tanggal_publish', 'desc')
             ->take(4)
             ->get();

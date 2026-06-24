@@ -4,21 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\InformasiKelurahan;
+use App\Models\Berita;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class InformasiKelurahanController extends Controller
+class BeritaController extends Controller
 {
     public function index()
     {
-        $data = InformasiKelurahan::orderBy('tanggal_publish', 'desc')->get();
-        return view('admin.informasi.index', compact('data'));
+        $data = Berita::orderBy('tanggal_publish', 'desc')->get();
+        return view('Admin.berita.index', compact('data'));
     }
 
     public function create()
     {
-        return view('admin.informasi.create');
+        return view('Admin.berita.create');
     }
 
     public function store(Request $request)
@@ -36,10 +36,9 @@ class InformasiKelurahanController extends Controller
             $gambar = $request->file('gambar')->store('berita', 'public');
         }
 
-        // ✅ FIX: slug dijamin tidak pernah null atau kosong
         $slug = $this->generateUniqueSlug($request->judul);
 
-        InformasiKelurahan::create([
+        Berita::create([
             'judul'           => $request->judul,
             'slug'            => $slug,
             'kategori'        => $request->kategori,
@@ -52,19 +51,19 @@ class InformasiKelurahanController extends Controller
             'views'           => 0,
         ]);
 
-        return redirect()->route('informasi-admin.index')
+        return redirect()->route('berita-admin.index')
             ->with('success', 'Berita berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
-        $data = InformasiKelurahan::findOrFail($id);
-        return view('admin.informasi.edit', compact('data'));
+        $data = Berita::findOrFail($id);
+        return view('Admin.berita.edit', compact('data'));
     }
 
     public function update(Request $request, $id)
     {
-        $data = InformasiKelurahan::findOrFail($id);
+        $data = Berita::findOrFail($id);
 
         $request->validate([
             'judul'    => 'required|string|max:255',
@@ -74,15 +73,11 @@ class InformasiKelurahanController extends Controller
             'gambar'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        // Ganti gambar lama jika ada upload baru
         if ($request->hasFile('gambar')) {
-            if ($data->gambar) {
-                Storage::disk('public')->delete($data->gambar);
-            }
+            if ($data->gambar) Storage::disk('public')->delete($data->gambar);
             $data->gambar = $request->file('gambar')->store('berita', 'public');
         }
 
-        // Update tanggal_publish hanya jika status berubah dari draft ke publish
         $tanggalPublish = $data->tanggal_publish;
         if ($request->status === 'publish' && $data->status === 'draft') {
             $tanggalPublish = now();
@@ -90,13 +85,9 @@ class InformasiKelurahanController extends Controller
             $tanggalPublish = null;
         }
 
-        // ✅ FIX: Jika slug lama masih null/kosong → generate slug baru sekarang
-        // Jika sudah ada slug → tetap pakai yang lama agar URL tidak berubah
-        if (empty($data->slug)) {
-            $newSlug = $this->generateUniqueSlug($request->judul, $data->id_informasi);
-        } else {
-            $newSlug = $data->slug;
-        }
+        $newSlug = empty($data->slug)
+            ? $this->generateUniqueSlug($request->judul, $data->id_berita)
+            : $data->slug;
 
         $data->update([
             'judul'           => $request->judul,
@@ -109,58 +100,29 @@ class InformasiKelurahanController extends Controller
             'gambar'          => $data->gambar,
         ]);
 
-        return redirect()->route('informasi-admin.index')
+        return redirect()->route('berita-admin.index')
             ->with('success', 'Berita berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
-        $data = InformasiKelurahan::findOrFail($id);
-
-        if ($data->gambar) {
-            Storage::disk('public')->delete($data->gambar);
-        }
-
+        $data = Berita::findOrFail($id);
+        if ($data->gambar) Storage::disk('public')->delete($data->gambar);
         $data->delete();
-
         return back()->with('success', 'Berita berhasil dihapus.');
     }
 
-    /**
-     * ✅ Helper: Generate slug unik yang dijamin tidak null dan tidak kosong.
-     *
-     * @param string   $judul     Judul berita
-     * @param int|null $excludeId ID berita yang dikecualikan saat cek unik (untuk update)
-     * @return string
-     */
     private function generateUniqueSlug(string $judul, $excludeId = null): string
     {
-        // Buat slug dari judul menggunakan helper Laravel
-        $slugBase = Str::slug($judul);
-
-        // Fallback: jika judul hanya berisi karakter khusus/arab/emoji
-        // sehingga Str::slug() menghasilkan string kosong
-        if (empty($slugBase)) {
-            $slugBase = 'berita';
-        }
-
-        // Gabungkan dengan timestamp agar slug bersifat unik secara default
+        $slugBase = Str::slug($judul) ?: 'berita';
         $slug = $slugBase . '-' . time();
-
-        // Jika ternyata masih ada duplikat di database, tambahkan counter
         $counter = 1;
         while (true) {
-            $query = InformasiKelurahan::where('slug', $slug);
-            if ($excludeId) {
-                $query->where('id_informasi', '!=', $excludeId);
-            }
-            if (!$query->exists()) {
-                break; // slug sudah unik, keluar dari loop
-            }
-            $slug = $slugBase . '-' . time() . '-' . $counter;
-            $counter++;
+            $query = Berita::where('slug', $slug);
+            if ($excludeId) $query->where('id_berita', '!=', $excludeId);
+            if (!$query->exists()) break;
+            $slug = $slugBase . '-' . time() . '-' . $counter++;
         }
-
         return $slug;
     }
 }

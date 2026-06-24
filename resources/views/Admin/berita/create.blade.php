@@ -93,9 +93,9 @@
 <div class="form-page">
 
     <div class="back-bar">
-        <a href="{{ route('informasi-admin.index') }}" class="back-btn"><i class="bi bi-arrow-left"></i> Kembali</a>
+        <a href="{{ route('berita-admin.index') }}" class="back-btn"><i class="bi bi-arrow-left"></i> Kembali</a>
         <span class="bc-sep">/</span>
-        <a href="{{ route('informasi-admin.index') }}" style="color:#64748b;text-decoration:none;font-size:13px">Berita</a>
+        <a href="{{ route('berita-admin.index') }}" style="color:#64748b;text-decoration:none;font-size:13px">Berita</a>
         <span class="bc-sep">/</span>
         <span class="bc-cur">Tulis Baru</span>
     </div>
@@ -117,7 +117,7 @@
         </div>
         @endif
 
-        <form action="{{ route('informasi-admin.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('berita-admin.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             {{-- Info Utama --}}
@@ -211,7 +211,7 @@
                 </div>
 
                 <div class="form-footer">
-                    <a href="{{ route('informasi-admin.index') }}" class="btn-batal"><i class="bi bi-x-lg"></i> Batal</a>
+                    <a href="{{ route('berita-admin.index') }}" class="btn-batal"><i class="bi bi-x-lg"></i> Batal</a>
                     <button type="submit" class="btn-simpan"><i class="bi bi-check-lg"></i> Simpan & Publikasi</button>
                 </div>
             </div>

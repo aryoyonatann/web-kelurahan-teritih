@@ -337,10 +337,10 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     {{-- QUICK MENU --}}
     <div class="row g-2 g-md-3 mb-4">
         <div class="col-3">
-            <a href="{{ route('kependudukan.index') }}" class="quick-card">
+            <a href="{{ route('kelola-akun.index') }}" class="quick-card">
                 <div class="quick-icon icon-blue"><i class="bi bi-person-vcard-fill"></i></div>
                 <div class="quick-title">Data Warga</div>
-                <div class="quick-desc">Kependudukan</div>
+                <div class="quick-desc">Kelola Akun Masyarakat</div>
             </a>
         </div>
         <div class="col-3">
@@ -351,7 +351,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             </a>
         </div>
         <div class="col-3">
-            <a href="{{ route('informasi-admin.index') }}" class="quick-card">
+            <a href="{{ route('berita-admin.index') }}" class="quick-card">
                 <div class="quick-icon" style="background:#fff7ed;color:var(--orange)"><i class="bi bi-newspaper"></i></div>
                 <div class="quick-title">Berita</div>
                 <div class="quick-desc">Kelola konten</div>
@@ -376,7 +376,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <div class="dash-card h-100">
                 <div class="dash-card-header">
                     <div class="dash-card-title"><i class="bi bi-newspaper"></i> Manajemen Berita</div>
-                    <a href="{{ route('informasi-admin.create') }}" class="btn-card-add">
+                    <a href="{{ route('berita-admin.create') }}" class="btn-card-add">
                         <i class="bi bi-plus-lg"></i> <span class="d-none d-sm-inline">Tulis Baru</span>
                     </a>
                 </div>
@@ -404,7 +404,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                             </div>
                         </div>
                         <div class="d-flex gap-1 flex-shrink-0">
-                            <a href="{{ route('informasi-admin.edit', $berita->id_informasi) }}" class="action-icon-btn edit">
+                            <a href="{{ route('berita-admin.edit', $berita->id_berita) }}" class="action-icon-btn edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
                         </div>
@@ -412,11 +412,11 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                     @empty
                     <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">
                         <i class="bi bi-newspaper" style="font-size:28px;display:block;margin-bottom:8px;color:var(--border)"></i>
-                        Belum ada berita. <a href="{{ route('informasi-admin.create') }}" style="color:var(--blue)">Tulis sekarang</a>
+                        Belum ada berita. <a href="{{ route('berita-admin.create') }}" style="color:var(--blue)">Tulis sekarang</a>
                     </div>
                     @endforelse
                 </div>
-                <a href="{{ route('informasi-admin.index') }}" class="card-more-link">Kelola Semua Berita →</a>
+                <a href="{{ route('berita-admin.index') }}" class="card-more-link">Kelola Semua Berita →</a>
             </div>
         </div>
 

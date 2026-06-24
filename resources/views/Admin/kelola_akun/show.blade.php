@@ -94,7 +94,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     <div class="breadcrumb-bar">
         <a href="{{ route('admin.dashboard') }}">Portal Admin</a>
         <i class="bi bi-chevron-right" style="font-size:10px"></i>
-        <a href="{{ route('kependudukan.index') }}">Kependudukan</a>
+        <a href="{{ route('kelola-akun.index') }}">Kelola Akun Masyarakat</a>
         <i class="bi bi-chevron-right" style="font-size:10px"></i>
         <span class="active">{{ $user->nama }}</span>
     </div>
@@ -121,14 +121,12 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <div class="mt-2">
                 @if($status === 'aktif')
                     <span class="bdg bdg-aktif">Aktif</span>
-                @elseif($status === 'blokir')
+                @else($status === 'blokir')
                     <span class="bdg bdg-blokir">Blokir</span>
-                @else
-                    <span class="bdg bdg-nonaktif">Non-Aktif</span>
                 @endif
             </div>
         </div>
-        <a href="{{ route('kependudukan.index') }}" class="btn-back">
+        <a href="{{ route('kelola-akun.index') }}" class="btn-back">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
     </div>
@@ -224,7 +222,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
     {{-- Action Bar --}}
     <div class="action-bar">
-        <form method="POST" action="{{ route('kependudukan.toggle', $user->id_user) }}">
+        <form method="POST" action="{{ route('kelola-akun.toggle', $user->id_user) }}">
             @csrf @method('PATCH')
             @if($status === 'aktif')
                 <button type="submit" class="btn-toggle-nonaktif">
@@ -252,7 +250,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         <p class="modal-desc">Anda yakin ingin menghapus data <strong>{{ $user->nama }}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">Batal</button>
-            <form method="POST" action="{{ route('kependudukan.destroy', $user->id_user) }}">
+            <form method="POST" action="{{ route('kelola-akun.destroy', $user->id_user) }}">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn-danger">Ya, Hapus</button>
             </form>

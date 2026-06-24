@@ -49,9 +49,16 @@ class StatistikController extends Controller
             }
         }
 
+        // ── Hapus statistik yang ditandai ──────────────────
+        $hapusKeys = $request->input('hapus_statistik', []);
+        if (!empty($hapusKeys)) {
+            \App\Models\StatistikDemografi::whereIn('kunci', $hapusKeys)->delete();
+        }
+
         // ── Simpan statistik demografi (logic yang sudah ada) ──
         if ($request->has('statistik')) {
             foreach ($request->statistik as $kunci => $data) {
+                if (in_array($kunci, $hapusKeys)) continue;
                 \App\Models\StatistikDemografi::updateOrCreate(
                     ['kunci' => $kunci],
                     [
@@ -59,6 +66,19 @@ class StatistikController extends Controller
                         'nilai'      => $data['nilai']      ?? 0,
                         'nilai_teks' => $data['nilai_teks'] ?? null,
                     ]
+                );
+            }
+
+            // Auto-calculate total sample DDK dari 4 kelompok umur
+            $umur4Keys = ['umur4_anak','umur4_remaja','umur4_dewasa','umur4_lansia'];
+            $totalDDK = \App\Models\StatistikDemografi::whereIn('kunci', $umur4Keys)->sum('nilai');
+            if ($totalDDK > 0) {
+                $teksL = \App\Models\StatistikDemografi::whereIn('kunci', $umur4Keys)->get()
+                    ->sum(fn($r) => (int)explode('|', $r->nilai_teks ?? '0|0')[0]);
+                $teksP = $totalDDK - $teksL;
+                \App\Models\StatistikDemografi::updateOrCreate(
+                    ['kunci' => 'total_sample_ddk'],
+                    ['label' => 'Total Sample DDK', 'nilai' => $totalDDK, 'nilai_teks' => $teksL.'|'.$teksP, 'urutan' => 39]
                 );
             }
         }

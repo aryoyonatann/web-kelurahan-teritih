@@ -345,7 +345,7 @@
         <li><a href="{{ route('home') }}">Beranda</a></li>
         <li><a href="{{ route('profil') }}">Profil</a></li>
         <li><a href="{{ route('layanan') }}">Layanan</a></li>
-        <li><a href="{{ route('informasi') }}">Informasi</a></li>
+        <li><a href="{{ route('demografi') }}">Informasi</a></li>
     </ul>
 
     <div class="login-nav-cta">
@@ -491,8 +491,8 @@
                     <li><a href="{{ route('home') }}"><i class="bi bi-chevron-right"></i> Beranda</a></li>
                     <li><a href="{{ route('profil') }}"><i class="bi bi-chevron-right"></i> Profil Kelurahan</a></li>
                     <li><a href="{{ route('layanan') }}"><i class="bi bi-chevron-right"></i> Layanan Online</a></li>
-                    <li><a href="{{ route('informasi') }}"><i class="bi bi-chevron-right"></i> Informasi</a></li>
-                    <li><a href="{{ route('informasi.berita') }}"><i class="bi bi-chevron-right"></i> Berita Kelurahan</a></li>
+                    <li><a href="{{ route('demografi') }}"><i class="bi bi-chevron-right"></i> Informasi</a></li>
+                    <li><a href="{{ route('berita') }}"><i class="bi bi-chevron-right"></i> Berita Kelurahan</a></li>
                     <li><a href="{{ route('register') }}"><i class="bi bi-chevron-right"></i> Daftar Akun</a></li>
                 </ul>
             </div>

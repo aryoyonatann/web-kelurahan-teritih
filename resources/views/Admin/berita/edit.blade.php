@@ -109,9 +109,9 @@
 <div class="form-page">
 
     <div class="back-bar">
-        <a href="{{ route('informasi-admin.index') }}" class="back-btn"><i class="bi bi-arrow-left"></i> Kembali</a>
+        <a href="{{ route('berita-admin.index') }}" class="back-btn"><i class="bi bi-arrow-left"></i> Kembali</a>
         <span class="bc-sep">/</span>
-        <a href="{{ route('informasi-admin.index') }}" style="color:#64748b;text-decoration:none;font-size:13px">Berita</a>
+        <a href="{{ route('berita-admin.index') }}" style="color:#64748b;text-decoration:none;font-size:13px">Berita</a>
         <span class="bc-sep">/</span>
         <span class="bc-cur">Edit</span>
     </div>
@@ -123,7 +123,7 @@
                 <h1><i class="bi bi-pencil-square me-2"></i>Edit Berita</h1>
                 <p>Perbarui konten berita yang sudah dipublikasikan</p>
             </div>
-            <div class="hero-id-badge"><i class="bi bi-hash"></i> ID {{ $data->id_informasi }}</div>
+            <div class="hero-id-badge"><i class="bi bi-hash"></i> ID {{ $data->id_berita }}</div>
         </div>
     </div>
 
@@ -141,7 +141,7 @@
         </div>
         @endif
 
-        <form action="{{ route('informasi-admin.update', $data->id_informasi) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('berita-admin.update', $data->id_berita) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -224,7 +224,7 @@
                 <div class="form-footer">
                     <div class="footer-left"><i class="bi bi-clock-history"></i> Perubahan akan langsung tersimpan</div>
                     <div class="footer-right">
-                        <a href="{{ route('informasi-admin.index') }}" class="btn-batal"><i class="bi bi-x-lg"></i> Batal</a>
+                        <a href="{{ route('berita-admin.index') }}" class="btn-batal"><i class="bi bi-x-lg"></i> Batal</a>
                         <button type="submit" class="btn-update"><i class="bi bi-check-lg"></i> Update Berita</button>
                     </div>
                 </div>

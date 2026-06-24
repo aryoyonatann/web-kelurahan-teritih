@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\Berita;
 
 class Admin extends Authenticatable
 {
@@ -26,9 +27,8 @@ class Admin extends Authenticatable
         return $this->hasMany(Approval::class, 'id_admin');
     }
 
-    // relasi informasi
-    public function informasi()
+    public function berita()
     {
-        return $this->hasMany(InformasiKelurahan::class, 'id_admin');
+        return $this->hasMany(Berita::class, 'id_admin');
     }
 }   

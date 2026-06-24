@@ -65,8 +65,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .fi.c2{grid-column:span 2}
 .fi.c3{grid-column:span 3}
 .fi.c4{grid-column:span 4}
-/* last row - remove bottom border on last 4 items */
-.fg .fi:nth-last-child(-n+4){border-bottom:none}
+.fg .fi:last-child,.fg .fi:nth-last-child(2){border-bottom:none}
+.fdivider{grid-column:span 4;padding:8px 24px 6px;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;background:#f8fafc}
+.fdivider span{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b}
 .fl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:5px}
 .fv{font-size:14px;color:var(--navy);font-weight:500;line-height:1.5}
 .fv.mono{font-family:'Courier New',monospace;font-size:13px;letter-spacing:.03em}
@@ -191,9 +192,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         } else {
             $dt = [];
         }
-        $jenis = $dt['jenis'] ?? null;
 
-        $tgl = fn($t) => $t ? \Carbon\Carbon::parse($t)->isoFormat('D MMMM Y') : '-';
+        $tgl = fn($t) => $t ? \Carbon\Carbon::parse($t)->locale('id')->isoFormat('D MMMM Y') : '-';
         $dokCount = $permohonan->persyaratan->count();
     @endphp
 
@@ -258,241 +258,86 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     </div>
     @endif
 
-    {{-- ══ DATA PEMOHON ══ --}}
+    {{-- ══ DATA PERMOHONAN (biodata + extra fields, dinamis dari fields_config) ══ --}}
+    @php
+        $allFields = collect($permohonan->jenisSurat->fields_config ?? []);
+        if (is_string($permohonan->jenisSurat->fields_config)) $allFields = collect(json_decode($permohonan->jenisSurat->fields_config, true) ?? []);
+        $isPerwakilan = $permohonan->isPerwakilan();
+        $nama  = $permohonan->nama_pemohon ?? auth()->user()->nama ?? '-';
+        $nik   = $permohonan->nik_pemohon  ?? auth()->user()->nik  ?? '-';
+        $alamat = $permohonan->alamat_pemohon ?? auth()->user()->alamat ?? '-';
+    @endphp
     <div class="sec">
         <div class="sec-head">
             <div class="sec-icon" style="background:var(--blue-lt);color:var(--blue)"><i class="bi bi-person-fill"></i></div>
-            <div class="sec-title">Data Pemohon</div>
-            @if($permohonan->nama_pemohon && $permohonan->nama_pemohon !== auth()->user()->nama)
+            <div class="sec-title">Data Permohonan</div>
+            @if($isPerwakilan)
             <span style="font-size:11px;font-weight:700;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:3px 12px">PERWAKILAN</span>
             @endif
         </div>
         <div class="fg">
             <div class="fi c2">
                 <div class="fl">Nama Lengkap</div>
-                <div class="fv" style="font-size:15px;font-weight:700">{{ $permohonan->nama_pemohon ?? auth()->user()->nama ?? '-' }}</div>
+                <div class="fv" style="font-size:15px;font-weight:700">{{ $nama }}</div>
             </div>
             <div class="fi c2">
                 <div class="fl">NIK</div>
-                <div class="fv mono" style="font-size:15px;font-weight:700">{{ $permohonan->nik_pemohon ?? auth()->user()->nik ?? '-' }}</div>
+                <div class="fv mono" style="font-size:15px;font-weight:700">{{ $nik }}</div>
             </div>
-            @if(!empty($dt['tempat_lahir']))
-            <div class="fi">
-                <div class="fl">Tempat Lahir</div>
-                <div class="fv">{{ $dt['tempat_lahir'] }}</div>
+
+            @foreach($allFields->where('group','biodata')->whereNotIn('key',['nama','nik','alamat'])->where('type','!=','section') as $bf)
+            @php
+                $bval = match($bf['key']) {
+                    'tempat_tgl_lahir' => trim(($dt['tempat_lahir']??'').', '.($dt['tanggal_lahir'] ? \Carbon\Carbon::parse($dt['tanggal_lahir'])->locale('id')->isoFormat('D MMMM Y') : '')),
+                    'rt_rw'  => 'RT '.($dt['rt']??'-').' / RW '.($dt['rw']??'-'),
+                    'umur'   => !empty($dt['umur']) ? $dt['umur'].' Tahun' : '-',
+                    default  => $dt[$bf['key']] ?? '-',
+                };
+            @endphp
+            <div class="fi c2">
+                <div class="fl">{{ $bf['print_label'] ?? $bf['label'] }}</div>
+                <div class="fv">{{ $bval }}</div>
             </div>
-            <div class="fi">
-                <div class="fl">Tanggal Lahir</div>
-                <div class="fv">{{ $tgl($dt['tanggal_lahir'] ?? null) }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Jenis Kelamin</div>
-                <div class="fv">{{ $dt['jenis_kelamin'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Agama</div>
-                <div class="fv">{{ $dt['agama'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Status Perkawinan</div>
-                <div class="fv">{{ $dt['status_kawin'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Pekerjaan</div>
-                <div class="fv">{{ $dt['pekerjaan'] ?? '-' }}</div>
-            </div>
-            @if(!empty($dt['rt']))
-            <div class="fi">
-                <div class="fl">RT / RW</div>
-                <div class="fv">RT {{ $dt['rt'] }} / RW {{ $dt['rw'] ?? '-' }}</div>
-            </div>
-            <div class="fi c3">
-                <div class="fl">Alamat Lengkap</div>
-                <div class="fv">{{ $permohonan->alamat_pemohon ?? auth()->user()->alamat ?? '-' }}</div>
-            </div>
-            @else
+            @endforeach
+
             <div class="fi c4">
-                <div class="fl">Alamat Lengkap</div>
-                <div class="fv">{{ $permohonan->alamat_pemohon ?? auth()->user()->alamat ?? '-' }}</div>
+                <div class="fl">Alamat</div>
+                <div class="fv">{{ $alamat }}</div>
+            </div>
+
+            <div class="fdivider"><span>Keperluan &amp; Data Surat</span></div>
+            <div class="fi c2">
+                <div class="fl">Keperluan / Tujuan Surat</div>
+                <div class="fv">{{ $permohonan->keperluan ?? '-' }}</div>
+            </div>
+            <div class="fi c2">
+                <div class="fl">Tanggal Pengajuan</div>
+                <div class="fv">{{ \Carbon\Carbon::parse($permohonan->tanggal_pengajuan)->locale('id')->isoFormat('D MMMM Y') }}</div>
+            </div>
+
+            @foreach($allFields->where('group','extra') as $ef)
+                @if(($ef['type'] ?? '') === 'section')
+                <div class="fdivider"><span>{{ $ef['label'] }}</span></div>
+                @elseif(($ef['print_style'] ?? '') !== 'center_bold')
+                <div class="fi c2">
+                    <div class="fl">{{ $ef['label'] }}</div>
+                    <div class="fv">
+                        @php $val = $dt[$ef['key']] ?? null; if (($ef['type']??'') === 'date' && $val) $val = \Carbon\Carbon::parse($val)->locale('id')->isoFormat('D MMMM Y'); @endphp
+                        {{ $val ?? '-' }}
+                    </div>
+                </div>
+                @endif
+            @endforeach
+
+            @if($isPerwakilan)
+            <div class="fdivider"><span>Info Pengaju</span></div>
+            <div class="fi c2">
+                <div class="fl">Diajukan oleh (Akun)</div>
+                <div class="fv">{{ auth()->user()->nama ?? '-' }}</div>
             </div>
             @endif
-            @else
-            <div class="fi c4">
-                <div class="fl">Alamat Lengkap</div>
-                <div class="fv">{{ $permohonan->alamat_pemohon ?? auth()->user()->alamat ?? '-' }}</div>
-            </div>
-            @endif
         </div>
     </div>
-
-    {{-- ══ DATA KHUSUS PER JENIS ══ --}}
-
-    @if($jenis === 'sktm')
-    <div class="sec">
-        <div class="sec-head">
-            <div class="sec-icon" style="background:#ecfdf5;color:var(--green)"><i class="bi bi-file-text-fill"></i></div>
-            <div class="sec-title">Keperluan Surat Keterangan Tidak Mampu (SKTM)</div>
-        </div>
-        <div class="fg">
-            <div class="fi c2">
-                <div class="fl">Tujuan / Keperluan SKTM</div>
-                <div class="fv">{{ $dt['keperluan_sktm'] ?? $permohonan->keperluan ?? '-' }}</div>
-            </div>
-            <div class="fi c2">
-                <div class="fl">Keterangan Tambahan</div>
-                <div class="fv">{{ $dt['keterangan_tambahan'] ?? '-' }}</div>
-            </div>
-        </div>
-    </div>
-
-    @elseif($jenis === 'kematian')
-    <div class="sec">
-        <div class="sec-head">
-            <div class="sec-icon" style="background:#ecfdf5;color:var(--green)"><i class="bi bi-file-earmark-medical-fill"></i></div>
-            <div class="sec-title">Data Kematian Almarhum / Almarhumah</div>
-        </div>
-        <div class="fg">
-            <div class="fi">
-                <div class="fl">Umur Saat Meninggal</div>
-                <div class="fv">{{ !empty($dt['umur']) ? $dt['umur'].' Tahun' : '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Hari Meninggal</div>
-                <div class="fv">{{ $dt['hari_meninggal'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Tanggal Meninggal</div>
-                <div class="fv">{{ $tgl($dt['tanggal_meninggal'] ?? null) }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Tempat Meninggal</div>
-                <div class="fv">{{ $dt['tempat_meninggal'] ?? '-' }}</div>
-            </div>
-            <div class="fi c2">
-                <div class="fl">Sebab Meninggal</div>
-                <div class="fv">{{ $dt['sebab_meninggal'] ?? '-' }}</div>
-            </div>
-            <div class="fi c2">
-                <div class="fl">Keperluan Surat</div>
-                <div class="fv">{{ $permohonan->keperluan ?? '-' }}</div>
-            </div>
-        </div>
-    </div>
-
-    @elseif($jenis === 'suami-istri')
-    <div class="sec">
-        <div class="sec-head">
-            <div class="sec-icon" style="background:#fff1f2;color:#f43f5e"><i class="bi bi-people-fill"></i></div>
-            <div class="sec-title">Data Istri & Pernikahan</div>
-        </div>
-        <div class="fg">
-            <div class="fi c2">
-                <div class="fl">Nama Lengkap Istri</div>
-                <div class="fv" style="font-weight:700">{{ $dt['nama_istri'] ?? '-' }}</div>
-            </div>
-            <div class="fi c2">
-                <div class="fl">NIK Istri</div>
-                <div class="fv mono">{{ $dt['nik_istri'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Tempat / Tanggal Lahir Istri</div>
-                <div class="fv">{{ $dt['ttl_istri'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Agama Istri</div>
-                <div class="fv">{{ $dt['agama_istri'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Pekerjaan Istri</div>
-                <div class="fv">{{ $dt['pekerjaan_istri'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Tahun Menikah</div>
-                <div class="fv">{{ $dt['tahun_menikah'] ?? '-' }}</div>
-            </div>
-            <div class="fi c4">
-                <div class="fl">Alamat Istri</div>
-                <div class="fv">{{ !empty($dt['alamat_istri']) ? $dt['alamat_istri'] : 'Sama dengan alamat suami' }}</div>
-            </div>
-        </div>
-    </div>
-
-    @elseif($jenis === 'beda-nama')
-    <div class="sec">
-        <div class="sec-head">
-            <div class="sec-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-arrow-left-right"></i></div>
-            <div class="sec-title">Detail Perbedaan Nama pada Dokumen</div>
-        </div>
-        <div class="nama-compare">
-            <div class="nc-head">Nama di KTP</div>
-            <div class="nc-mid head" style="font-size:11px;font-weight:700;color:var(--muted);text-align:center">VS</div>
-            <div class="nc-head">Nama di {{ $dt['jenis_dokumen_2'] ?? 'Dokumen Lain' }}</div>
-            <div class="nc-val">{{ $dt['nama_dokumen_1'] ?? ($permohonan->nama_pemohon ?? '-') }}</div>
-            <div class="nc-mid"><i class="bi bi-arrow-left-right" style="font-size:18px;color:var(--muted)"></i></div>
-            <div class="nc-val">{{ $dt['nama_dokumen_2'] ?? '-' }}</div>
-        </div>
-        <div class="nc-note">
-            <i class="bi bi-info-circle-fill" style="flex-shrink:0"></i>
-            Kedua nama di atas adalah satu orang yang sama dan akan dinyatakan resmi dalam surat keterangan ini.
-        </div>
-        <div class="fg" style="border-top:1px solid var(--border)">
-            <div class="fi c2">
-                <div class="fl">Jenis Dokumen Pembanding</div>
-                <div class="fv">{{ $dt['jenis_dokumen_2'] ?? '-' }}</div>
-            </div>
-            <div class="fi c2">
-                <div class="fl">Keperluan Surat</div>
-                <div class="fv">{{ $permohonan->keperluan ?? '-' }}</div>
-            </div>
-        </div>
-    </div>
-
-    @elseif($jenis === 'izin-cuti')
-    <div class="sec">
-        <div class="sec-head">
-            <div class="sec-icon" style="background:var(--blue-lt);color:var(--blue)"><i class="bi bi-calendar-check-fill"></i></div>
-            <div class="sec-title">Detail Izin Cuti</div>
-        </div>
-        <div class="fg">
-            <div class="fi c2">
-                <div class="fl">Nama Perusahaan / Instansi</div>
-                <div class="fv" style="font-weight:700;font-size:15px">{{ $dt['nama_perusahaan'] ?? '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Lama Cuti</div>
-                <div class="fv">{{ !empty($dt['lama_cuti']) ? $dt['lama_cuti'].' Hari' : '-' }}</div>
-            </div>
-            <div class="fi">
-                <div class="fl">Keperluan / Alasan Cuti</div>
-                <div class="fv">{{ $permohonan->keperluan ?? '-' }}</div>
-            </div>
-            <div class="fi c2">
-                <div class="fl">Tanggal Mulai Cuti</div>
-                <div class="fv" style="font-weight:700">{{ $tgl($dt['tanggal_mulai_cuti'] ?? null) }}</div>
-            </div>
-            <div class="fi c2">
-                <div class="fl">Tanggal Selesai Cuti</div>
-                <div class="fv" style="font-weight:700">{{ $tgl($dt['tanggal_selesai_cuti'] ?? null) }}</div>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    {{-- KEPERLUAN UMUM jika bukan sktm/izin-cuti atau jenis NULL --}}
-    @if(!in_array($jenis, ['sktm','kematian','suami-istri','beda-nama','izin-cuti']))
-    <div class="sec">
-        <div class="sec-head">
-            <div class="sec-icon" style="background:var(--blue-lt);color:var(--blue)"><i class="bi bi-chat-left-text-fill"></i></div>
-            <div class="sec-title">Keperluan / Tujuan Surat</div>
-        </div>
-        <div class="fg">
-            <div class="fi c4">
-                <div class="fl">Keperluan</div>
-                <div class="fv" style="font-size:15px">{{ $permohonan->keperluan ?? '-' }}</div>
-            </div>
-        </div>
-    </div>
-    @endif
 
     {{-- DOKUMEN --}}
     <div class="sec">

@@ -22,6 +22,7 @@
         --fs-lg: 20px; --fs-xl: 24px; --fs-2xl: 32px; --fs-3xl: 42px;
     }
     *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--slate);font-size:var(--fs-base);line-height:1.75;min-height:100vh;display:flex;flex-direction:column}
 
     /* ── PAGE HEADER ── */
@@ -38,7 +39,8 @@
     /* ── TENTANG ── */
     .about-section{background:white;border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:28px}
     .about-hero-img{width:100%;aspect-ratio:16/7;overflow:hidden;position:relative;background:var(--navy);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:80px}
-    .about-hero-img img{width:100%;height:100%;object-fit:cover;object-position:center}
+    .about-hero-img img{width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .6s ease}
+    .about-hero-img:hover img{transform:scale(1.04)}
     .about-hero-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(10,20,50,.85) 0%,rgba(10,20,50,.45) 55%,transparent 100%);padding:60px 32px 22px;display:flex;align-items:center;gap:10px;color:white;font-size:var(--fs-base);font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.4)}
     .about-body{padding:36px 40px}
     .about-section-label{font-size:var(--fs-xs);font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
@@ -110,6 +112,7 @@
 
     /* Container utama bagan — relatif untuk SVG absolute */
     .org-tree{position:relative;width:100%;max-width:1200px;margin:0 auto;min-width:880px}
+    .org-vline,.org-hline-wrap{display:none}
     .org-tree-svg{
         position:absolute;top:0;left:0;width:100%;height:100%;
         pointer-events:none;z-index:0;
@@ -120,6 +123,7 @@
         gap:36px;
         margin-bottom:48px;
     }
+    .org-col-wrapper{display:flex;justify-content:center;align-items:flex-start;gap:36px;width:100%}
     .org-tree > .org-row:last-child{margin-bottom:0}
 
     /* Untuk row dengan multi-kolom yang punya sub-tree */
@@ -134,8 +138,8 @@
     /* ── NODE ── */
     .org-node{
         background:white;border:2px solid var(--border);border-radius:14px;
-        padding:16px 20px 14px;text-align:center;
-        min-width:195px;max-width:230px;
+        padding:12px 14px 10px;text-align:center;
+        min-width:160px;max-width:190px;
         transition:box-shadow .2s, border-color .2s, transform .2s;
         position:relative;flex-shrink:0;
     }
@@ -144,45 +148,45 @@
         border-color:var(--blue);
         background:linear-gradient(145deg,#fff 60%,#eff6ff);
         box-shadow:0 6px 24px rgba(28,100,242,.18);
-        min-width:230px;padding:20px 24px 18px;
+        min-width:185px;padding:14px 18px 12px;
     }
-    .org-node.sekre{border-color:#93c5fd;min-width:220px;padding:18px 22px 16px}
+    .org-node.sekre{border-color:#93c5fd;min-width:175px;padding:13px 16px 11px}
     .org-node.fungsional{
         border-color:#d97706;border-style:dashed;
         background:linear-gradient(145deg,#fff 60%,#fffbeb);
-        min-width:175px;padding:14px 18px 12px;
+        min-width:145px;padding:10px 13px 9px;
     }
-    .org-node.kasi{background:linear-gradient(145deg,#fff 60%,#f8fafc);min-width:205px}
-    .org-node.pelaksana{background:#f8fafc;border-color:#e2e8f0;min-width:200px}
-    .org-node.operator{background:white;min-width:175px;max-width:195px;padding:14px 16px 12px}
+    .org-node.kasi{background:linear-gradient(145deg,#fff 60%,#f8fafc);min-width:165px}
+    .org-node.pelaksana{background:#f8fafc;border-color:#e2e8f0;min-width:160px}
+    .org-node.operator{background:white;min-width:145px;max-width:165px;padding:10px 12px 9px}
 
     .org-avatar{
-        width:60px;height:60px;border-radius:50%;
+        width:48px;height:48px;border-radius:50%;
         background:var(--bg);border:2px solid var(--border);
         display:flex;align-items:center;justify-content:center;
-        font-size:26px;color:var(--muted);
-        margin:0 auto 12px;overflow:hidden;
+        font-size:20px;color:var(--muted);
+        margin:0 auto 10px;overflow:hidden;
     }
     .org-avatar img{width:100%;height:100%;object-fit:cover;object-position:top}
-    .org-node.lurah .org-avatar{background:var(--blue-lt);border-color:#93c5fd;color:var(--blue);width:72px;height:72px;font-size:32px}
-    .org-node.sekre .org-avatar{background:#eff6ff;border-color:#bfdbfe;color:var(--blue-dk);width:64px;height:64px;font-size:28px}
-    .org-node.fungsional .org-avatar{background:#fffbeb;border-color:#fcd34d;color:#d97706;width:48px;height:48px;font-size:20px}
-    .org-node.kasi .org-avatar{background:#f0f9ff;border-color:#bae6fd;color:#0284c7}
-    .org-node.pelaksana .org-avatar{background:#f1f5f9;border-color:#cbd5e1;width:54px;height:54px;font-size:22px}
-    .org-node.operator .org-avatar{width:48px;height:48px;font-size:20px;margin-bottom:8px}
+    .org-node.lurah .org-avatar{background:var(--blue-lt);border-color:#93c5fd;color:var(--blue);width:58px;height:58px;font-size:26px}
+    .org-node.sekre .org-avatar{background:#eff6ff;border-color:#bfdbfe;color:var(--blue-dk);width:52px;height:52px;font-size:22px}
+    .org-node.fungsional .org-avatar{background:#fffbeb;border-color:#fcd34d;color:#d97706;width:40px;height:40px;font-size:17px}
+    .org-node.kasi .org-avatar{background:#f0f9ff;border-color:#bae6fd;color:#0284c7;width:46px;height:46px;font-size:19px}
+    .org-node.pelaksana .org-avatar{background:#f1f5f9;border-color:#cbd5e1;width:44px;height:44px;font-size:18px}
+    .org-node.operator .org-avatar{width:38px;height:38px;font-size:16px;margin-bottom:7px}
 
-    .org-nip{font-size:11.5px;color:var(--muted);font-weight:500;margin-top:4px;line-height:1.3}
-    .org-name{font-size:15px;font-weight:700;color:var(--navy);line-height:1.35}
-    .org-node.lurah .org-name{font-size:17px}
-    .org-node.sekre .org-name{font-size:16px}
-    .org-node.operator .org-name{font-size:13.5px}
+    .org-nip{font-size:10px;color:var(--muted);font-weight:500;margin-top:3px;line-height:1.3}
+    .org-name{font-size:13px;font-weight:700;color:var(--navy);line-height:1.35}
+    .org-node.lurah .org-name{font-size:14px}
+    .org-node.sekre .org-name{font-size:13.5px}
+    .org-node.operator .org-name{font-size:12px}
     .org-role-badge{
-        display:inline-block;margin-top:8px;padding:4px 11px;
-        border-radius:20px;font-size:11px;font-weight:700;
+        display:inline-block;margin-top:7px;padding:3px 9px;
+        border-radius:20px;font-size:10px;font-weight:700;
         letter-spacing:.05em;text-transform:uppercase;
     }
-    .org-node.lurah .org-role-badge{font-size:12px;padding:4px 13px}
-    .org-node.operator .org-role-badge{font-size:10px;padding:3px 9px}
+    .org-node.lurah .org-role-badge{font-size:10.5px;padding:3px 10px}
+    .org-node.operator .org-role-badge{font-size:9.5px;padding:2px 8px}
     .badge-lurah{background:var(--blue);color:white}
     .badge-sekre{background:#dbeafe;color:#1e40af}
     .badge-fungsional{background:#fef3c7;color:#92400e}
@@ -296,23 +300,80 @@
         .galeri-zoom-hint{display:none}
         .galeri-zoom-btn{opacity:1;top:10px;right:10px;padding:6px 10px;font-size:11px}
 
-        /* Bagan vertical mode */
         .org-tree-svg, .pkk-tree-svg{display:none}
-        .org-tree, .pkk-tree{min-width:0}
+        .org-tree, .pkk-tree{min-width:0 !important}
+        .struktur-section{padding:24px 12px;overflow:hidden}
         .struktur-section .org-tree-wrap,
-        .pkk-section .pkk-tree-wrap{overflow:visible;padding-bottom:0;margin:0;padding-left:0;padding-right:0}
-        .org-tree > .org-row, .pkk-tree > .pkk-row{
-            flex-direction:column;align-items:center;gap:18px;margin-bottom:18px;
+        .pkk-section .pkk-tree-wrap{overflow:visible;padding:0;margin:0}
+
+        /* Semua row: vertikal, center */
+        .org-tree > .org-row{
+            flex-direction:column;align-items:center;gap:0;margin-bottom:0;
         }
-        .org-tree > .org-row::before, .pkk-tree > .pkk-row::before{
-            content:'';width:2px;height:18px;background:var(--line);margin:0 auto;
+        /* Nonaktifkan semua ::before CSS pseudo-element */
+        .org-tree > .org-row::before,
+        .org-tree > .org-row::after,
+        .org-col::before,.org-col::after,
+        .org-col-wrapper::before,.org-col-wrapper::after{content:none !important;display:none !important}
+
+        /* Connector eksplisit */
+        .org-vline{width:2px;height:20px;background:#bfdbfe;margin:0 auto;display:block}
+        .org-vline.org-vline-lg{height:36px}
+        .org-hline-wrap{display:block;width:100%;height:2px;background:#bfdbfe;margin:0}
+        /* Garis turun dari hline ke tiap kolom */
+        .org-col{
+            flex:1;min-width:0;gap:16px;padding:8px 5px;
+            background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;
+            position:relative;margin-top:16px;
         }
-        .org-tree > .org-row:first-child::before, .pkk-tree > .pkk-row:first-child::before{display:none}
-        .org-col{gap:18px}
-        .org-subgroup{flex-direction:column;align-items:center;gap:18px}
-    }
-    @media(max-width:768px){
-        /* Mobile-specific tweaks; vertikal layout sudah ditangani di 991px */
+        .org-col::before{
+            content:'';position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+            width:2px;height:16px;background:#bfdbfe;display:block !important;
+        }
+
+        /* Row 3: stretch agar kolom bisa full width */
+        .org-tree > .org-row:nth-child(3){align-items:stretch}
+
+        /* Wrapper kolom */
+        .org-col-wrapper{
+            display:flex !important;flex-direction:row !important;
+            gap:6px;padding:0 2px;align-items:flex-start;width:100%;
+        }
+        .org-subgroup{flex-direction:column;align-items:center;gap:10px}
+
+        /* Node compact */
+        .org-node{
+            min-width:0 !important;max-width:100% !important;
+            padding:6px 4px 5px !important;width:100% !important;box-sizing:border-box;
+        }
+        .org-node .org-avatar{width:28px !important;height:28px !important;font-size:12px !important;margin-bottom:4px !important}
+        .org-node .org-name{font-size:9px !important;line-height:1.3}
+        .org-node .org-nip{font-size:7.5px !important;margin-bottom:4px}
+        .org-role-badge{font-size:7px !important;padding:1px 4px !important;white-space:normal !important;text-align:center;line-height:1.2}
+        .org-node.lurah, .org-node.sekre{width:180px !important;margin:0 auto !important}
+
+        /* PKK mobile */
+        .pkk-tree{min-width:0 !important}
+        .pkk-tree > .pkk-row{flex-direction:column;align-items:center;gap:0;margin-bottom:0}
+        .pkk-tree > .pkk-row::before,.pkk-tree > .pkk-row::after{content:none !important;display:none !important}
+        /* Row 1: sembunyikan pembina-box, tampilkan ketua center */
+        .pkk-pembina-box{display:none}
+        .pkk-node.ketua{margin:0 auto !important;width:160px !important;min-width:unset !important}
+        /* Row 3: sekre+bendahara berdampingan */
+        .pkk-row-sekbend{flex-direction:row !important;justify-content:center;gap:0}
+        .pkk-row-sekbend .pkk-node{flex:1;max-width:160px;min-width:0}
+        .pkk-row-sekbend .pkk-node:first-child{margin-right:12px}
+        /* Row 4: pokja 2x2 grid */
+        .pkk-tree > .pkk-row:last-child{
+            flex-direction:row !important;flex-wrap:wrap;justify-content:center;gap:8px;
+            margin-top:0;
+        }
+        .pkk-pokja-card{flex:0 0 calc(50% - 4px) !important;min-width:0 !important;max-width:calc(50% - 4px) !important;margin-top:16px;position:relative}
+        .pkk-pokja-card::before{
+            content:'';position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+            width:2px;height:16px;background:#bfdbfe;display:block !important;
+        }
+        .pkk-node{min-width:0 !important}
     }
     @media(max-width:576px){
         .about-hero-img{aspect-ratio:4/3}
@@ -402,11 +463,12 @@
                     <div style="width:32px;height:32px;border-radius:8px;background:{{ $item['bg'] }};display:flex;align-items:center;justify-content:center;color:{{ $item['color'] }};font-size:15px">
                         <i class="bi {{ $item['icon'] }}"></i>
                     </div>
-                    <span style="font-size:var(--fs-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">{{ $item['label'] }}</span>
+                    <span style="font-size:var(--fs-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $item['label'] }}</span>
                 </div>
-                <div style="font-size:var(--fs-2xl);font-weight:800;color:var(--navy)">
+                <div style="font-size:var(--fs-2xl);font-weight:800;color:var(--navy)" class="ds-count-val"
+                     data-value="{{ $item['value'] }}">
                     {{ $item['value'] }}
-                    @if($item['unit'])<span style="font-size:var(--fs-lg)">{{ $item['unit'] }}</span>@endif
+                    @if($item['unit'])<span class="ds-unit" style="font-size:var(--fs-lg)">{{ $item['unit'] }}</span>@endif
                 </div>
             </div>
             @endforeach
@@ -469,65 +531,67 @@
             <svg class="org-tree-svg" id="orgSvg" xmlns="http://www.w3.org/2000/svg"></svg>
 
             {{-- Row 1: Lurah --}}
+            {{-- Helper: render avatar dari DB --}}
+            @php
+            function orgAvatar($p, $alt='') {
+                if (!empty($p['foto'])) {
+                    return '<div class="org-avatar"><img src="'.asset('storage/'.$p['foto']).'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" alt="'.e($alt).'"><i class="bi bi-person-fill" style="display:none"></i></div>';
+                }
+                return '<div class="org-avatar"><i class="bi bi-person-fill"></i></div>';
+            }
+            @endphp
+
+            {{-- Row 1: Lurah --}}
             <div class="org-row">
                 <div class="org-node lurah" data-node="lurah">
-                    <div class="org-avatar">
-                        <img src="{{ asset('images/foto-lurah.jpg') }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Lurah">
-                        <i class="bi bi-person-fill" style="display:none"></i>
-                    </div>
-                    <div class="org-name">Jupran, SE, MM</div>
-                    <div class="org-nip">NIP. 196808182009061005</div>
+                    {!! orgAvatar($pegawai['lurah'], 'Lurah') !!}
+                    <div class="org-name">{{ $pegawai['lurah']['nama'] }}</div>
+                    <div class="org-nip">NIP. {{ $pegawai['lurah']['nip'] }}</div>
                     <span class="org-role-badge badge-lurah">Kepala Kelurahan</span>
                 </div>
             </div>
+            <div class="org-vline"></div>
 
-            {{-- Row 2: Sekretaris (langsung di tengah, di bawah Lurah) --}}
+            {{-- Row 2: Sekretaris --}}
             <div class="org-row">
                 <div class="org-node sekre" data-node="sekretaris">
-                    <div class="org-avatar">
-                        <img src="{{ asset('images/foto-sekretaris.jpg') }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Sekretaris">
-                        <i class="bi bi-person-fill" style="display:none"></i>
-                    </div>
-                    <div class="org-name">Maryam, S.ST</div>
-                    <div class="org-nip">NIP. 198709232017042001</div>
+                    {!! orgAvatar($pegawai['sekretaris'], 'Sekretaris') !!}
+                    <div class="org-name">{{ $pegawai['sekretaris']['nama'] }}</div>
+                    <div class="org-nip">NIP. {{ $pegawai['sekretaris']['nip'] }}</div>
                     <span class="org-role-badge badge-sekre">Sekretaris Kelurahan</span>
                 </div>
             </div>
+            <div class="org-vline org-vline-lg"></div>
+            <div class="org-hline-wrap"></div>
+            <div class="org-vline" style="height:0"></div>
 
             {{-- Row 3: 3 Kasi --}}
             <div class="org-row">
+            <div class="org-col-wrapper">
                 <div class="org-col">
                     <div class="org-node kasi" data-node="kasi-pemum">
-                        <div class="org-avatar">
-                            <img src="{{ asset('images/foto-kasi-pemum.jpg') }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Kasi Pemum">
-                            <i class="bi bi-person-fill" style="display:none"></i>
-                        </div>
-                        <div class="org-name">Neni Khaeratunnisa,<br>Amd.Kep</div>
-                        <div class="org-nip">NIP. 198411122011012002</div>
+                        {!! orgAvatar($pegawai['kasi-pemum'], 'Kasi Pemum') !!}
+                        <div class="org-name">{{ $pegawai['kasi-pemum']['nama'] }}</div>
+                        <div class="org-nip">NIP. {{ $pegawai['kasi-pemum']['nip'] }}</div>
                         <span class="org-role-badge badge-kasi">Kasi Pemum</span>
                     </div>
-                    {{-- Sub: Pelaksana di bawah Kasi Pemum --}}
                     <div class="org-node pelaksana" data-node="pelaksana">
-                        <div class="org-avatar">
-                            <img src="{{ asset('images/foto-pelaksana.jpg') }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Pelaksana">
-                            <i class="bi bi-person-fill" style="display:none"></i>
-                        </div>
-                        <div class="org-name">Serli Laraswanti, SE</div>
-                        <div class="org-nip">NIP. 199812232025062005</div>
+                        {!! orgAvatar($pegawai['pelaksana'], 'Pelaksana') !!}
+                        <div class="org-name">{{ $pegawai['pelaksana']['nama'] }}</div>
+                        <div class="org-nip">NIP. {{ $pegawai['pelaksana']['nip'] }}</div>
                         <span class="org-role-badge badge-pelaksana">Pelaksana Pelayanan Umum</span>
                     </div>
-                    {{-- Sub-sub: Sanusi & Hawari di bawah Pelaksana --}}
                     <div class="org-subgroup">
                         <div class="org-node operator" data-node="op-sanusi">
-                            <div class="org-avatar"><i class="bi bi-person-fill"></i></div>
-                            <div class="org-name">Sanusi</div>
-                            <div class="org-nip">NIP. 197908052025211063</div>
+                            {!! orgAvatar($pegawai['op-sanusi']) !!}
+                            <div class="org-name">{{ $pegawai['op-sanusi']['nama'] }}</div>
+                            <div class="org-nip">NIP. {{ $pegawai['op-sanusi']['nip'] }}</div>
                             <span class="org-role-badge badge-operator">Operator Layanan Operasional</span>
                         </div>
                         <div class="org-node operator" data-node="op-hawari">
-                            <div class="org-avatar"><i class="bi bi-person-fill"></i></div>
-                            <div class="org-name">Hawari</div>
-                            <div class="org-nip">NIP. 198210082025211086</div>
+                            {!! orgAvatar($pegawai['op-hawari']) !!}
+                            <div class="org-name">{{ $pegawai['op-hawari']['nama'] }}</div>
+                            <div class="org-nip">NIP. {{ $pegawai['op-hawari']['nip'] }}</div>
                             <span class="org-role-badge badge-operator">Operator Layanan Operasional</span>
                         </div>
                     </div>
@@ -535,49 +599,42 @@
 
                 <div class="org-col">
                     <div class="org-node kasi" data-node="kasi-pmk">
-                        <div class="org-avatar">
-                            <img src="{{ asset('images/foto-kasi-pmk.jpg') }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Kasi PMK">
-                            <i class="bi bi-person-fill" style="display:none"></i>
-                        </div>
-                        <div class="org-name">Hafid, Amd.Kep</div>
-                        <div class="org-nip">NIP. 198009122009021003</div>
+                        {!! orgAvatar($pegawai['kasi-pmk'], 'Kasi PMK') !!}
+                        <div class="org-name">{{ $pegawai['kasi-pmk']['nama'] }}</div>
+                        <div class="org-nip">NIP. {{ $pegawai['kasi-pmk']['nip'] }}</div>
                         <span class="org-role-badge badge-kasi">Kasi PMK</span>
                     </div>
-                    {{-- Sub: Hasan Gaus di bawah Kasi PMK --}}
                     <div class="org-node operator" data-node="op-hasan">
-                        <div class="org-avatar"><i class="bi bi-person-fill"></i></div>
-                        <div class="org-name">Hasan Gaus, SM</div>
-                        <div class="org-nip">NIP. 199711262025211052</div>
+                        {!! orgAvatar($pegawai['op-hasan']) !!}
+                        <div class="org-name">{{ $pegawai['op-hasan']['nama'] }}</div>
+                        <div class="org-nip">NIP. {{ $pegawai['op-hasan']['nip'] }}</div>
                         <span class="org-role-badge badge-operator">Penata Layanan Operasional</span>
                     </div>
                 </div>
 
                 <div class="org-col">
                     <div class="org-node kasi" data-node="kasi-trantibum">
-                        <div class="org-avatar">
-                            <img src="{{ asset('images/foto-kasi-trantibum.jpg') }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Kasi Trantibum">
-                            <i class="bi bi-person-fill" style="display:none"></i>
-                        </div>
-                        <div class="org-name">Khuriyah, Amd.Kep</div>
-                        <div class="org-nip">NIP. 198409292011012002</div>
+                        {!! orgAvatar($pegawai['kasi-trantibum'], 'Kasi Trantibum') !!}
+                        <div class="org-name">{{ $pegawai['kasi-trantibum']['nama'] }}</div>
+                        <div class="org-nip">NIP. {{ $pegawai['kasi-trantibum']['nip'] }}</div>
                         <span class="org-role-badge badge-kasi">Kasi Trantibum</span>
                     </div>
-                    {{-- Sub-sub: Afif & Jamaludin di bawah Kasi Trantibum --}}
                     <div class="org-subgroup">
                         <div class="org-node operator" data-node="op-afif">
-                            <div class="org-avatar"><i class="bi bi-person-fill"></i></div>
-                            <div class="org-name">Afif</div>
-                            <div class="org-nip">NIP. 197808032025211041</div>
+                            {!! orgAvatar($pegawai['op-afif']) !!}
+                            <div class="org-name">{{ $pegawai['op-afif']['nama'] }}</div>
+                            <div class="org-nip">NIP. {{ $pegawai['op-afif']['nip'] }}</div>
                             <span class="org-role-badge badge-operator">Operator Layanan Operasional</span>
                         </div>
                         <div class="org-node operator" data-node="op-jamaludin">
-                            <div class="org-avatar"><i class="bi bi-person-fill"></i></div>
-                            <div class="org-name">Jamaludin</div>
-                            <div class="org-nip">NIP. 197503012025211032</div>
+                            {!! orgAvatar($pegawai['op-jamaludin']) !!}
+                            <div class="org-name">{{ $pegawai['op-jamaludin']['nama'] }}</div>
+                            <div class="org-nip">NIP. {{ $pegawai['op-jamaludin']['nip'] }}</div>
                             <span class="org-role-badge badge-operator">Pengelola Umum Operasional</span>
                         </div>
                     </div>
                 </div>
+            </div>{{-- /org-col-wrapper --}}
             </div>
         </div>
         </div>{{-- /org-tree-wrap --}}
@@ -606,8 +663,10 @@
                     <div class="pkk-role">Ketua</div>
                 </div>
             </div>
-
+            <div class="org-vline"></div>
+            <div class="org-vline"></div>
             {{-- Row 2: Wakil Ketua --}}
+            <div class="org-vline"></div>
             <div class="pkk-row">
                 <div class="pkk-node" data-node="wakil">
                     <div class="pkk-avatar"><i class="bi bi-person-fill"></i></div>
@@ -615,9 +674,10 @@
                     <div class="pkk-role">Wakil Ketua</div>
                 </div>
             </div>
+            <div class="org-vline"></div>
 
             {{-- Row 3: Sekretaris + Bendahara --}}
-            <div class="pkk-row">
+            <div class="pkk-row pkk-row-sekbend">
                 <div class="pkk-node" data-node="sekretaris-pkk">
                     <div class="pkk-avatar"><i class="bi bi-person-fill"></i></div>
                     <div class="pkk-name">Esih Sukaesih</div>
@@ -629,6 +689,8 @@
                     <div class="pkk-role bend">Bendahara</div>
                 </div>
             </div>
+            <div class="org-vline"></div>
+            <div class="org-hline-wrap"></div>
 
             {{-- Row 4: 4 Pokja --}}
             <div class="pkk-row">
@@ -665,7 +727,6 @@
     <!-- ══ GALERI ══ -->
     @php
         $galeri = [
-            ['thumb'=>'images/STRUKTUR-KELURAHAN-TERITIH.jpg','full'=>'images/STRUKTUR-KELURAHAN-TERITIH.jpg','name'=>'Struktur Organisasi Lengkap','desc'=>'Susunan pejabat dan staf Kelurahan Teritih beserta jabatannya','icon'=>'bi-diagram-3-fill','color'=>'#1c64f2','bg'=>'#eff6ff'],
             ['thumb'=>'images/STRUKTUR-RT-RW-KEL-TERITIH.jpg','full'=>'images/STRUKTUR-RT-RW-TERITIH.jpg','name'=>'Struktur RT/RW Kelurahan Teritih','desc'=>'Daftar Ketua RT dan RW di seluruh wilayah Kelurahan Teritih','icon'=>'bi-people-fill','color'=>'#a855f7','bg'=>'#fdf4ff'],
         ];
     @endphp
@@ -967,6 +1028,125 @@ window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(renderAllConnectors, 100);
 });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+function onScroll(trigger, fn) {
+    ScrollTrigger.create({trigger:trigger, start:'top 88%', once:true, onEnter:fn});
+}
+
+// Page header — slide dari atas smooth
+gsap.from('.page-header', {opacity:0, y:-40, duration:1.0, ease:'power3.out'});
+gsap.from('.page-header .page-title', {opacity:0, y:-20, duration:1.0, delay:.15, ease:'power3.out'});
+gsap.from('.kelurahan-badge', {opacity:0, x:20, duration:.8, delay:.3, ease:'back.out(1.5)'});
+
+// About hero image
+(function(){
+    const el = document.querySelector('.about-hero-img');
+    if (!el) return;
+    gsap.set(el, {opacity:0, scale:.97});
+    onScroll(el, ()=> gsap.to(el, {opacity:1, scale:1, duration:1.9, ease:'power3.out'}));
+})();
+
+// About body text paragraphs
+(function(){
+    const els = document.querySelectorAll('.about-text p');
+    if (!els.length) return;
+    gsap.set(els, {opacity:0, y:28});
+    onScroll(els[0], ()=> gsap.to(els, {opacity:1, y:0, duration:1.5, stagger:.1, ease:'power3.out'}));
+})();
+
+// Data singkat — counter count-up
+(function(){
+    const items = document.querySelectorAll('.ds-grid > div');
+    if (!items.length) return;
+    gsap.set(items, {opacity:0, y:20});
+    onScroll(items[0], ()=>{
+        gsap.to(items, {opacity:1, y:0, duration:1.4, stagger:.08, ease:'power3.out'});
+
+        // Count-up untuk nilai numerik
+        document.querySelectorAll('.ds-count-val').forEach(el => {
+            const raw = el.dataset.value;           // e.g. "4.520" atau "2.54"
+            const unit = el.querySelector('.ds-unit');
+            const unitHtml = unit ? unit.outerHTML : '';
+
+            // Coba parse sebagai angka (hapus titik ribuan & ganti koma decimal)
+            const cleaned = raw.replace(/\./g, '').replace(',', '.');
+            const num = parseFloat(cleaned);
+            if (isNaN(num)) return;                // Teks seperti "Walantaka" — skip
+
+            const isDecimal = raw.includes(',') || (raw.includes('.') && raw.split('.')[1]?.length <= 2 && parseFloat(raw) < 1000);
+            const decimals = isDecimal ? (raw.split(/[.,]/)[1]?.length || 0) : 0;
+
+            gsap.fromTo({v:0}, {v:0}, {v:num, duration:2.2, ease:'power2.out',
+                onUpdate: function() {
+                    const val = this.targets()[0].v;
+                    const display = decimals > 0
+                        ? val.toFixed(decimals).replace('.', ',')
+                        : Math.round(val).toLocaleString('id-ID');
+                    el.innerHTML = display + unitHtml;
+                }
+            });
+        });
+    });
+})();
+
+// Misi items — slow smooth stagger
+(function(){
+    const items = document.querySelectorAll('.misi-item');
+    if (!items.length) return;
+    gsap.set(items, {opacity:0, y:35});
+    onScroll(items[0], ()=> gsap.to(items, {opacity:1, y:0, duration:1.5, stagger:.18, ease:'power3.out'}));
+})();
+(function(){
+    const items = document.querySelectorAll('.timeline-item');
+    if (!items.length) return;
+    items.forEach(item => {
+        gsap.set(item, {opacity:0, y:35});
+        onScroll(item, ()=> gsap.to(item, {opacity:1, y:0, duration:1.6, ease:'power3.out'}));
+    });
+})();
+
+// Visi card
+(function(){
+    const el = document.querySelector('.visi-full-card');
+    if (!el) return;
+    gsap.set(el, {opacity:0, y:40, scale:.97});
+    onScroll(el, ()=> gsap.to(el, {opacity:1, y:0, scale:1, duration:2.2, ease:'power3.out'}));
+})();
+
+
+
+// Org nodes — opacity only agar posisi SVG connector tidak bergeser
+(function(){
+    const nodes = document.querySelectorAll('.org-node');
+    if (!nodes.length) return;
+    gsap.set(nodes, {opacity:0});
+    onScroll(nodes[0], ()=> gsap.to(nodes, {opacity:1, duration:1.2, stagger:.08, ease:'power2.out',
+        onComplete: renderAllConnectors
+    }));
+})();
+
+// PKK nodes — opacity only
+(function(){
+    const nodes = document.querySelectorAll('.pkk-node, .pkk-pokja-card');
+    if (!nodes.length) return;
+    gsap.set(nodes, {opacity:0});
+    onScroll(nodes[0], ()=> gsap.to(nodes, {opacity:1, duration:1.1, stagger:.07, ease:'power2.out',
+        onComplete: renderAllConnectors
+    }));
+})();
+
+// Galeri items
+(function(){
+    const items = document.querySelectorAll('.galeri-item');
+    if (!items.length) return;
+    gsap.set(items, {opacity:0, y:35});
+    onScroll(items[0], ()=> gsap.to(items, {opacity:1, y:0, duration:1.6, stagger:.12, ease:'power3.out'}));
+})();
 </script>
 </body>
 </html>

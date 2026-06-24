@@ -379,7 +379,8 @@
                     $persyaratan = $d->persyaratan ?? collect();
                     $namaPemohon = $d->nama_pemohon ?? $d->user->nama ?? '-';
                     $nikPemohon  = $d->nik_pemohon  ?? $d->user->nik  ?? '-';
-                    $isWakil     = !empty($d->nama_pemohon) && $d->nama_pemohon !== ($d->user->nama ?? '');
+                    $dtArr       = is_array($d->data_tambahan) ? $d->data_tambahan : (json_decode($d->data_tambahan??'{}', true) ?? []);
+                    $isWakil     = $d->isPerwakilan();
                 @endphp
                 <tr data-status="{{ $rowStatus }}"
                     data-name="{{ strtolower($namaPemohon) }}"
@@ -461,20 +462,20 @@
                             @endif
 
                             @if($rowStatus === 'pending')
-                                <form action="{{ route('permohonan.approve', $d->id_permohonan) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('permohonan.approve', $d->id_permohonan) }}" method="POST" style="display:inline;" id="form-approve-{{ $d->id_permohonan }}">
                                     @csrf @method('PUT')
-                                    <button type="submit" class="btn-act btn-approve"
-                                            onclick="return confirm('Setujui permohonan dari {{ addslashes($namaPemohon) }}?')">
+                                    <button type="button" class="btn-act btn-approve"
+                                            onclick="showConfirm('Setujui permohonan dari <strong>{{ addslashes($namaPemohon) }}</strong>?', () => document.getElementById('form-approve-{{ $d->id_permohonan }}').submit(), {confirmText:'Ya, Setujui', type:'success'})">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <polyline points="20 6 9 17 4 12"/>
                                         </svg>
                                         Setujui
                                     </button>
                                 </form>
-                                <form action="{{ route('permohonan.reject', $d->id_permohonan) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('permohonan.reject', $d->id_permohonan) }}" method="POST" style="display:inline;" id="form-reject-{{ $d->id_permohonan }}">
                                     @csrf @method('PUT')
-                                    <button type="submit" class="btn-act btn-reject"
-                                            onclick="return confirm('Tolak permohonan dari {{ addslashes($namaPemohon) }}?')">
+                                    <button type="button" class="btn-act btn-reject"
+                                            onclick="showConfirm('Tolak permohonan dari <strong>{{ addslashes($namaPemohon) }}</strong>?', () => document.getElementById('form-reject-{{ $d->id_permohonan }}').submit(), {confirmText:'Ya, Tolak', type:'danger'})">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                                         </svg>

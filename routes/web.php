@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\NotifikasiController;
 use App\Http\Controllers\Admin\Auth\AdminLoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\JenisSuratController;
 use App\Http\Controllers\Admin\PermohonanController;
-use App\Http\Controllers\Admin\InformasiKelurahanController;
-use App\Http\Controllers\Admin\KependudukanController;
+use App\Http\Controllers\Admin\BeritaController;
+use App\Http\Controllers\Admin\KelolaAkunController;
 use App\Http\Controllers\User\PermohonanUserController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Admin\StatistikController;
@@ -21,9 +22,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/',                 [PublicController::class, 'home'])        ->name('home');
 Route::get('/profil',           [ProfilController::class, 'index'])       ->name('profil');
 Route::get('/layanan',          fn () => view('layanan'))                 ->name('layanan');
-Route::get('/informasi',        [PublicController::class, 'informasi'])   ->name('informasi');
-Route::get('/informasi/berita', [PublicController::class, 'berita'])      ->name('informasi.berita');
-Route::get('/informasi/berita/{slug}', [PublicController::class, 'detailBerita'])->name('informasi.berita.detail');
+Route::get('/demografi',        [PublicController::class, 'demografi'])   ->name('demografi');
+Route::get('/berita',           [PublicController::class, 'berita'])      ->name('berita');
+Route::get('/berita/{slug}',    [PublicController::class, 'detailBerita'])->name('berita.detail');
+
+// Backward compat — redirect URL lama
+Route::redirect('/informasi',         '/demografi', 301);
+Route::redirect('/informasi/berita',  '/berita',    301);
 
 // Chatbot AI
 Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
@@ -52,6 +57,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/dashboard',                    [DashboardController::class, 'index'])           ->name('admin.dashboard');
         Route::get('/dashboard/permohonan-bulan',   [DashboardController::class, 'permohonanBulan']) ->name('admin.dashboard.permohonan-bulan');
         Route::post('/logout',                      [AdminLoginController::class, 'logout'])          ->name('admin.logout');
+        Route::get('/ganti-password',               [AdminLoginController::class, 'showChangePassword'])->name('admin.password.form');
+        Route::post('/ganti-password',              [AdminLoginController::class, 'changePassword'])   ->name('admin.password.update');
 
         Route::resource('jenis-surat', JenisSuratController::class);
 
@@ -60,18 +67,26 @@ Route::prefix('admin')->group(function () {
         Route::get( 'permohonan/{id}',            [PermohonanController::class, 'show'])            ->name('permohonan.show');
         Route::put( 'permohonan/{id}/approve',    [PermohonanController::class, 'approve'])         ->name('permohonan.approve');
         Route::put( 'permohonan/{id}/reject',     [PermohonanController::class, 'reject'])          ->name('permohonan.reject');
+        Route::put( 'permohonan/{id}/update-data',[PermohonanController::class, 'updateData'])      ->name('permohonan.updateData');
         Route::put( 'permohonan/{id}/keterangan', [PermohonanController::class, 'updateKeterangan'])->name('permohonan.keterangan');
         Route::get( 'permohonan/{id}/print',      [PermohonanController::class, 'print'])           ->name('permohonan.print');
 
-        Route::resource('informasi-admin', InformasiKelurahanController::class);
+        Route::resource('berita-admin', BeritaController::class)->except(['show']);
 
-        // Kependudukan
-        Route::get(   'kependudukan',               [KependudukanController::class, 'index'])        ->name('kependudukan.index');
-        Route::post(  'kependudukan',               [KependudukanController::class, 'store'])        ->name('kependudukan.store');
-        Route::get(   'kependudukan-export',        [KependudukanController::class, 'export'])       ->name('kependudukan.export');
-        Route::get(   'kependudukan/{id}',          [KependudukanController::class, 'show'])         ->name('kependudukan.show');
-        Route::patch( 'kependudukan/{id}/toggle',   [KependudukanController::class, 'toggleStatus']) ->name('kependudukan.toggle');
-        Route::delete('kependudukan/{id}',          [KependudukanController::class, 'destroy'])      ->name('kependudukan.destroy');
+        // Kelola Akun Masyarakat
+        Route::get(   'kelola-akun',               [KelolaAkunController::class, 'index'])        ->name('kelola-akun.index');
+        Route::post(  'kelola-akun',               [KelolaAkunController::class, 'store'])        ->name('kelola-akun.store');
+        Route::get(   'kelola-akun-export',        [KelolaAkunController::class, 'export'])       ->name('kelola-akun.export');
+        Route::get(   'kelola-akun/{id}',          [KelolaAkunController::class, 'show'])         ->name('kelola-akun.show');
+        Route::patch( 'kelola-akun/{id}/toggle',   [KelolaAkunController::class, 'toggleStatus']) ->name('kelola-akun.toggle');
+        Route::delete('kelola-akun/{id}',          [KelolaAkunController::class, 'destroy'])      ->name('kelola-akun.destroy');
+
+        // Master Data
+        Route::get('master-data', fn() => view('Admin.master-data.index'))->name('admin.master-data');
+
+        // Pengaturan
+        Route::get( 'pengaturan', [PengaturanController::class, 'edit'])  ->name('admin.pengaturan.edit');
+        Route::put( 'pengaturan', [PengaturanController::class, 'update'])->name('admin.pengaturan.update');
     });
 });
 
@@ -87,7 +102,6 @@ Route::middleware('auth')->group(function () {
         Route::post('permohonan/form/{slug}', [PermohonanUserController::class, 'storeSurat']) ->name('permohonan.store.surat');
 
         Route::get(   'permohonan',        [PermohonanUserController::class, 'index'])   ->name('permohonan.index');
-        Route::get(   'permohonan/create', [PermohonanUserController::class, 'create'])  ->name('permohonan.create');
         Route::get(   'permohonan/{id}',   [PermohonanUserController::class, 'show'])    ->name('permohonan.show');
         Route::delete('permohonan/{id}',   [PermohonanUserController::class, 'destroy']) ->name('permohonan.destroy');
     });
