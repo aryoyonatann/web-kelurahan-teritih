@@ -34,7 +34,7 @@ class StatistikController extends Controller
             $dataSingkat[$key] = Pengaturan::getValue($key, $default);
         }
 
-        return view('admin.statistik.edit', compact('statistik', 'dataSingkat'));
+        return view('Admin.statistik.edit', compact('statistik', 'dataSingkat'));
     }
 
     public function update(Request $request)

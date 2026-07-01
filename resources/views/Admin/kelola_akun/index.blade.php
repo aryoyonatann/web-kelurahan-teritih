@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Kelola Akun Masyarakat')
 
@@ -185,7 +185,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 @endpush
 
 @section('content')
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 {{-- ── HERO ── --}}
 <div class="kp-hero">
@@ -603,7 +603,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
     </div>
 </div>
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 @endsection
 
 @push('scripts')

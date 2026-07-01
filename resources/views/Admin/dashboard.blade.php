@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Dashboard')
 
@@ -72,7 +72,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 @media(min-width:576px){ .quick-desc{ display:block; } }
 
 /* DASH CARD */
-.dash-card { background:white; border-radius:12px; border:1px solid var(--border); overflow:hidden; }
+.dash-card { background:white; border-radius:12px; border:1px solid var(--border); overflow:hidden; display:flex; flex-direction:column; }
 .dash-card-header {
     display:flex; align-items:center; justify-content:space-between;
     padding:12px 16px; border-bottom:1px solid var(--border); gap:8px;
@@ -80,7 +80,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 @media(min-width:576px){ .dash-card-header{ padding:14px 18px; } }
 .dash-card-title { font-size:13px; font-weight:700; color:var(--navy); display:flex; align-items:center; gap:7px; }
 .dash-card-title i { color:var(--blue); font-size:15px; }
-.dash-card-body { padding:4px 16px 6px; }
+.dash-card-body { padding:4px 16px 6px; flex:1 1 auto; }
 @media(min-width:576px){ .dash-card-body{ padding:6px 18px; } }
 
 .btn-card-add {
@@ -99,22 +99,22 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .btn-card-link:hover { background:#dbeafe; }
 
 /* BERITA */
-.berita-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+.berita-item { display:flex; align-items:center; gap:14px; padding:16px 0; border-bottom:1px solid var(--border); }
 .berita-item:last-child { border-bottom:none; }
 .berita-thumb {
-    width:48px; height:38px; border-radius:7px;
+    width:60px; height:48px; border-radius:9px;
     background:var(--bg); flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    color:var(--muted); font-size:20px; overflow:hidden;
+    color:var(--muted); font-size:22px; overflow:hidden;
 }
-@media(min-width:576px){ .berita-thumb{ width:56px; height:44px; } }
+@media(min-width:576px){ .berita-thumb{ width:76px; height:60px; } }
 .berita-thumb img { width:100%; height:100%; object-fit:cover; }
-.berita-title { font-size:12px; font-weight:600; color:var(--navy); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
-@media(min-width:576px){ .berita-title{ font-size:13px; max-width:none; } }
-.berita-meta { font-size:11px; color:var(--muted); margin-top:3px; }
+.berita-title { font-size:13px; font-weight:600; color:var(--navy); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
+@media(min-width:576px){ .berita-title{ font-size:15px; max-width:none; } }
+.berita-meta { font-size:12px; color:var(--muted); margin-top:5px; }
 
 .action-icon-btn {
-    width:28px; height:28px; border-radius:6px;
+    width:32px; height:32px; border-radius:7px;
     border:1px solid var(--border); background:white;
     cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
     font-size:13px; color:var(--muted); text-decoration:none; transition:all .18s;
@@ -127,6 +127,8 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     border-top:1px solid var(--border); text-decoration:none; transition:background .18s;
 }
 .card-more-link:hover { background:var(--blue-lt); }
+
+#dash-notif-list { max-height:340px; overflow-y:auto; }
 
 /* BADGES */
 .bdg { display:inline-flex; align-items:center; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; }
@@ -161,6 +163,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .user-nik { font-size:11px; color:var(--muted); }
 
 /* JAM OPERASIONAL */
+.jam-body { padding:6px 16px 14px; flex:1 1 auto; display:flex; flex-direction:column; }
 .jam-row {
     display:flex; justify-content:space-between; align-items:center;
     padding:9px 0; border-bottom:1px dashed var(--border); font-size:13px;
@@ -169,6 +172,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .jam-day  { font-weight:600; color:var(--navy); }
 .jam-time { color:var(--slate); font-size:12px; }
 .bdg-closed { display:inline-flex; padding:2px 9px; border-radius:20px; font-size:10px; font-weight:600; background:#fef2f2; color:var(--red); }
+#status-kantor { margin-top:auto; }
 
 /* HERO BANNER */
 .dash-hero {
@@ -266,7 +270,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
 @section('content')
 
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 <div class="page-wrapper">
 
@@ -442,11 +446,11 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             </div>
 
             {{-- Jam Operasional --}}
-            <div class="dash-card">
+            <div class="dash-card flex-grow-1">
                 <div class="dash-card-header">
                     <div class="dash-card-title"><i class="bi bi-clock-fill"></i> Jam Operasional</div>
                 </div>
-                <div style="padding:6px 16px 14px">
+                <div class="jam-body">
                     <div class="jam-row" id="row-senin-kamis">
                         <span class="jam-day">Senin – Kamis</span>
                         <span class="jam-time">08.00 – 15.00</span>
@@ -460,7 +464,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                         <span class="bdg-closed">Tutup</span>
                     </div>
                     <div id="status-kantor"
-                         style="margin-top:12px;border-radius:8px;padding:9px 12px;font-size:12px;display:flex;align-items:center;gap:6px;"></div>
+                         style="border-radius:8px;padding:9px 12px;font-size:12px;display:flex;align-items:center;gap:6px;"></div>
                 </div>
             </div>
 
@@ -585,7 +589,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     </div>
 </div>
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 
 @endsection
 

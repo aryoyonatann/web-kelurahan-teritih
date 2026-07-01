@@ -52,6 +52,11 @@
         flex-shrink: 0;
     }
 
+    /* Spacer kiri dan kanan agar links selalu di tengah */
+    .login-nav-spacer {
+        flex: 1;
+    }
+
     .login-nav-brand {
         display: flex; align-items: center; gap: 10px;
         text-decoration: none;
@@ -76,6 +81,9 @@
     .login-nav-links {
         display: flex; align-items: center; gap: 4px;
         list-style: none; margin: 0; padding: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
     }
     .login-nav-links a {
         display: block; padding: 7px 16px; border-radius: 8px;
@@ -341,6 +349,8 @@
         </div>
     </a>
 
+    <div class="login-nav-spacer"></div>
+
     <ul class="login-nav-links">
         <li><a href="{{ route('home') }}">Beranda</a></li>
         <li><a href="{{ route('profil') }}">Profil</a></li>
@@ -348,11 +358,8 @@
         <li><a href="{{ route('demografi') }}">Informasi</a></li>
     </ul>
 
-    <div class="login-nav-cta">
-        <a href="{{ route('register') }}" class="btn-daftar">
-            <i class="bi bi-person-plus-fill"></i> Daftar
-        </a>
-    </div>
+    <div class="login-nav-spacer"></div>
+
 </nav>
 
 <div class="page-body">
@@ -441,15 +448,6 @@
             <div class="divider-row mt-3">
                 Belum memiliki akun? <a href="{{ route('register') }}">Daftar Akun Baru</a>
             </div>
-
-            <a href="{{ route('admin.login') }}" class="admin-box mt-1">
-                <div class="admin-box-icon"><i class="bi bi-shield-lock"></i></div>
-                <div>
-                    <div class="admin-box-title">Login Admin</div>
-                    <div class="admin-box-sub">Halaman khusus petugas</div>
-                </div>
-                <i class="bi bi-arrow-right admin-box-arr"></i>
-            </a>
 
             <div class="secure-note">
                 <i class="bi bi-lock-fill" style="color:#10b981;font-size:12px"></i>

@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 @section('title', 'Tambah Jenis Surat')
 
 @push('styles')

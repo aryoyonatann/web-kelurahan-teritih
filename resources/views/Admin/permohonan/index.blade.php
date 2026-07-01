@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Data Permohonan')
 
@@ -149,7 +149,7 @@
         background: var(--white);
         border: 1px solid var(--gray-200);
         border-radius: var(--radius-lg);
-        overflow: hidden;
+        overflow: visible;
         box-shadow: var(--shadow-sm);
     }
     table { width: 100%; border-collapse: collapse; }
@@ -262,7 +262,7 @@
 
 @section('content')
 
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 <div class="perm-page">
 
@@ -360,7 +360,8 @@
 
     <!-- TABLE -->
     <div class="table-card">
-        <table id="permohonanTable">
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+            <table id="permohonanTable">
             <thead>
                 <tr>
                     <th style="width:48px">No</th>
@@ -503,6 +504,7 @@
                 @endforelse
             </tbody>
         </table>
+            </div>
     </div>
 
 </div><!-- /perm-page -->
@@ -606,6 +608,6 @@ document.getElementById('modalDokumen').addEventListener('click', function(e) {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDokModal(); });
 </script>
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 
 @endsection

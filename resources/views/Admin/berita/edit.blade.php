@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Edit Berita')
 
@@ -104,7 +104,7 @@
 
 @section('content')
 
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 <div class="form-page">
 
@@ -234,7 +234,7 @@
     </div>
 </div>
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 
 @endsection
 

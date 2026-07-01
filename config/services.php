@@ -30,8 +30,19 @@ return [
     |--------------------------------------------------------------------------
     */
     'gemini' => [
-        'api_key' => env('GEMINI_API_KEY'),
-        'model'   => env('GEMINI_MODEL', 'gemini-2.5-flash-lite'),
+        'api_key'   => env('GEMINI_API_KEY'),
+        'model'     => env('GEMINI_MODEL', 'gemini-2.5-flash-lite'),
+        'ca_bundle' => env('GEMINI_CA_BUNDLE', ''),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Groq AI - Fallback Chatbot
+    |--------------------------------------------------------------------------
+    */
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'model'   => env('GROQ_MODEL', 'llama-3.1-8b-instant'),
     ],
 
 ];

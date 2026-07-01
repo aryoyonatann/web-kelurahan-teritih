@@ -571,6 +571,10 @@
         msgs.scrollTop = msgs.scrollHeight;
 
         try {
+            // Timeout 35 detik (lebih dari timeout backend 30 detik × 3 retry)
+            var controller = new AbortController();
+            var timeoutId = setTimeout(function () { controller.abort(); }, 35000);
+
             var response = await fetch('{{ route("chatbot.ask") }}', {
                 method: 'POST',
                 headers: {
@@ -580,7 +584,10 @@
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify({ message: message }),
+                signal: controller.signal,
             });
+
+            clearTimeout(timeoutId);
 
             var typingEl = document.getElementById('chat-typing-indicator');
             if (typingEl) typingEl.remove();
@@ -615,7 +622,12 @@
 
             var bubbleErr = document.createElement('div');
             bubbleErr.className = 'chat-bubble-bot';
-            bubbleErr.innerHTML = '⚠️ Gagal terhubung. Periksa koneksi internet Anda atau hubungi kantor via WhatsApp.';
+            // Bedakan timeout vs error koneksi lain
+            if (err.name === 'AbortError') {
+                bubbleErr.innerHTML = '⏳ Asisten butuh waktu terlalu lama untuk merespons. Silakan coba lagi beberapa saat.';
+            } else {
+                bubbleErr.innerHTML = '⚠️ Gagal terhubung. Periksa koneksi internet Anda atau hubungi kantor via WhatsApp.';
+            }
             msgs.appendChild(bubbleErr);
         } finally {
             sendBtn.disabled = false;

@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Detail Permohonan')
 
@@ -174,7 +174,7 @@
 @endpush
 
 @section('content')
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 @php
     $status = optional($data->approval)->status ?? 'pending';
@@ -535,5 +535,5 @@
 
 {{-- ── MODAL EDIT DATA ── --}}
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 @endsection

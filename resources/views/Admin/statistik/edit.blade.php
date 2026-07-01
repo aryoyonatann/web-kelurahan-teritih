@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Edit Statistik Demografi')
 
@@ -82,7 +82,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 @endpush
 
 @section('content')
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 <div>
     <div class="back-bar">
@@ -583,7 +583,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
     </div>
 </div>
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 @endsection
 
 @push('scripts')

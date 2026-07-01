@@ -38,20 +38,39 @@ class ChatbotController extends Controller
         $apiKey = config('services.gemini.api_key');
         $model  = config('services.gemini.model');
 
+        $groqApiKey = config('services.groq.api_key');
+        $groqModel  = config('services.groq.model');
+
+        $systemPrompt = $this->buildSystemPrompt();
+
+        // Kalau Gemini tidak dikonfigurasi sama sekali, langsung pakai Groq
         if (empty($apiKey)) {
-            Log::error('Gemini API key belum dikonfigurasi di .env');
-            return response()->json([
-                'success' => false,
-                'reply'   => 'Maaf, layanan chatbot sedang tidak tersedia. Silakan hubungi kantor kelurahan di (0254) 123456.',
-            ], 500);
+            if (empty($groqApiKey)) {
+                Log::error('Baik Gemini maupun Groq API key belum dikonfigurasi di .env');
+                return response()->json([
+                    'success' => false,
+                    'reply'   => 'Maaf, layanan chatbot sedang tidak tersedia. Silakan hubungi kantor kelurahan di (0254) 123456.',
+                ], 500);
+            }
+
+            try {
+                $reply = $this->callGroq($groqApiKey, $groqModel, $systemPrompt, $validated['message']);
+                return response()->json(['success' => true, 'reply' => $reply]);
+            } catch (\Throwable $e) {
+                Log::error('Groq API error (primary): ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'reply'   => 'Maaf, asisten sedang sibuk. Silakan coba beberapa saat lagi atau pilih FAQ di atas.',
+                ], 500);
+            }
         }
 
-    
+        // Coba Gemini dulu, kalau gagal fallback ke Groq
         try {
             $reply = $this->callGemini(
                 apiKey: $apiKey,
                 model: $model,
-                systemPrompt: $this->buildSystemPrompt(),
+                systemPrompt: $systemPrompt,
                 userMessage: $validated['message'],
             );
 
@@ -60,9 +79,26 @@ class ChatbotController extends Controller
                 'reply'   => $reply,
             ]);
         } catch (\Throwable $e) {
-            Log::error('Gemini API error: ' . $e->getMessage(), [
+            Log::warning('Gemini gagal, mencoba fallback ke Groq. Error: ' . $e->getMessage(), [
                 'message' => $validated['message'],
             ]);
+
+            // Fallback ke Groq jika tersedia
+            if (!empty($groqApiKey)) {
+                try {
+                    $reply = $this->callGroq($groqApiKey, $groqModel, $systemPrompt, $validated['message']);
+                    return response()->json([
+                        'success' => true,
+                        'reply'   => $reply,
+                    ]);
+                } catch (\Throwable $groqError) {
+                    Log::error('Groq fallback juga gagal: ' . $groqError->getMessage(), [
+                        'message' => $validated['message'],
+                    ]);
+                }
+            }
+
+            // Kedua provider gagal
             return response()->json([
                 'success' => false,
                 'reply'   => 'Maaf, asisten sedang sibuk. Silakan coba beberapa saat lagi atau pilih FAQ di atas.',
@@ -74,58 +110,159 @@ class ChatbotController extends Controller
     {
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
 
-        $response = Http::timeout(30)
-            ->withHeaders([
-                'Content-Type'   => 'application/json',
-                'x-goog-api-key' => $apiKey,
-            ])
-            ->post($url, [
-                // System instruction = "otak" chatbot, kasih konteks ke AI
-                'system_instruction' => [
+        $payload = [
+            // System instruction = "otak" chatbot, kasih konteks ke AI
+            'system_instruction' => [
+                'parts' => [
+                    ['text' => $systemPrompt],
+                ],
+            ],
+            // Pesan dari user
+            'contents' => [
+                [
+                    'role'  => 'user',
                     'parts' => [
-                        ['text' => $systemPrompt],
+                        ['text' => $userMessage],
                     ],
                 ],
-                // Pesan dari user
-                'contents' => [
+            ],
+            // Konfigurasi generasi — kontrol gaya jawaban
+            'generationConfig' => [
+                'temperature'     => 0.4,
+                'maxOutputTokens' => 500,
+                'topP'            => 0.9,
+            ],
+            // Safety settings — blokir konten berbahaya
+            'safetySettings' => [
+                ['category' => 'HARM_CATEGORY_HARASSMENT',        'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
+                ['category' => 'HARM_CATEGORY_HATE_SPEECH',       'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
+                ['category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
+                ['category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
+            ],
+        ];
+
+        // Retry otomatis: coba sampai 3 kali untuk error sementara (503, timeout, koneksi putus)
+        $maxAttempts = 3;
+        $lastException = null;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                $response = Http::timeout(30)
+                    ->withOptions([
+                        // Pastikan SSL verify aktif di production, nonaktifkan hanya jika hosting bermasalah
+                        'verify' => $this->getSslVerify(),
+                    ])
+                    ->withHeaders([
+                        'Content-Type'   => 'application/json',
+                        'x-goog-api-key' => $apiKey,
+                    ])
+                    ->post($url, $payload);
+
+                // Jika 503 atau 429 (overload/rate limit), tunggu lalu retry
+                if (in_array($response->status(), [429, 503]) && $attempt < $maxAttempts) {
+                    $waitSeconds = $attempt * 2; // 2 detik, lalu 4 detik
+                    Log::warning("Gemini API returned {$response->status()}, retrying in {$waitSeconds}s (attempt {$attempt}/{$maxAttempts})");
+                    sleep($waitSeconds);
+                    continue;
+                }
+
+                if (!$response->successful()) {
+                    throw new \Exception('Gemini API HTTP ' . $response->status() . ': ' . $response->body());
+                }
+
+                $data = $response->json();
+
+                // Ambil teks jawaban dari response
+                $reply = data_get($data, 'candidates.0.content.parts.0.text');
+
+                if (empty($reply)) {
+                    // Bisa jadi diblokir safety filter
+                    $blockReason = data_get($data, 'promptFeedback.blockReason');
+                    if ($blockReason) {
+                        return 'Maaf, pertanyaan tersebut tidak dapat saya jawab. Silakan ajukan pertanyaan lain seputar layanan kelurahan. 🙏';
+                    }
+
+                    // Periksa finish reason (bisa SAFETY, RECITATION, dll)
+                    $finishReason = data_get($data, 'candidates.0.finishReason');
+                    if ($finishReason && $finishReason !== 'STOP') {
+                        Log::warning("Gemini non-STOP finish reason: {$finishReason}", ['data' => $data]);
+                        return 'Maaf, pertanyaan tersebut tidak dapat saya jawab. Silakan ajukan pertanyaan lain seputar layanan kelurahan. 🙏';
+                    }
+
+                    throw new \Exception('Empty response from Gemini (finishReason: ' . ($finishReason ?? 'unknown') . ')');
+                }
+
+                return trim($reply);
+
+            } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                // Error koneksi (timeout, SSL, DNS) — retry
+                $lastException = $e;
+                if ($attempt < $maxAttempts) {
+                    $waitSeconds = $attempt * 2;
+                    Log::warning("Gemini connection error (attempt {$attempt}/{$maxAttempts}): {$e->getMessage()}, retrying in {$waitSeconds}s");
+                    sleep($waitSeconds);
+                    continue;
+                }
+            }
+        }
+
+        // Semua retry gagal
+        throw $lastException ?? new \Exception('Gemini API failed after all retries');
+    }
+
+    /**
+     * Tentukan apakah SSL verify diaktifkan.
+     * Di production (hosted), selalu true.
+     * Di development dengan masalah SSL, bisa dimatikan via env.
+     */
+    private function getSslVerify(): bool|string
+    {
+        // Jika ada CA bundle yang ditentukan, gunakan itu
+        $caBundle = config('services.gemini.ca_bundle');
+        if (!empty($caBundle) && file_exists($caBundle)) {
+            return $caBundle;
+        }
+
+        // Default: aktifkan SSL verify (aman untuk production)
+        // Set GEMINI_SSL_VERIFY=false di .env HANYA jika hosting bermasalah dengan SSL
+        return env('GEMINI_SSL_VERIFY', true);
+    }
+
+    /**
+     * Fallback: panggil Groq API (Llama) jika Gemini gagal.
+     * Groq gratis ~14.400 req/hari dan sangat stabil.
+     */
+    private function callGroq(string $apiKey, string $model, string $systemPrompt, string $userMessage): string
+    {
+        $response = Http::timeout(20)
+            ->withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type'  => 'application/json',
+            ])
+            ->post('https://api.groq.com/openai/v1/chat/completions', [
+                'model'       => $model,
+                'temperature' => 0.4,
+                'max_tokens'  => 500,
+                'messages'    => [
                     [
-                        'role'  => 'user',
-                        'parts' => [
-                            ['text' => $userMessage],
-                        ],
+                        'role'    => 'system',
+                        'content' => $systemPrompt,
                     ],
-                ],
-                // Konfigurasi generasi — kontrol gaya jawaban
-                'generationConfig' => [
-                    'temperature'     => 0.4,   
-                    'maxOutputTokens' => 500,   
-                    'topP'            => 0.9,
-                ],
-                // Safety settings — blokir konten berbahaya
-                'safetySettings' => [
-                    ['category' => 'HARM_CATEGORY_HARASSMENT',        'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
-                    ['category' => 'HARM_CATEGORY_HATE_SPEECH',       'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
-                    ['category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
-                    ['category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
+                    [
+                        'role'    => 'user',
+                        'content' => $userMessage,
+                    ],
                 ],
             ]);
 
         if (!$response->successful()) {
-            throw new \Exception('Gemini API HTTP ' . $response->status() . ': ' . $response->body());
+            throw new \Exception('Groq API HTTP ' . $response->status() . ': ' . $response->body());
         }
 
-        $data = $response->json();
-
-        // Ambil teks jawaban dari response
-        $reply = data_get($data, 'candidates.0.content.parts.0.text');
+        $reply = data_get($response->json(), 'choices.0.message.content');
 
         if (empty($reply)) {
-            // Bisa jadi diblokir safety filter
-            $blockReason = data_get($data, 'promptFeedback.blockReason');
-            if ($blockReason) {
-                return 'Maaf, pertanyaan tersebut tidak dapat saya jawab. Silakan ajukan pertanyaan lain seputar layanan kelurahan. 🙏';
-            }
-            throw new \Exception('Empty response from Gemini');
+            throw new \Exception('Empty response from Groq');
         }
 
         return trim($reply);

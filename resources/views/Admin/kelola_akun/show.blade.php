@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Detail Warga')
 
@@ -87,7 +87,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 @endpush
 
 @section('content')
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 <div class="page-wrapper">
 
@@ -258,7 +258,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     </div>
 </div>
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 @endsection
 
 @push('scripts')

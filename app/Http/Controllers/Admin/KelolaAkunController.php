@@ -51,7 +51,7 @@ class KelolaAkunController extends Controller
         $rtList = User::whereNotNull('rt')->distinct()->orderBy('rt')->pluck('rt');
         $rwList = User::whereNotNull('rw')->distinct()->orderBy('rw')->pluck('rw');
 
-        return view('admin.kelola_akun.index', compact(
+        return view('Admin.kelola_akun.index', compact(
             'users', 'totalUser', 'nonAktif', 'rtList', 'rwList'
         ));
     }
@@ -59,7 +59,7 @@ class KelolaAkunController extends Controller
     public function show($id)
     {
         $user = User::withCount('permohonan')->findOrFail($id);
-        return view('admin.kelola_akun.show', compact('user'));
+        return view('Admin.kelola_akun.show', compact('user'));
     }
 
     public function store(Request $request)

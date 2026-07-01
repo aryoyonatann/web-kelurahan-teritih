@@ -15,10 +15,12 @@ class Admin extends Authenticatable
         'nama_admin',
         'username',
         'password',
+        'remember_token',
     ];
 
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
     // relasi approval
@@ -31,4 +33,4 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(Berita::class, 'id_admin');
     }
-}   
+}

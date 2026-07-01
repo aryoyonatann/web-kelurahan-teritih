@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Manajemen Berita')
 
@@ -53,7 +53,7 @@
     @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
 
     /* ── TABLE CARD ── */
-    .table-card { background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    .table-card { background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: visible; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
     .table-card-header {
         display: flex; align-items: center; justify-content: space-between;
         padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;
@@ -126,7 +126,7 @@
 
 @section('content')
 
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 <div class="inf-page">
 
@@ -186,6 +186,7 @@
                 </a>
             </div>
             @else
+            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
             <table class="inf-tbl">
                 <thead>
                     <tr>
@@ -245,6 +246,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
             @endif
         </div>
 
@@ -270,7 +272,7 @@
     </div>
 </div>
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 
 @endsection
 

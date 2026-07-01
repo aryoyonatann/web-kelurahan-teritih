@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('Admin.layouts.app')
 
 @section('title', 'Data Jenis Surat')
 
@@ -67,7 +67,7 @@
     .table-card {
         background: white; border-radius: 14px;
         border: 1px solid #e2e8f0;
-        overflow: hidden;
+        overflow: visible;
         box-shadow: 0 1px 3px rgba(0,0,0,.06);
     }
     .table-card-header {
@@ -187,7 +187,7 @@
 
 @section('content')
 
-@include('admin.partials.header')
+@include('Admin.partials.header')
 
 <div class="js-page">
 
@@ -249,6 +249,7 @@
                 </a>
             </div>
             @else
+            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
             <table class="js-tbl">
                 <thead>
                     <tr>
@@ -285,6 +286,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
             @endif
         </div>
 
@@ -310,7 +312,7 @@
     </div>
 </div>
 
-@include('admin.partials.footer')
+@include('Admin.partials.footer')
 
 @endsection
 

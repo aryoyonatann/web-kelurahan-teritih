@@ -41,6 +41,8 @@
         position: sticky; top: 0; z-index: 1000;
         box-shadow: 0 2px 12px rgba(0,0,0,.25); flex-shrink: 0;
     }
+    /* Spacer kiri dan kanan agar links selalu di tengah */
+    .reg-nav-spacer { flex: 1; }
     .reg-nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 
     .nav-brand-icon {
@@ -58,7 +60,7 @@
     .reg-nav-text { display: flex; flex-direction: column; line-height: 1.15; }
     .reg-nav-sub  { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: rgba(255,255,255,.6); text-transform: uppercase; }
     .reg-nav-name { font-size: 18px; font-weight: 800; color: #ffffff; }
-    .reg-nav-links { display: flex; align-items: center; gap: 4px; list-style: none; margin: 0; padding: 0; }
+    .reg-nav-links { display: flex; align-items: center; gap: 4px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); }
     .reg-nav-links a { display: block; padding: 7px 16px; border-radius: 8px; font-size: 15px; font-weight: 500; color: rgba(255,255,255,.85); text-decoration: none; transition: all .18s; }
     .reg-nav-links a:hover { background: rgba(255,255,255,.12); color: #ffffff; }
     .reg-nav-cta { display: flex; align-items: center; gap: 10px; }
@@ -261,17 +263,17 @@
             <span class="reg-nav-name">Kelurahan Teritih</span>
         </div>
     </a>
+    <div class="reg-nav-spacer"></div>
+
     <ul class="reg-nav-links">
         <li><a href="{{ route('home') }}">Beranda</a></li>
         <li><a href="{{ route('profil') }}">Profil</a></li>
         <li><a href="{{ route('layanan') }}">Layanan</a></li>
         <li><a href="{{ route('demografi') }}">Informasi</a></li>
     </ul>
-    <div class="reg-nav-cta">
-        <a href="{{ route('login') }}" class="btn-masuk">
-            <i class="bi bi-box-arrow-in-right"></i> Masuk
-        </a>
-    </div>
+
+    <div class="reg-nav-spacer"></div>
+
 </nav>
 
 <div class="page-body">

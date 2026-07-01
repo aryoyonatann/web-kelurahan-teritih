@@ -296,9 +296,6 @@
             <span class="admin-nav-name">Kelurahan Teritih</span>
         </div>
     </a>
-    <a href="{{ route('home') }}" class="btn-back-home">
-        <i class="bi bi-arrow-left"></i> Kembali ke Beranda
-    </a>
 </nav>
 
 <div class="page-body">

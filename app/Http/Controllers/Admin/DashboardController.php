@@ -21,14 +21,14 @@ class DashboardController extends Controller
         $suratKeluar      = Approval::whereRaw('LOWER(status) = ?', ['disetujui'])->count();
         $suratHariIni     = PermohonanSurat::whereDate('tanggal_pengajuan', today())->count();
 
-        $beritaTerbaru = Berita::orderBy('tanggal_publish', 'desc')->take(5)->get();
+        $beritaTerbaru = Berita::orderBy('tanggal_publish', 'desc')->take(6)->get();
 
         $permohonanTerbaru = PermohonanSurat::with(['user', 'jenisSurat', 'approval'])
             ->latest('tanggal_pengajuan')
-            ->take(5)
+            ->take(6)
             ->get();
 
-        return view('admin.dashboard', compact(
+        return view('Admin.dashboard', compact(
             'totalWarga',
             'perluVerifikasi',
             'suratKeluar',

@@ -31,12 +31,12 @@ class JenisSuratController extends Controller
     public function index()
     {
         $data = JenisSurat::orderBy('id_jenis_surat')->get();
-        return view('admin.jenis_surat.index', compact('data'));
+        return view('Admin.jenis_surat.index', compact('data'));
     }
 
     public function create()
     {
-        return view('admin.jenis_surat.create', [
+        return view('Admin.jenis_surat.create', [
             'standardFields' => self::$standardFields,
         ]);
     }
@@ -77,7 +77,7 @@ class JenisSuratController extends Controller
     public function edit($id)
     {
         $data = JenisSurat::findOrFail($id);
-        return view('admin.jenis_surat.edit', [
+        return view('Admin.jenis_surat.edit', [
             'data' => $data,
             'standardFields' => self::$standardFields,
         ]);

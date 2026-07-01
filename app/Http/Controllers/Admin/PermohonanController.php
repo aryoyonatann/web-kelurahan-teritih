@@ -15,7 +15,7 @@ class PermohonanController extends Controller
             ->latest('tanggal_pengajuan')
             ->get();
 
-        return view('admin.permohonan.index', compact('data'));
+        return view('Admin.permohonan.index', compact('data'));
     }
 
     public function show($id)
@@ -23,7 +23,7 @@ class PermohonanController extends Controller
         $data = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])
             ->findOrFail($id);
 
-        return view('admin.permohonan.show', compact('data'));
+        return view('Admin.permohonan.show', compact('data'));
     }
 
     public function approve($id)
@@ -67,7 +67,7 @@ class PermohonanController extends Controller
 
         $bulanRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now()->month - 1];
 
-        return view('admin.permohonan.print', compact('permohonan', 'nomorUrut', 'bulanRomawi'));
+        return view('Admin.permohonan.print', compact('permohonan', 'nomorUrut', 'bulanRomawi'));
     }
 
     public function updateData(Request $request, $id)
