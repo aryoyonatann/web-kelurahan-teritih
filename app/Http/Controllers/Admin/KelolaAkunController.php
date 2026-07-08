@@ -67,9 +67,8 @@ class KelolaAkunController extends Controller
         $request->validate([
             'nama'          => 'required|string|max:100',
             'nik'           => 'required|string|max:20|unique:users,nik',
-            'email'         => 'required|email|unique:users,email',
+            'email'         => 'nullable|email|unique:users,email',
             'no_hp'         => 'required|string|max:15',
-            'username'      => 'required|string|max:50|unique:users,username',
             'password'      => 'required|string|min:6',
             'alamat'        => 'nullable|string',
             'rt'            => 'nullable|string|max:10',
@@ -79,16 +78,16 @@ class KelolaAkunController extends Controller
         ], [
             'nik.unique'      => 'NIK sudah terdaftar.',
             'email.unique'    => 'Email sudah digunakan.',
-            'username.unique' => 'Username sudah dipakai.',
             'password.min'    => 'Password minimal 6 karakter.',
         ]);
 
         User::create([
             'nama'          => $request->nama,
             'nik'           => $request->nik,
-            'email'         => $request->email,
+            // Disimpan sebagai NULL (bukan string kosong) bila dikosongkan,
+            // supaya beberapa akun tanpa email tidak bentrok dengan aturan unique.
+            'email'         => $request->email ?: null,
             'no_hp'         => $request->no_hp,
-            'username'      => $request->username,
             'password'      => Hash::make($request->password),
             'alamat'        => $request->alamat,
             'rt'            => $request->rt,
@@ -102,6 +101,24 @@ class KelolaAkunController extends Controller
 
         return redirect()->route('kelola-akun.index')
             ->with('success', 'Akun masyarakat berhasil ditambahkan.');
+    }
+
+    public function resetPassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ], [
+            'password.required'  => 'Password baru wajib diisi.',
+            'password.min'       => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return back()->with('success', "Password akun {$user->nama} berhasil diubah.");
     }
 
     public function toggleStatus($id)

@@ -317,11 +317,11 @@
                 <div class="jam-body">
                     <div class="jam-row">
                         <span class="jam-day">Senin – Kamis</span>
-                        <span class="jam-time">08:00 – 16:00</span>
+                        <span class="jam-time">07:30 – 16:00</span>
                     </div>
                     <div class="jam-row">
                         <span class="jam-day">Jumat</span>
-                        <span class="jam-time">08:00 – 15:30</span>
+                        <span class="jam-time">07:30 – 16:30</span>
                     </div>
                     <div class="jam-row">
                         <span class="jam-day">Sabtu – Minggu</span>
@@ -345,7 +345,7 @@
                         <i class="bi bi-megaphone-fill"></i> Pengumuman Penting
                     </div>
                     <div class="pengumuman-text">
-                        Layanan administrasi kependudukan tersedia pada hari kerja Senin–Kamis pukul 08.00–16.00 dan Jumat pukul 08.00–15.30. Harap membawa dokumen persyaratan yang lengkap saat mengajukan permohonan.
+                        Layanan administrasi kependudukan tersedia pada hari kerja Senin–Kamis pukul 07.30–16.00 dan Jumat pukul 07.30–16.30. Harap membawa dokumen persyaratan yang lengkap saat mengajukan permohonan.
                     </div>
                 </div>
             </div>

@@ -355,7 +355,8 @@
         <li><a href="{{ route('home') }}">Beranda</a></li>
         <li><a href="{{ route('profil') }}">Profil</a></li>
         <li><a href="{{ route('layanan') }}">Layanan</a></li>
-        <li><a href="{{ route('demografi') }}">Informasi</a></li>
+        <li><a href="{{ route('demografi') }}">Demografi</a></li>
+        <li><a href="{{ route('berita') }}">Berita &amp; Pengumuman</a></li>
     </ul>
 
     <div class="login-nav-spacer"></div>
@@ -504,7 +505,7 @@
                     </li>
                     <li><i class="bi bi-envelope-fill"></i><a href="mailto:kel.teritih@serangkota.go.id">kel.teritih@serangkota.go.id</a></li>
                     <li><i class="bi bi-instagram"></i><a href="https://www.instagram.com/kelurahanteritih/" target="_blank" rel="noopener">@kelurahanteritih</a></li>
-                    <li><i class="bi bi-clock-fill"></i><span>Senin–Jumat: 08.00–16.00</span></li>
+                    <li><i class="bi bi-clock-fill"></i><span>Senin–Kamis: 07.30–16.00 | Jumat: 07.30–16.30</span></li>
                 </ul>
             </div>
 

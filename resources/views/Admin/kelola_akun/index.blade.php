@@ -406,7 +406,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                             @endif
                         </td>
                         <td>
-                            <div class="kontak-email">{{ $user->email }}</div>
+                            <div class="kontak-email">{{ $user->email ?? '-' }}</div>
                             <div class="kontak-telp">{{ $user->no_hp ?? '-' }}</div>
                         </td>
 
@@ -458,6 +458,11 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                                     <a href="{{ route('kelola-akun.show', $user->id_user) }}" class="dd-item">
                                         <i class="bi bi-eye"></i> Lihat Detail
                                     </a>
+                                    <hr class="dd-divider">
+                                    <button type="button" class="dd-item"
+                                        onclick="openModalPassword({{ $user->id_user }}, '{{ addslashes($user->nama) }}')">
+                                        <i class="bi bi-key"></i> Ganti Password
+                                    </button>
                                     <hr class="dd-divider">
                                     <form method="POST" action="{{ route('kelola-akun.toggle', $user->id_user) }}">
                                         @csrf @method('PATCH')
@@ -538,45 +543,69 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                     <input type="text" name="nik" class="form-control" value="{{ old('nik') }}" placeholder="16 digit NIK" maxlength="20" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Email <span>*</span></label>
-                    <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="email@domain.com" required>
+                    <label class="form-label">Email <span style="color:#94a3b8;font-weight:400">(Opsional)</span></label>
+                    <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="email@domain.com (boleh dikosongkan)">
                 </div>
                 <div class="form-group">
                     <label class="form-label">No. HP <span>*</span></label>
                     <input type="text" name="no_hp" class="form-control" value="{{ old('no_hp') }}" placeholder="08xx-xxxx-xxxx" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Username <span>*</span></label>
-                    <input type="text" name="username" class="form-control" value="{{ old('username') }}" placeholder="Username untuk login" autocomplete="off" required>
-                </div>
-                <div class="form-group">
                     <label class="form-label">Password <span>*</span></label>
                     <input type="password" name="password" class="form-control" placeholder="Min. 6 karakter" autocomplete="new-password" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">RT</label>
-                    <input type="text" name="rt" class="form-control" value="{{ old('rt') }}" placeholder="Contoh: 001">
+                    <label class="form-label">RT <span>*</span></label>
+                    <input type="text" name="rt" class="form-control" value="{{ old('rt') }}" placeholder="Contoh: 001" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">RW</label>
-                    <input type="text" name="rw" class="form-control" value="{{ old('rw') }}" placeholder="Contoh: 002">
+                    <label class="form-label">RW <span>*</span></label>
+                    <input type="text" name="rw" class="form-control" value="{{ old('rw') }}" placeholder="Contoh: 002" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Tempat Lahir</label>
-                    <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir') }}" placeholder="Kota lahir">
+                    <label class="form-label">Tempat Lahir <span>*</span></label>
+                    <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir') }}" placeholder="Kota lahir" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Tanggal Lahir</label>
-                    <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir') }}">
+                    <label class="form-label">Tanggal Lahir <span>*</span></label>
+                    <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir') }}" required>
                 </div>
                 <div class="form-group span2">
-                    <label class="form-label">Alamat</label>
-                    <textarea name="alamat" class="form-control" rows="2" placeholder="Alamat lengkap">{{ old('alamat') }}</textarea>
+                    <label class="form-label">Alamat <span>*</span></label>
+                    <textarea name="alamat" class="form-control" rows="2" placeholder="Alamat lengkap" required>{{ old('alamat') }}</textarea>
                 </div>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeModal('modalTambah')">Batal</button>
                 <button type="submit" class="btn-primary"><i class="bi bi-check-lg me-1"></i>Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ═══ MODAL GANTI PASSWORD ═══ --}}
+<div class="modal-overlay" id="modalPassword">
+    <div class="modal-box sm">
+        <div class="modal-header">
+            <div class="modal-title"><i class="bi bi-key-fill me-2"></i>Ganti Password</div>
+            <button class="modal-close" onclick="closeModal('modalPassword')"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <p class="modal-desc">
+            Ganti password untuk akun <strong id="modalPasswordNama"></strong>.
+        </p>
+        <form id="formPassword" method="POST">
+            @csrf @method('PATCH')
+            <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label">Password Baru <span style="color:red">*</span></label>
+                <input type="password" name="password" class="form-control" placeholder="Min. 6 karakter" autocomplete="new-password" required minlength="6">
+            </div>
+            <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label">Konfirmasi Password <span style="color:red">*</span></label>
+                <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password baru" autocomplete="new-password" required minlength="6">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('modalPassword')">Batal</button>
+                <button type="submit" class="btn-primary"><i class="bi bi-check-lg me-1"></i>Simpan Password</button>
             </div>
         </form>
     </div>
@@ -623,6 +652,14 @@ function openModalHapus(id, nama) {
     document.getElementById('modalNama').textContent = nama;
     document.getElementById('formHapus').action = `/admin/kelola-akun/${id}`;
     openModal('modalHapus');
+}
+
+function openModalPassword(id, nama) {
+    document.getElementById('modalPasswordNama').textContent = nama;
+    document.getElementById('formPassword').action = `/admin/kelola-akun/${id}/password`;
+    // Reset input
+    document.getElementById('formPassword').reset();
+    openModal('modalPassword');
 }
 
 let activeBtn = null;

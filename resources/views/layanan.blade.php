@@ -166,8 +166,8 @@
                     <div class="jam-header-text"><div class="jam-title">Jam Operasional</div><div class="jam-subtitle">Pelayanan Kantor Kelurahan</div></div>
                 </div>
                 <div class="jam-body">
-                    <div class="jam-row"><span class="jam-day">Senin–Kamis</span><span class="jam-time">08:00 – 16:00</span></div>
-                    <div class="jam-row"><span class="jam-day">Jumat</span><span class="jam-time">08:00 – 15:30</span></div>
+                    <div class="jam-row"><span class="jam-day">Senin–Kamis</span><span class="jam-time">07:30 – 16:00</span></div>
+                    <div class="jam-row"><span class="jam-day">Jumat</span><span class="jam-time">07:30 – 16:30</span></div>
                     <div class="jam-row"><span class="jam-day">Sabtu–Minggu</span><span class="jam-tutup">Tutup</span></div>
                     <div class="jam-row" style="border-bottom:none;padding-top:10px;border-top:1px dashed var(--border)">
                         <span class="jam-day" style="font-size:12px;font-weight:600">Status Sekarang</span>

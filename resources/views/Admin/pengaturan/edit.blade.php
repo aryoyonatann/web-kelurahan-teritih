@@ -112,7 +112,7 @@ input[type=file].hidden-file{display:none}
             </div>
             <div class="sidebar-info">
                 <div class="sidebar-info-item"><i class="bi bi-geo-alt-fill"></i><div>Kel. Teritih, Kec. Walantaka <span>Kota Serang</span></div></div>
-                <div class="sidebar-info-item"><i class="bi bi-clock-fill"></i><div>Jam Operasional <span>Senin–Jumat 08.00–16.00</span></div></div>
+                <div class="sidebar-info-item"><i class="bi bi-clock-fill"></i><div>Jam Operasional <span>Senin–Kamis 07.30–16.00 | Jumat 07.30–16.30</span></div></div>
                 <div class="sidebar-info-item"><i class="bi bi-instagram"></i><div>@kelurahanteritih</div></div>
             </div>
         </div>

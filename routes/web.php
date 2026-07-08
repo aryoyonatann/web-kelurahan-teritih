@@ -79,6 +79,7 @@ Route::prefix('admin')->group(function () {
         Route::get(   'kelola-akun-export',        [KelolaAkunController::class, 'export'])       ->name('kelola-akun.export');
         Route::get(   'kelola-akun/{id}',          [KelolaAkunController::class, 'show'])         ->name('kelola-akun.show');
         Route::patch( 'kelola-akun/{id}/toggle',   [KelolaAkunController::class, 'toggleStatus']) ->name('kelola-akun.toggle');
+        Route::patch( 'kelola-akun/{id}/password', [KelolaAkunController::class, 'resetPassword'])->name('kelola-akun.reset-password');
         Route::delete('kelola-akun/{id}',          [KelolaAkunController::class, 'destroy'])      ->name('kelola-akun.destroy');
 
         // Master Data

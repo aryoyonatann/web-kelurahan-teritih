@@ -30,7 +30,7 @@ class ProfileController extends Controller
 
         $rules = [
             'nama'  => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:100',
+            'email' => ['nullable', 'email', 'max:100',
                         "unique:users,email,{$userId},{$primaryKey}"],
             'no_hp'         => ['nullable', 'string', 'max:15'],
             'tempat_lahir'  => ['nullable', 'string', 'max:255'],
@@ -58,7 +58,7 @@ class ProfileController extends Controller
         $request->validate($rules);
 
         $user->nama          = $request->nama;
-        $user->email         = $request->email;
+        $user->email         = $request->email ?: null;
         $user->no_hp         = $request->input('no_hp',        $user->no_hp);
         $user->alamat        = $request->input('alamat',       $user->alamat);
         $user->tempat_lahir  = $request->input('tempat_lahir', $user->tempat_lahir);

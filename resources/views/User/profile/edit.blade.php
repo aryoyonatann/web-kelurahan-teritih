@@ -386,12 +386,12 @@
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label-custom">Alamat Email</label>
+                                <label class="form-label-custom">Email <span style="font-weight:400;color:#94a3b8;font-size:12px">(Opsional)</span></label>
                                 <div class="input-icon-wrap">
                                     <i class="bi bi-envelope-fill"></i>
                                     <input type="email" name="email" class="form-control-custom"
                                         value="{{ old('email', Auth::user()->email) }}"
-                                        placeholder="nama@email.com" required>
+                                        placeholder="nama@email.com (boleh dikosongkan)">
                                 </div>
                             </div>
 

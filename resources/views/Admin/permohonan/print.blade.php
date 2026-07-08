@@ -46,7 +46,7 @@
         .surat{width:210mm;min-height:297mm;padding:10mm 18mm 10mm 22mm;font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.4;color:black}
         @page{size:A4;margin:0}
     }
-    .surat{font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.4;color:black}
+    .surat{font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.5;color:black}
     .kop{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:3px double black;margin-bottom:0}
     .kop img{width:100px;height:auto}
     .kop-teks{text-align:center;flex:1;line-height:1.2}
@@ -54,15 +54,15 @@
     .kop-teks .k2{font-size:24pt;font-weight:bold;letter-spacing:.04em}
     .kop-teks .k3{font-size:24pt;font-weight:bold;letter-spacing:.04em}
     .kop-teks .k4{font-size:12pt;margin-top:2px;font-style:italic}
-    .judul{text-align:center;font-size:14pt;font-weight:bold;text-decoration:underline;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 2px}
-    .nomor{text-align:center;font-size:12pt;margin-bottom:6px}
-    .pembuka{text-align:justify;margin-bottom:6px;text-indent:36px;font-size:12pt}
-    .bio{width:100%;border-collapse:collapse;margin-bottom:6px}
+    .judul{text-align:center;font-size:14pt;font-weight:bold;text-decoration:underline;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 2px}
+    .nomor{text-align:center;font-size:12pt;margin-bottom:14px}
+    .pembuka{text-align:justify;margin-bottom:18px;text-indent:36px;font-size:12pt}
+    .bio{width:100%;border-collapse:collapse;margin-bottom:18px}
     .bio tr td{padding:0 0;vertical-align:top;font-size:12pt}
     .bio tr td:first-child{width:145px}
     .bio tr td:nth-child(2){width:12px;padding:0 6px}
-    .isi-surat{text-align:justify;margin-bottom:6px;white-space:pre-wrap;word-break:break-word;font-size:12pt;text-indent:36px}
-    .penutup{text-align:justify;margin-bottom:8px;font-size:12pt}
+    .isi-surat{text-align:justify;margin-top:0;margin-bottom:18px;white-space:pre-wrap;word-break:break-word;font-size:12pt;text-indent:36px}
+    .penutup{text-align:justify;margin-top:0;margin-bottom:8px;font-size:12pt}
     .ttd-box{text-align:center;min-width:200px;font-size:12pt;margin-top:24pt}
     .ttd-kota{margin-bottom:2px}
     .ttd-ruang{height:70px}
@@ -383,7 +383,7 @@
             @php $cbVal = $dt[$ef['key']] ?? ''; @endphp
             @if($cbVal)
             @php $cbPrefix = !empty($ef['template_text']) ? $ef['template_text'].' ' : ''; @endphp
-            <p style="text-align:center;font-weight:bold;font-style:italic;margin:8px 0;font-size:12pt">{{ $cbPrefix }}{{ $cbVal }}</p>
+            <p style="text-align:center;font-weight:bold;font-style:italic;margin:18px 0 18px;font-size:12pt">{{ $cbPrefix }}{{ $cbVal }}</p>
             @endif
         @endif
     @endforeach

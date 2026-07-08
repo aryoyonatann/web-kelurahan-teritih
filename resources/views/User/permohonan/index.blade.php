@@ -31,16 +31,25 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .stat-info small{font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .stat-info strong{font-size:20px;font-weight:800;color:var(--navy);display:block;line-height:1.2}
 .table-card{background:white;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.05)}
-table{width:100%;border-collapse:collapse}
+.table-scroll{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+    scrollbar-color:#cbd5e1 transparent;
+}
+.table-scroll::-webkit-scrollbar{height:6px}
+.table-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px}
+.table-scroll::-webkit-scrollbar-track{background:transparent}
+table{width:100%;border-collapse:collapse;min-width:720px}
 thead th{background:#f9fafb;padding:11px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
 tbody tr{border-bottom:1px solid #f3f4f6;transition:background .12s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:#f9fafb}
 tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:middle}
 .td-no{color:#9ca3af;font-size:12px;font-weight:600}
-.td-surat{font-weight:600;color:var(--navy)}
+.td-surat{font-weight:600;color:var(--navy);white-space:normal}
 .td-surat small{display:block;font-size:11px;font-weight:400;color:#9ca3af;margin-top:2px}
-.td-date{color:var(--muted);font-size:12px}
+.td-date{color:var(--muted);font-size:12px;white-space:nowrap}
 .pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
 .pill::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .pill-pending{background:#fef9c3;color:#854d0e}.pill-pending::before{background:#ca8a04}
@@ -135,6 +144,7 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
             </a>
         </div>
         @else
+        <div class="table-scroll">
         <table>
             <thead>
                 <tr>
@@ -193,6 +203,7 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
                 @endforeach
             </tbody>
         </table>
+        </div>
         @endif
     </div>
 

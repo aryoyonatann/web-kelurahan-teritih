@@ -269,7 +269,8 @@
         <li><a href="{{ route('home') }}">Beranda</a></li>
         <li><a href="{{ route('profil') }}">Profil</a></li>
         <li><a href="{{ route('layanan') }}">Layanan</a></li>
-        <li><a href="{{ route('demografi') }}">Informasi</a></li>
+        <li><a href="{{ route('demografi') }}">Demografi</a></li>
+        <li><a href="{{ route('berita') }}">Berita &amp; Pengumuman</a></li>
     </ul>
 
     <div class="reg-nav-spacer"></div>
@@ -349,10 +350,10 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="field-label">Alamat Email</label>
+                    <label class="field-label">Email <span style="font-weight:400;color:#94a3b8;font-size:12px">(Opsional)</span></label>
                     <div class="input-wrap">
                         <i class="bi bi-envelope ico-l"></i>
-                        <input type="email" name="email" class="{{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="contoh@email.com" value="{{ old('email') }}" required>
+                        <input type="email" name="email" class="{{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="contoh@email.com (boleh dikosongkan)" value="{{ old('email') }}">
                     </div>
                     @error('email') <span class="invalid-feedback">{{ $message }}</span> @enderror
                 </div>
@@ -479,7 +480,7 @@
                 <ul>
                     <li>Email: <strong>kel.teritih@serangkota.go.id</strong></li>
                     <li>Instagram: <strong>@kelurahanteritih</strong></li>
-                    <li>Datang langsung ke Kantor Kelurahan Teritih pada jam kerja (Senin–Jumat, 08.00–16.00)</li>
+                    <li>Datang langsung ke Kantor Kelurahan Teritih pada jam kerja (Senin–Kamis 07.30–16.00, Jumat 07.30–16.30)</li>
                 </ul>
             </div>
             <div class="tnc-section">
@@ -537,7 +538,7 @@
                     <li><i class="bi bi-geo-alt-fill"></i><span>Jl. Raya Kalodran - Sidapurna No. 1 Teritih, Kecamatan Walantaka, Kota Serang, Banten 42183</span></li>
                     <li><i class="bi bi-envelope-fill"></i><a href="mailto:kel.teritih@serangkota.go.id">kel.teritih@serangkota.go.id</a></li>
                     <li><i class="bi bi-instagram"></i><a href="https://www.instagram.com/kelurahanteritih/" target="_blank" rel="noopener">@kelurahanteritih</a></li>
-                    <li><i class="bi bi-clock-fill"></i><span>Senin–Jumat: 08.00–16.00</span></li>
+                    <li><i class="bi bi-clock-fill"></i><span>Senin–Kamis: 07.30–16.00 | Jumat: 07.30–16.30</span></li>
                 </ul>
             </div>
 

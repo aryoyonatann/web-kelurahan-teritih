@@ -242,6 +242,15 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     display:flex; align-items:center; gap:6px;
 }
 .btn-filter-apply:hover { background:var(--blue-dk); }
+.btn-print-apply {
+    padding:7px 16px; border-radius:8px; border:1.5px solid var(--border);
+    background:white; color:var(--navy); font-size:13px; font-weight:600;
+    cursor:pointer; transition:all .18s; font-family:inherit;
+    display:flex; align-items:center; gap:6px;
+}
+.btn-print-apply:first-of-type { margin-left:auto; }
+.btn-print-apply:hover:not(:disabled) { background:#f8fafc; border-color:#cbd5e1; }
+.btn-print-apply:disabled { opacity:.5; cursor:not-allowed; }
 .month-modal-body { overflow-y:auto; flex:1; padding:0; }
 .month-summary {
     display:flex; gap:10px; padding:14px 20px; flex-wrap:wrap;
@@ -453,11 +462,11 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                 <div class="jam-body">
                     <div class="jam-row" id="row-senin-kamis">
                         <span class="jam-day">Senin – Kamis</span>
-                        <span class="jam-time">08.00 – 15.00</span>
+                        <span class="jam-time">07.30 – 16.00</span>
                     </div>
                     <div class="jam-row" id="row-jumat">
                         <span class="jam-day">Jumat</span>
-                        <span class="jam-time">08.00 – 11.30</span>
+                        <span class="jam-time">07.30 – 16.30</span>
                     </div>
                     <div class="jam-row" id="row-sabtu-minggu">
                         <span class="jam-day">Sabtu – Minggu</span>
@@ -579,6 +588,12 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <button class="btn-filter-apply" id="btnApplyFilter">
                 <i class="bi bi-search"></i> Tampilkan
             </button>
+            <button class="btn-print-apply" id="btnPrintRekap" disabled>
+                <i class="bi bi-printer"></i> Cetak / Rekap
+            </button>
+            <button class="btn-print-apply" id="btnExcelRekap" disabled style="margin-left:0">
+                <i class="bi bi-file-earmark-excel" style="color:#16a34a"></i> Unduh Excel
+            </button>
         </div>
         <div class="month-modal-body" id="monthModalBody">
             <div style="padding:48px 20px;text-align:center;color:#94a3b8;font-size:13px;">
@@ -679,11 +694,18 @@ setInterval(updateStatusKantor, 60000);
     const btnOpen  = document.getElementById('btn-open-month-modal');
     const btnClose = document.getElementById('btnCloseMonthModal');
     const btnApply = document.getElementById('btnApplyFilter');
+    const btnPrint = document.getElementById('btnPrintRekap');
+    const btnExcel = document.getElementById('btnExcelRekap');
     const body     = document.getElementById('monthModalBody');
     const selBulan = document.getElementById('selectBulan');
     const selTahun = document.getElementById('selectTahun');
 
     const BULAN_NAMES = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    // Menyimpan data hasil fetch terakhir supaya bisa dipakai tombol Cetak/Rekap
+    let lastResult = null;
+    let lastBulan  = null;
+    let lastTahun  = null;
 
     const openModal  = () => { overlay.classList.add('show'); document.body.style.overflow='hidden'; };
     const closeModal = () => { overlay.classList.remove('show'); document.body.style.overflow=''; };
@@ -703,9 +725,17 @@ setInterval(updateStatusKantor, 60000);
         return '<span class="bdg bdg-pending">Pending</span>';
     }
 
+    function statusLabel(status) {
+        if (status==='disetujui') return 'Disetujui';
+        if (status==='ditolak')  return 'Ditolak';
+        return 'Pending';
+    }
+
     function loadData() {
         const bulan = selBulan.value;
         const tahun = selTahun.value;
+        btnPrint.disabled = true;
+        btnExcel.disabled = true;
         body.innerHTML = `<div style="padding:48px 20px;text-align:center;color:#94a3b8;font-size:13px">
             <i class="bi bi-arrow-clockwise" style="font-size:32px;display:block;margin-bottom:10px;color:#e2e8f0"></i>
             Memuat data...</div>`;
@@ -720,6 +750,13 @@ setInterval(updateStatusKantor, 60000);
             const setuju = data.disetujui||0;
             const tolak  = data.ditolak||0;
             const pend   = data.pending||0;
+
+            // Simpan untuk keperluan cetak/rekap
+            lastResult = data;
+            lastBulan  = bulan;
+            lastTahun  = tahun;
+            btnPrint.disabled = items.length === 0;
+            btnExcel.disabled = items.length === 0;
 
             let html = `<div class="month-summary">
                 <div class="month-sum-item"><div class="month-sum-val">${total}</div><div class="month-sum-lbl">Total</div></div>
@@ -750,10 +787,144 @@ setInterval(updateStatusKantor, 60000);
         })
         .catch(()=>{
             body.innerHTML = `<div class="month-empty"><i class="bi bi-wifi-off"></i>Gagal memuat data. Coba lagi.</div>`;
+            btnPrint.disabled = true;
+            btnExcel.disabled = true;
         });
     }
 
+    function cetakRekap() {
+        if (!lastResult || !lastResult.data || !lastResult.data.length) return;
+
+        const items    = lastResult.data;
+        const periode  = `${BULAN_NAMES[lastBulan]} ${lastTahun}`;
+        const tanggalCetak = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+
+        const rows = items.map((p, i) => `
+            <tr>
+                <td style="text-align:center">${i+1}</td>
+                <td>${escHtml(p.nama_pemohon||'-')}</td>
+                <td>${escHtml(p.nik_pemohon||'-')}</td>
+                <td>${escHtml(p.jenis_surat||'-')}</td>
+                <td>${escHtml(p.tanggal)}</td>
+                <td style="text-align:center">${statusLabel(p.status)}</td>
+            </tr>`).join('');
+
+        const printHtml = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Rekap Permohonan Surat - ${periode}</title>
+<style>
+    * { box-sizing:border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; color:#0f172a; padding:32px; }
+    .print-header { display:flex; align-items:center; gap:14px; border-bottom:2px solid #0d1b3e; padding-bottom:14px; margin-bottom:18px; }
+    .print-header h1 { font-size:16px; margin:0; color:#0d1b3e; }
+    .print-header p { font-size:12px; margin:2px 0 0; color:#475569; }
+    .print-title { text-align:center; margin-bottom:6px; }
+    .print-title h2 { font-size:15px; margin:0; text-transform:uppercase; letter-spacing:.03em; }
+    .print-title p { font-size:12px; margin:2px 0 16px; color:#475569; }
+    table { width:100%; border-collapse:collapse; font-size:12px; margin-top:10px; }
+    th, td { border:1px solid #cbd5e1; padding:7px 10px; }
+    th { background:#f1f5f9; text-transform:uppercase; font-size:10.5px; letter-spacing:.03em; }
+    .summary { display:flex; gap:14px; margin:14px 0 4px; font-size:12px; }
+    .summary div { border:1px solid #cbd5e1; border-radius:6px; padding:8px 14px; }
+    .summary strong { display:block; font-size:16px; }
+    .footer-note { margin-top:26px; font-size:11px; color:#64748b; display:flex; justify-content:space-between; }
+    @media print {
+        body { padding:0 24px; }
+        @page { margin:18mm 14mm; }
+    }
+</style>
+</head>
+<body>
+    <div class="print-header">
+        <div>
+            <h1>Pemerintah Kota Serang — Kelurahan Teritih</h1>
+            <p>Jl. Raya Kaloran - Sidapurna No.1 Teritih, Kecamatan Walantaka, Kota Serang, Banten 42183</p>
+        </div>
+    </div>
+
+    <div class="print-title">
+        <h2>Rekap Data Permohonan Surat</h2>
+        <p>Periode: ${periode}</p>
+    </div>
+
+    <div class="summary">
+        <div>Total<strong>${lastResult.total||0}</strong></div>
+        <div>Disetujui<strong>${lastResult.disetujui||0}</strong></div>
+        <div>Ditolak<strong>${lastResult.ditolak||0}</strong></div>
+        <div>Pending<strong>${lastResult.pending||0}</strong></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>No</th><th>Nama Pemohon</th><th>NIK</th><th>Jenis Surat</th><th>Tanggal</th><th>Status</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+    </table>
+
+    <div class="footer-note">
+        <span>Dicetak pada ${tanggalCetak}</span>
+        <span>Sistem Layanan Informasi Kelurahan Teritih</span>
+    </div>
+</body>
+</html>`;
+
+        const printWindow = window.open('', '_blank', 'width=900,height=700');
+        if (!printWindow) {
+            alert('Popup diblokir browser. Izinkan popup untuk situs ini agar bisa mencetak.');
+            return;
+        }
+        printWindow.document.open();
+        printWindow.document.write(printHtml);
+        printWindow.document.close();
+        printWindow.onload = function() {
+            printWindow.focus();
+            printWindow.print();
+        };
+    }
+
+    function unduhExcel() {
+        if (!lastResult || !lastResult.data || !lastResult.data.length) return;
+
+        const items   = lastResult.data;
+        const periode = `${BULAN_NAMES[lastBulan]}_${lastTahun}`;
+
+        // Fungsi kecil untuk membungkus nilai CSV supaya koma/tanda kutip di dalam
+        // data (misal alamat atau nama dengan koma) tidak merusak kolom.
+        function csvCell(val) {
+            const s = String(val ?? '-').replace(/"/g, '""');
+            return `"${s}"`;
+        }
+
+        const header = ['No', 'Nama Pemohon', 'NIK', 'Jenis Surat', 'Tanggal', 'Status'];
+        const rows = items.map((p, i) => [
+            i + 1,
+            p.nama_pemohon || '-',
+            p.nik_pemohon || '-',
+            p.jenis_surat || '-',
+            p.tanggal || '-',
+            statusLabel(p.status),
+        ]);
+
+        let csv = header.map(csvCell).join(',') + '\r\n';
+        rows.forEach(r => { csv += r.map(csvCell).join(',') + '\r\n'; });
+
+        // BOM UTF-8 supaya karakter dan format terbaca benar saat dibuka di Excel
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `rekap-permohonan-${periode}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     btnApply.addEventListener('click', loadData);
+    btnPrint.addEventListener('click', cetakRekap);
+    btnExcel.addEventListener('click', unduhExcel);
 })();
 </script>
 @endpush

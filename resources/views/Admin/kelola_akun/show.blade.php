@@ -117,7 +117,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         <div class="profile-av">{{ $initials }}</div>
         <div class="flex-grow-1">
             <div class="profile-nama">{{ $user->nama }}</div>
-            <div class="profile-sub">{{ $user->email }}</div>
+            <div class="profile-sub">{{ $user->email ?? '-' }}</div>
             <div class="mt-2">
                 @if($status === 'aktif')
                     <span class="bdg bdg-aktif">Aktif</span>
@@ -195,10 +195,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <i class="bi bi-shield-lock-fill"></i> Data Akun
         </div>
         <div class="detail-grid">
-            <div class="detail-row">
-                <span class="detail-label">Username</span>
-                <span class="detail-value mono">{!! $val($user->username) !!}</span>
-            </div>
             <div class="detail-row">
                 <span class="detail-label">Terdaftar Sejak</span>
                 <span class="detail-value">

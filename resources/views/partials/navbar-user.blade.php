@@ -230,6 +230,7 @@
         <li><a href="{{ route('profil') }}"    class="{{ request()->routeIs('profil') ? 'active' : '' }}">Profil</a></li>
         <li><a href="{{ route('layanan') }}"   class="{{ request()->routeIs('layanan') ? 'active' : '' }}">Layanan</a></li>
         <li><a href="{{ route('demografi') }}" class="{{ request()->routeIs('demografi') ? 'active' : '' }}">Demografi</a></li>
+        <li><a href="{{ route('berita') }}"    class="{{ request()->routeIs('berita') ? 'active' : '' }}">Berita &amp; Pengumuman</a></li>
     </ul>
 
     <div class="user-chip" id="userChipNav">
@@ -280,6 +281,7 @@
         <a href="{{ route('profil') }}"    class="drawer-nav-link {{ request()->routeIs('profil') ? 'active' : '' }}"><i class="bi bi-building"></i> Profil</a>
         <a href="{{ route('layanan') }}"   class="drawer-nav-link {{ request()->routeIs('layanan') ? 'active' : '' }}"><i class="bi bi-file-earmark-text"></i> Layanan</a>
         <a href="{{ route('demografi') }}" class="drawer-nav-link {{ request()->routeIs('demografi') ? 'active' : '' }}"><i class="bi bi-bar-chart-fill"></i> Demografi</a>
+        <a href="{{ route('berita') }}"    class="drawer-nav-link {{ request()->routeIs('berita') ? 'active' : '' }}"><i class="bi bi-newspaper"></i> Berita &amp; Pengumuman</a>
 
         <div class="drawer-divider"></div>
         <a href="{{ route('profile.edit') }}"          class="drawer-action-link"><i class="bi bi-person-circle"></i> Profil Saya</a>
