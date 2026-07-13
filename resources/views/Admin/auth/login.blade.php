@@ -350,7 +350,6 @@
                 <div class="mb-3">
                     <div class="label-row">
                         <label>Kata Sandi</label>
-                        <a href="#">Lupa kata sandi?</a>
                     </div>
                     <div class="input-wrap">
                         <i class="bi bi-lock ico-l"></i>
