@@ -62,7 +62,7 @@
     .bio tr td:first-child{width:145px}
     .bio tr td:nth-child(2){width:12px;padding:0 6px}
     .isi-surat{text-align:justify;margin-top:0;margin-bottom:18px;white-space:pre-wrap;word-break:break-word;font-size:12pt;text-indent:36px}
-    .penutup{text-align:justify;margin-top:0;margin-bottom:8px;font-size:12pt}
+    .penutup{text-align:justify;margin-top:0;margin-bottom:8px;font-size:12pt;text-indent:36px}
     .ttd-box{text-align:center;min-width:200px;font-size:12pt;margin-top:24pt}
     .ttd-kota{margin-bottom:2px}
     .ttd-ruang{height:70px}
@@ -104,7 +104,7 @@
 
     // Replace placeholders di template
     $replacements = [
-        '{nama}' => $nama, '{nik}' => $nik, '{alamat}' => $alamat,
+        '{nama}' => $nama, '{nik}' => $nik, '{alamat}' => $alamat, '{domisili}' => $alamat,
         '{tempat_lahir}' => $dt['tempat_lahir'] ?? '', '{tanggal_lahir}' => $dt['tanggal_lahir'] ?? '',
         '{jenis_kelamin}' => $jk, '{agama}' => $agama, '{pekerjaan}' => $pekerjaan,
     ];
@@ -209,6 +209,37 @@
             <textarea class="form-textarea" id="inp_isi" rows="5">{{ $isiDefault }}</textarea>
             <div style="font-size:11px;color:#94a3b8;margin-top:4px">Gunakan **teks** untuk bold. Admin bisa edit sebelum cetak.</div>
         </div>
+
+        @php
+            $editableExtras = collect($fieldsConfig)->where('group', 'extra')
+                ->where('type', '!=', 'section')
+                ->filter(fn($ef) => $ef['on_print'] ?? false)
+                ->values();
+            $centerBoldExtras = collect($fieldsConfig)->where('group', 'extra')
+                ->filter(fn($ef) => ($ef['print_style'] ?? '') === 'center_bold')
+                ->values();
+        @endphp
+        @if($editableExtras->isNotEmpty() || $centerBoldExtras->isNotEmpty())
+        <hr class="divider">
+        <div class="section-sep">Data Tambahan (Bisa Diedit)</div>
+        @foreach($editableExtras as $ef)
+            <div class="form-group">
+                <label class="form-label">{{ $ef['print_label'] ?? $ef['label'] }}</label>
+                <input type="text" class="form-input pr-extra-input" data-key="{{ $ef['key'] }}"
+                       id="inp_extra_{{ $ef['key'] }}"
+                       value="{{ $dt[$ef['key']] ?? '' }}">
+            </div>
+        @endforeach
+        @foreach($centerBoldExtras as $ef)
+            <div class="form-group">
+                <label class="form-label">{{ $ef['print_label'] ?? $ef['label'] }} (baris bold + center)</label>
+                <input type="text" class="form-input pr-cb-input" data-key="{{ $ef['key'] }}"
+                       id="inp_cb_{{ $ef['key'] }}"
+                       value="{{ $dt[$ef['key']] ?? '' }}">
+            </div>
+        @endforeach
+        <div style="font-size:11px;color:#94a3b8;margin-top:-8px;margin-bottom:16px">Gunakan **teks** untuk bold pada data di atas. Kosongkan agar tidak tampil di surat.</div>
+        @endif
 
         <hr class="divider">
 
@@ -353,6 +384,9 @@
     @endforeach
     @if($tableOpened)</table>@endif
 
+    {{-- ISI SURAT --}}
+    <p class="isi-surat" id="pr_isi"></p>
+
     {{-- Extra fields: render per group (support section separator) --}}
     @php $extras = collect($fieldsConfig)->where('group', 'extra')->values(); $extraTableOpened = false; @endphp
     @foreach($extras as $ef)
@@ -369,22 +403,17 @@
                     $val = \Carbon\Carbon::parse($val)->locale('id')->isoFormat('D MMMM Y');
                 }
             @endphp
-            <tr><td>{{ $ef['print_label'] ?? $ef['label'] }}</td><td>:</td><td>{{ $val }}</td></tr>
+            <tr><td>{{ $ef['print_label'] ?? $ef['label'] }}</td><td>:</td><td id="pr_extra_{{ $ef['key'] }}">{{ $val }}</td></tr>
         @endif
     @endforeach
     @if($extraTableOpened)</table>@endif
-
-    {{-- ISI SURAT --}}
-    <p class="isi-surat" id="pr_isi"></p>
 
     {{-- Extra fields dengan print_style center_bold --}}
     @foreach(collect($fieldsConfig)->where('group','extra') as $ef)
         @if(($ef['print_style'] ?? '') === 'center_bold')
             @php $cbVal = $dt[$ef['key']] ?? ''; @endphp
-            @if($cbVal)
             @php $cbPrefix = !empty($ef['template_text']) ? $ef['template_text'].' ' : ''; @endphp
-            <p style="text-align:center;font-weight:bold;font-style:italic;margin:18px 0 18px;font-size:12pt">{{ $cbPrefix }}{{ $cbVal }}</p>
-            @endif
+            <p style="text-align:center;font-weight:bold;font-style:italic;margin:18px 0 18px;font-size:12pt{{ $cbVal ? '' : ';display:none' }}" id="pr_cb_{{ $ef['key'] }}" data-prefix="{{ $ef['template_text'] ?? '' }}">{{ $cbVal ? $cbPrefix.$cbVal : '' }}</p>
         @endif
     @endforeach
 
@@ -505,6 +534,29 @@ function cetakSurat() {
     const parsed = isi.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g,'<br>');
     document.getElementById('pr_isi').innerHTML = parsed;
+
+    // Data tambahan (bisa diedit admin sebelum cetak, mendukung **bold**)
+    function parseBold(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    }
+    document.querySelectorAll('.pr-extra-input').forEach(function(inp) {
+        const key = inp.dataset.key;
+        const cell = document.getElementById('pr_extra_' + key);
+        if (cell) cell.innerHTML = parseBold(inp.value.trim() || '-');
+    });
+    document.querySelectorAll('.pr-cb-input').forEach(function(inp) {
+        const key = inp.dataset.key;
+        const el = document.getElementById('pr_cb_' + key);
+        if (!el) return;
+        const val = inp.value.trim();
+        if (val) {
+            el.style.display = '';
+            el.innerHTML = parseBold(el.dataset.prefix ? el.dataset.prefix + ' ' + val : val);
+        } else {
+            el.style.display = 'none';
+        }
+    });
 
     // TTD layout
     const ttds = collectTTDs();

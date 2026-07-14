@@ -111,4 +111,22 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
+// =========================================================
+// FALLBACK STORAGE SERVER — khusus buat local (php artisan serve di Windows
+// suka 403 kalau public/storage itu symlink). Hanya aktif kalau public/storage
+// BUKAN symlink (biar di hosting yang symlink-nya udah bener tetap dilayani
+// langsung sama web server, lebih cepat, route ini nggak kepakai).
+// =========================================================
+if (!is_link(public_path('storage'))) {
+    Route::get('/storage/{path}', function (string $path) {
+        $fullPath = storage_path('app/public/' . $path);
+
+        if (!file_exists($fullPath)) {
+            abort(404);
+        }
+
+        return response()->file($fullPath);
+    })->where('path', '.*');
+}
+
 require __DIR__.'/auth.php';

@@ -1,4 +1,4 @@
-@extends('Admin.layouts.app')
+﻿@extends('Admin.layouts.app')
 @section('title', 'Edit Jenis Surat')
 
 @push('styles')
@@ -380,6 +380,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
 .sp-bio td:first-child { width: 130px; }
 .sp-bio td:nth-child(2) { width: 12px; padding: 0 5px; }
 .sp-placeholder { color: #94a3b8; font-style: italic; }
+.sp-section { font-size: 11pt; margin: 10px 0 4px; }
 .sp-isi { text-align: justify; font-size: 11pt; margin: 6px 0; white-space: pre-wrap; text-indent: 28px; }
 .sp-penutup { text-align: justify; font-size: 11pt; margin: 6px 0; }
 .sp-ttd { display: flex; justify-content: flex-end; margin-top: 14px; font-size: 11pt; }
@@ -597,6 +598,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
                                     ['key'=>'sebab_meninggal','label'=>'Sebab Meninggal','type'=>'text','req'=>true,'print'=>true],
                                     ['key'=>'nama_usaha','label'=>'Nama Usaha','type'=>'text','req'=>true,'print'=>true],
                                     ['key'=>'jenis_usaha','label'=>'Jenis Usaha','type'=>'text','req'=>true,'print'=>true],
+                                    ['key'=>'alamat_usaha','label'=>'Alamat Usaha','type'=>'text','req'=>true,'print'=>true],
                                     ['key'=>'tanggal_cuti','label'=>'Tanggal Cuti','type'=>'text','req'=>true,'print'=>true],
                                     ['key'=>'lama_cuti','label'=>'Lama Cuti (hari)','type'=>'text','req'=>true,'print'=>true],
                                     ['key'=>'alasan_cuti','label'=>'Alasan Cuti','type'=>'textarea','req'=>true,'print'=>true],
@@ -703,8 +705,8 @@ textarea.fi { resize: vertical; min-height: 90px; }
                         <div class="sp-nomor">Nomor: <span id="pv_nomor">{{ $data->kode_klasifikasi }} / ___ / Kel.1010/{{ $data->kode_surat }}/ VI /2026</span></div>
                         <p class="sp-pembuka" id="pv_pembuka">{{ $data->template_pembuka }}</p>
                         <table class="sp-bio" id="pv_bio"></table>
-                        <div id="pv_extra"></div>
                         <p class="sp-isi" id="pv_isi" style="{{ $data->template_isi ? '' : 'display:none' }}">{{ $data->template_isi }}</p>
+                        <div id="pv_extra"></div>
                         <div id="pv_center_bold"></div>
                         <p class="sp-penutup" id="pv_penutup">{{ $data->template_penutup }}</p>
                         <div class="sp-ttd">
@@ -909,8 +911,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isCenterBold) item.style.display = 'none';
 
         // Build hidden form inputs
-        var safeLabel = (label || '').replace(/"/g, '"');
-        var safeTmpl  = (templateText || '').replace(/"/g, '"');
+        var safeLabel = (label || '').replace(/"/g, '&quot;');
+        var safeTmpl  = (templateText || '').replace(/"/g, '&quot;');
 
         var hidden = document.createElement('div');
         hidden.id = 'fh_' + i;
@@ -929,9 +931,9 @@ document.addEventListener('DOMContentLoaded', function() {
             renderCenterBoldUI(i, templateText || '');
         }
 
-        // Track for preview
-        if (!isSection && !isCenterBold && onPrint) {
-            pvExtra.push({ i: i, key: key, label: label });
+        // Track for preview (section separators included so they render in the live preview too)
+        if (!isCenterBold && onPrint) {
+            pvExtra.push({ i: i, key: key, label: label, isSection: isSection });
         }
 
         updatePresetButtons();
@@ -1032,8 +1034,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.submitInputModal = function() {
         var val = document.querySelector('#inputModal .im-input').value.trim();
         if (!val) { document.querySelector('#inputModal .im-input').focus(); return; }
+        var cb = inputModalCallback;
         closeInputModal();
-        if (inputModalCallback) inputModalCallback(val);
+        if (cb) cb(val);
     };
 
     function showAlert(msg, type) {
@@ -1063,17 +1066,20 @@ document.addEventListener('DOMContentLoaded', function() {
             bioTbl.innerHTML += '<tr><td>' + (BIO_LABELS[b.key] || b.label) + '</td><td>:</td><td class="sp-placeholder">' + b.label + '</td></tr>';
         });
 
-        var extraDiv = document.getElementById('pv_extra');
-        if (pvExtra.length) {
-            var html = '<table class="sp-bio">';
-            pvExtra.forEach(function(e) {
-                html += '<tr><td>' + e.label + '</td><td>:</td><td class="sp-placeholder">' + e.label + '</td></tr>';
-            });
-            html += '</table>';
-            extraDiv.innerHTML = html;
-        } else {
-            extraDiv.innerHTML = '';
-        }
+        var extraDiv  = document.getElementById('pv_extra');
+        var extraHtml = '';
+        var tableOpen = false;
+        pvExtra.forEach(function(e) {
+            if (e.isSection) {
+                if (tableOpen) { extraHtml += '</table>'; tableOpen = false; }
+                extraHtml += '<p class="sp-section">' + e.label + '</p>';
+            } else {
+                if (!tableOpen) { extraHtml += '<table class="sp-bio">'; tableOpen = true; }
+                extraHtml += '<tr><td>' + e.label + '</td><td>:</td><td class="sp-placeholder">' + e.label + '</td></tr>';
+            }
+        });
+        if (tableOpen) extraHtml += '</table>';
+        extraDiv.innerHTML = extraHtml;
 
         var isiEl = document.getElementById('pv_isi');
         if (isi) { isiEl.innerHTML = applyBold(isi); isiEl.style.display = ''; }

@@ -293,6 +293,7 @@ textarea[name=template_pembuka],textarea[name=template_isi],textarea[name=templa
                             ['key'=>'sebab_meninggal','label'=>'Sebab Meninggal','type'=>'text','req'=>true,'print'=>true],
                             ['key'=>'nama_usaha','label'=>'Nama Usaha','type'=>'text','req'=>true,'print'=>true],
                             ['key'=>'jenis_usaha','label'=>'Jenis Usaha','type'=>'text','req'=>true,'print'=>true],
+                            ['key'=>'alamat_usaha','label'=>'Alamat Usaha','type'=>'text','req'=>true,'print'=>true],
                             ['key'=>'tanggal_cuti','label'=>'Tanggal Cuti','type'=>'text','req'=>true,'print'=>true],
                             ['key'=>'lama_cuti','label'=>'Lama Cuti (hari)','type'=>'text','req'=>true,'print'=>true],
                             ['key'=>'alasan_cuti','label'=>'Alasan Cuti','type'=>'textarea','req'=>true,'print'=>true],
@@ -404,8 +405,8 @@ textarea[name=template_pembuka],textarea[name=template_isi],textarea[name=templa
                     <div class="sp-nomor">Nomor: <span id="pv_nomor">470 / ___ / Kel.1010/SK/ VI /2026</span></div>
                     <p class="sp-pembuka">Yang bertanda tangan di bawah ini Kepala Kelurahan Teritih Kecamatan Walantaka Kota Serang Provinsi Banten, menerangkan dengan sebenarnya bahwa:</p>
                     <table class="sp-bio" id="pv_bio"></table>
-                    <div id="pv_extra"></div>
                     <p class="sp-isi" id="pv_isi"></p>
+                    <div id="pv_extra"></div>
                     <div id="pv_center_bold"></div>
                     <p class="sp-penutup">Demikian surat keterangan ini kami buat dengan sebenar-benarnya dan untuk dipergunakan sebagaimana mestinya.</p>
                     <div class="sp-ttd">

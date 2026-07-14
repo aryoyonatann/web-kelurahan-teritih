@@ -112,6 +112,13 @@
     .fi.c4 { grid-column:span 4; }
     .fg .fi:last-child, .fg .fi:nth-last-child(2) { border-bottom:none; }
     .fl { font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:5px; }
+    .fl-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:5px; }
+    .fl-row .fl { margin-bottom:0; }
+    .btn-bold-toggle { width:20px;height:20px;border-radius:4px;border:1.5px solid #e2e8f0;background:white;color:var(--gray-400);font-size:11px;font-weight:800;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:Georgia,serif;transition:all .15s; }
+    .btn-bold-toggle:hover { border-color:var(--primary);color:var(--primary);background:#eff6ff; }
+    .btn-bold-toggle.is-active { border-color:var(--primary);color:white;background:var(--primary); }
+    .fv-boldpreview { font-size:11px;color:var(--gray-400);margin-top:4px;min-height:14px; }
+    .fv-boldpreview strong { color:var(--gray-600); }
     .fv { font-size:13.5px;color:var(--gray-800);font-weight:500;line-height:1.5; }
     .fv.mono { font-family:'DM Mono',monospace;font-size:13px; }
     .fv-input { width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13.5px;font-weight:500;color:var(--gray-800);font-family:inherit;transition:border-color .2s; }
@@ -323,13 +330,23 @@
                         <div class="fdivider"><span>{{ $ef['label'] }}</span></div>
                         @elseif(($ef['print_style'] ?? '') !== 'center_bold')
                         <div class="fi c2">
-                            <div class="fl">{{ $ef['label'] }}</div>
                             @if(($ef['type'] ?? '') === 'date')
+                            <div class="fl">{{ $ef['label'] }}</div>
                             <input type="date" name="extra_{{ $ef['key'] }}" value="{{ $dt[$ef['key']] ?? '' }}" class="fv-input">
                             @elseif(($ef['type'] ?? '') === 'textarea')
-                            <textarea name="extra_{{ $ef['key'] }}" rows="2" class="fv-input">{{ $dt[$ef['key']] ?? '' }}</textarea>
+                            <div class="fl-row">
+                                <div class="fl">{{ $ef['label'] }}</div>
+                                <button type="button" class="btn-bold-toggle" id="bold_extra_{{ $ef['key'] }}" onclick="toggleBoldField('extra_{{ $ef['key'] }}')" title="Bold-kan teks ini di surat cetak">B</button>
+                            </div>
+                            <textarea name="extra_{{ $ef['key'] }}" id="extra_{{ $ef['key'] }}" rows="2" class="fv-input" oninput="syncBoldButton('extra_{{ $ef['key'] }}')">{{ $dt[$ef['key']] ?? '' }}</textarea>
+                            <div class="fv-boldpreview" id="preview_extra_{{ $ef['key'] }}"></div>
                             @else
-                            <input type="text" name="extra_{{ $ef['key'] }}" value="{{ $dt[$ef['key']] ?? '' }}" class="fv-input">
+                            <div class="fl-row">
+                                <div class="fl">{{ $ef['label'] }}</div>
+                                <button type="button" class="btn-bold-toggle" id="bold_extra_{{ $ef['key'] }}" onclick="toggleBoldField('extra_{{ $ef['key'] }}')" title="Bold-kan teks ini di surat cetak (atau tekan Ctrl+B)">B</button>
+                            </div>
+                            <input type="text" name="extra_{{ $ef['key'] }}" id="extra_{{ $ef['key'] }}" value="{{ $dt[$ef['key']] ?? '' }}" class="fv-input" oninput="syncBoldButton('extra_{{ $ef['key'] }}')">
+                            <div class="fv-boldpreview" id="preview_extra_{{ $ef['key'] }}"></div>
                             @endif
                         </div>
                         @endif
@@ -536,4 +553,61 @@
 {{-- ── MODAL EDIT DATA ── --}}
 
 @include('Admin.partials.footer')
+
+@push('scripts')
+<script>
+function isWrappedBold(val) {
+    var t = (val || '').trim();
+    return t.length > 3 && t.startsWith('**') && t.endsWith('**');
+}
+
+function toggleBoldField(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var start = el.selectionStart, end = el.selectionEnd, val = el.value;
+
+    if (start !== null && end !== null && start !== end) {
+        // Ada teks yang di-select -> bold/un-bold hanya bagian itu
+        var selected = val.slice(start, end);
+        var already = isWrappedBold(selected);
+        var replacement = already ? selected.trim().slice(2, -2) : '**' + selected + '**';
+        el.value = val.slice(0, start) + replacement + val.slice(end);
+        el.focus();
+        el.setSelectionRange(start, start + replacement.length);
+    } else {
+        // Tidak ada seleksi -> bold/un-bold seluruh isi field
+        var already2 = isWrappedBold(val);
+        el.value = already2 ? val.trim().slice(2, -2) : (val.trim() ? '**' + val.trim() + '**' : '');
+        el.focus();
+    }
+    syncBoldButton(id);
+}
+
+function syncBoldButton(id) {
+    var el = document.getElementById(id);
+    var btn = document.getElementById('bold_' + id);
+    var preview = document.getElementById('preview_' + id);
+    if (el && btn) btn.classList.toggle('is-active', isWrappedBold(el.value));
+    if (el && preview) {
+        var val = (el.value || '').trim();
+        if (!val) { preview.innerHTML = ''; }
+        else if (isWrappedBold(val)) { preview.innerHTML = 'Tampil di surat: <strong>' + val.slice(2, -2) + '</strong>'; }
+        else { preview.innerHTML = ''; }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[id^="extra_"]').forEach(function(el) {
+        syncBoldButton(el.id);
+        // Shortcut Ctrl/Cmd+B: sama seperti tombol B, tapi tanpa perlu lepas keyboard
+        el.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+                e.preventDefault();
+                toggleBoldField(el.id);
+            }
+        });
+    });
+});
+</script>
+@endpush
 @endsection
