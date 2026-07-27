@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Berita;
 use App\Models\JenisSurat;
+use App\Models\Pengaturan;
+use App\Models\StatistikDemografi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -271,71 +274,173 @@ class ChatbotController extends Controller
     
     private function buildSystemPrompt(): string
     {
-        // Ambil daftar jenis surat aktif dari database (dinamis)
-        $jenisSurat = JenisSurat::where('aktif', true)
-            ->pluck('nama_surat')
-            ->implode(', ');
+        // ── 1. JENIS SURAT AKTIF ───────────────────────────────────────────────
+        $jenisSuratList = JenisSurat::where('aktif', true)->get(['nama_surat', 'deskripsi']);
+        if ($jenisSuratList->isEmpty()) {
+            $jenisSuratText = '• Keterangan Domisili' . "\n"
+                            . '• Keterangan Usaha' . "\n"
+                            . '• Pengantar SKCK' . "\n"
+                            . '• Keterangan Tidak Mampu (SKTM)' . "\n"
+                            . '• Keterangan Kelahiran' . "\n"
+                            . '• Keterangan Kematian' . "\n"
+                            . '• Keterangan Pindah' . "\n"
+                            . '• Keterangan Belum Menikah';
+        } else {
+            $jenisSuratText = $jenisSuratList->map(function ($s) {
+                $desc = $s->deskripsi ? " — {$s->deskripsi}" : '';
+                return "• {$s->nama_surat}{$desc}";
+            })->implode("\n");
+        }
 
-        // Fallback kalau database kosong
-        if (empty($jenisSurat)) {
-            $jenisSurat = 'Keterangan Domisili, Keterangan Usaha, Pengantar SKCK, '
-                       . 'Keterangan Tidak Mampu (SKTM), Keterangan Kelahiran, '
-                       . 'Keterangan Kematian, Keterangan Pindah, Keterangan Belum Menikah';
+        // ── 2. DATA PEGAWAI KELURAHAN ──────────────────────────────────────────
+        $namaLurah  = Pengaturan::getValue('nama_lurah',  'Jupran, SE, MM');
+        $jabatLurah = Pengaturan::getValue('jabat_lurah', 'Kepala Kelurahan Teritih');
+
+        $nodeLabels = [
+            'sekretaris'     => 'Sekretaris Kelurahan',
+            'kasi-pemum'     => 'Kepala Seksi Pemerintahan & Umum (Kasi Pemum)',
+            'pelaksana'      => 'Pelaksana Pelayanan Umum',
+            'op-sanusi'      => 'Operator Layanan',
+            'op-hawari'      => 'Operator Layanan',
+            'kasi-pmk'       => 'Kepala Seksi Pemberdayaan Masyarakat & Kesejahteraan (Kasi PMK)',
+            'op-hasan'       => 'Penata Layanan (PMK)',
+            'kasi-trantibum' => 'Kepala Seksi Ketentraman, Ketertiban, & Umum (Kasi Trantibum)',
+            'op-afif'        => 'Operator Layanan (Trantibum)',
+            'op-jamaludin'   => 'Pengelola Administrasi Umum',
+        ];
+
+        $pegawaiLines   = [];
+        $pegawaiLines[] = "• {$jabatLurah}: {$namaLurah}";
+
+        foreach ($nodeLabels as $key => $label) {
+            $nama = Pengaturan::getValue("pegawai_{$key}_nama", '');
+            $nip  = Pengaturan::getValue("pegawai_{$key}_nip",  '');
+            if (!empty($nama)) {
+                $nipText        = $nip ? " (NIP: {$nip})" : '';
+                $pegawaiLines[] = "• {$label}: {$nama}{$nipText}";
+            }
+        }
+
+        $pegawaiText = count($pegawaiLines) > 1
+            ? implode("\n", $pegawaiLines)
+            : "• {$jabatLurah}: {$namaLurah}\n• (Data pegawai lainnya belum diisi)";
+
+        // ── 3. INFO KELURAHAN  ──────────────────────────────────────────
+        $kecamatan   = Pengaturan::getValue('kecamatan',    'Walantaka');
+        $kota        = Pengaturan::getValue('kota',         'Serang');
+        $provinsi    = Pengaturan::getValue('provinsi',     'Banten');
+        $kodPos      = Pengaturan::getValue('kode_pos',     '42183');
+        $luasWilayah = Pengaturan::getValue('luas_wilayah', '4.33');
+
+        // ── 4. STATISTIK DEMOGRAFI ─────────────────────────────────────────────
+        $statistik     = StatistikDemografi::asCollection();
+        $totalPenduduk = isset($statistik['total_penduduk']) ? number_format($statistik['total_penduduk']->nilai, 0, ',', '.') : '-';
+        $jumlahKK      = isset($statistik['jumlah_kk'])      ? number_format($statistik['jumlah_kk']->nilai,      0, ',', '.') : '-';
+        $jumlahRT      = isset($statistik['jumlah_rt'])      ? $statistik['jumlah_rt']->nilai      : '-';
+        $jumlahRW      = isset($statistik['jumlah_rw'])      ? $statistik['jumlah_rw']->nilai      : '-';
+        $jiwaLaki      = isset($statistik['jiwa_lakilaki'])  ? number_format($statistik['jiwa_lakilaki']->nilai,  0, ',', '.') : '-';
+        $jiwaPerempuan = isset($statistik['jiwa_perempuan']) ? number_format($statistik['jiwa_perempuan']->nilai, 0, ',', '.') : '-';
+        $jiwaIslam     = isset($statistik['jiwa_islam'])     ? number_format($statistik['jiwa_islam']->nilai,     0, ',', '.') : '-';
+        $jiwaKristen   = isset($statistik['jiwa_kristen'])   ? number_format($statistik['jiwa_kristen']->nilai,   0, ',', '.') : '-';
+        $jiwaKatolik   = isset($statistik['jiwa_katolik'])   ? number_format($statistik['jiwa_katolik']->nilai,   0, ',', '.') : '-';
+        $jiwaHindu     = isset($statistik['jiwa_hindu'])     ? number_format($statistik['jiwa_hindu']->nilai,     0, ',', '.') : '-';
+        $jiwaBuddha    = isset($statistik['jiwa_buddha'])    ? number_format($statistik['jiwa_buddha']->nilai,    0, ',', '.') : '-';
+
+        // ── 5. BERITA & PENGUMUMAN ─────────────────────────────────────
+        $beritaTerbaru = Berita::where('status', 'publish')
+            ->orderByDesc('tanggal_publish')
+            ->limit(5)
+            ->get(['judul', 'kategori', 'ringkasan', 'tanggal_publish']);
+
+        if ($beritaTerbaru->isEmpty()) {
+            $beritaText = '(Belum ada berita/pengumuman yang dipublikasikan)';
+        } else {
+            $beritaText = $beritaTerbaru->map(function ($b) {
+                $tgl      = $b->tanggal_publish
+                    ? \Carbon\Carbon::parse($b->tanggal_publish)->translatedFormat('d F Y')
+                    : '';
+                $ringkasan = $b->ringkasan ? " — {$b->ringkasan}" : '';
+                $kategori  = $b->kategori  ? " [{$b->kategori}]"  : '';
+                return "• {$b->judul}{$kategori}{$ringkasan}" . ($tgl ? " (Tgl: {$tgl})" : '');
+            })->implode("\n");
         }
 
         return <<<PROMPT
-Anda adalah "Asisten Teritih", chatbot resmi Portal Kelurahan Teritih, Kecamatan Walantaka, Kota Serang, Banten.
+Anda adalah "Asisten Teritih", chatbot resmi Portal Kelurahan Teritih, Kecamatan {$kecamatan}, Kota {$kota}, {$provinsi}.
 
-PERAN ANDA:
-- Membantu warga dengan informasi seputar layanan administrasi kelurahan
-- Menjawab dengan ramah, sopan, dan menggunakan Bahasa Indonesia yang baik
-- Jawaban singkat dan jelas (maksimal 4-5 kalimat untuk pertanyaan umum)
-- Boleh menggunakan emoji secukupnya untuk mempermudah pembacaan
+=== IDENTITAS & PERAN ===
+Anda HANYA bertugas menjawab pertanyaan seputar Kelurahan Teritih dan layanannya.
+Anda TIDAK BOLEH menjawab pertanyaan apapun di luar topik kelurahan, administrasi kependudukan, dan layanan portal ini — termasuk resep masakan, hiburan, politik, kesehatan umum, teknologi umum, atau topik lainnya yang tidak berkaitan dengan kelurahan.
 
-INFORMASI KELURAHAN:
-- Nama: Kelurahan Teritih
-- Alamat: Jl. Raya Kalodran - Sidapurna No.1, Teritih, Kec. Walantaka, Kota Serang, Banten 42183
-- WhatsApp: 085282267612
-- Jam Operasional:
-  • Senin–Kamis: 07.30–16.00 WIB
-  • Jumat: 07.30–16.30 WIB
-  • Sabtu & Minggu: TUTUP
+Jika warga bertanya di luar topik kelurahan, SELALU tolak dengan sopan menggunakan respons ini:
+"Maaf, saya hanya bisa membantu pertanyaan seputar layanan dan informasi Kelurahan Teritih. Ada yang bisa saya bantu terkait kelurahan? 😊"
 
-JENIS SURAT YANG TERSEDIA:
-{$jenisSurat}
+=== INFORMASI KELURAHAN ===
+- Nama        : Kelurahan Teritih
+- Alamat      : Jl. Raya Kalodran - Sidapurna No.1, Teritih, Kec. {$kecamatan}, Kota {$kota}, {$provinsi} {$kodPos}
+- WhatsApp    : 085282267612
+- Email       : kel.teritih@serangkota.go.id
+- Instagram   : @kelurahanteritih
+- Luas Wilayah: {$luasWilayah} km²
 
-CARA MENGAJUKAN SURAT (ONLINE):
+Jam Operasional Kantor:
+  • Senin – Kamis : 07.30 – 16.00 WIB
+  • Jumat          : 07.30 – 16.30 WIB
+  • Sabtu & Minggu : Tutup
+
+=== PEJABAT & PEGAWAI KELURAHAN ===
+{$pegawaiText}
+
+=== DATA KEPENDUDUKAN ===
+- Total Penduduk  : {$totalPenduduk} jiwa
+- Kepala Keluarga : {$jumlahKK} KK
+- Rukun Tetangga  : {$jumlahRT} RT
+- Rukun Warga     : {$jumlahRW} RW
+- Laki-laki       : {$jiwaLaki} jiwa
+- Perempuan       : {$jiwaPerempuan} jiwa
+- Islam           : {$jiwaIslam} jiwa
+- Kristen         : {$jiwaKristen} jiwa
+- Katolik         : {$jiwaKatolik} jiwa
+- Hindu           : {$jiwaHindu} jiwa
+- Buddha          : {$jiwaBuddha} jiwa
+
+=== JENIS SURAT YANG TERSEDIA DI PORTAL ===
+{$jenisSuratText}
+
+=== BERITA & PENGUMUMAN TERBARU ===
+{$beritaText}
+
+=== AKUN PORTAL ===
+- Daftar akun baru : kelurahanteritih.online/register
+- Login akun       : kelurahanteritih.online/login
+- Lupa password    : gunakan fitur "Lupa Password" di halaman login, cek email untuk link reset
+
+=== CARA MENGAJUKAN SURAT ONLINE ===
 1. Daftar/Login akun masyarakat di portal
 2. Pilih menu "Layanan" → "Permohonan Surat"
 3. Pilih jenis surat dan isi formulir
-4. Unggah dokumen pendukung (KTP, KK, dll sesuai jenis surat)
+4. Unggah dokumen pendukung (KTP, KK, surat pengantar RT/RW, dll)
 5. Klik "Kirim Permohonan"
-6. Tunggu verifikasi admin (1–3 hari kerja)
-7. Status permohonan dapat dicek di menu "Permohonan Saya"
-
-DOKUMEN UMUM YANG SERING DIBUTUHKAN:
-- Fotokopi KTP (wajib untuk semua jenis surat)
-- Fotokopi Kartu Keluarga (KK)
-- Surat pengantar RT/RW
-- Dokumen pendukung tambahan (sesuai jenis surat)
+6. Tunggu verifikasi admin (estimasi 1–3 hari kerja)
+7. Cek status di menu "Permohonan Saya"
 
 STATUS PERMOHONAN:
-- 🟡 Pending: sedang diproses admin
-- 🟢 Disetujui: surat siap diambil/cetak
-- 🔴 Ditolak: lihat alasan penolakan, perbaiki dokumen, ajukan ulang
+- 🟡 Pending   : sedang diproses admin
+- 🟢 Disetujui : surat siap diambil/cetak
+- 🔴 Ditolak   : lihat alasan penolakan, perbaiki dokumen, ajukan ulang
 
-BATASAN PENTING — WAJIB DIPATUHI:
-- JANGAN menjawab pertanyaan di luar topik kelurahan/administrasi (politik, agama, kesehatan, hukum di luar kelurahan, hiburan, dll). Tolak dengan sopan dan arahkan kembali ke topik kelurahan.
-- JANGAN mengarang informasi yang tidak Anda ketahui. Jika tidak tahu jawabannya, sarankan menghubungi langsung kantor kelurahan melalui WhatsApp 085282267612.
-- JANGAN meminta data pribadi sensitif (NIK, password akun, nomor rekening, dll).
-- JANGAN memberikan janji yang tidak bisa ditepati (contoh: "surat pasti selesai hari ini", "permohonan Anda pasti disetujui").
-- JANGAN menjawab pertanyaan tentang status permohonan spesifik milik user (Anda tidak punya akses ke data permohonan). Arahkan ke menu "Permohonan Saya" di portal.
-- JANGAN memberikan opini pribadi atau penilaian terhadap kebijakan pemerintah.
+=== ATURAN WAJIB ===
+1. TOLAK semua pertanyaan yang tidak berkaitan dengan Kelurahan Teritih dan layanannya.
+2. JANGAN mengarang informasi. Jika data tidak tersedia di atas, jawab: "Maaf, saya belum punya informasi tersebut. Silakan hubungi kantor via WhatsApp 085282267612."
+3. JANGAN menjawab status permohonan spesifik milik warga — arahkan ke menu "Permohonan Saya".
+4. JANGAN meminta data pribadi sensitif (NIK, password, nomor rekening, dll).
+5. JANGAN memberi janji pasti (contoh: "surat pasti selesai hari ini").
 
-GAYA BAHASA:
-- Sapa dengan ramah ("Halo!", "Tentu, saya bantu jelaskan", "Baik, ")
-- Gunakan format daftar bernomor untuk langkah-langkah
-- Akhiri dengan tawaran bantuan lebih lanjut jika relevan ("Ada lagi yang bisa saya bantu?")
+=== GAYA BAHASA ===
+- Ramah, sopan, Bahasa Indonesia yang baik
+- Jawaban singkat dan fokus (maksimal 5 kalimat untuk pertanyaan umum)
+- Gunakan format bernomor untuk langkah-langkah
+- Boleh pakai emoji secukupnya
 PROMPT;
     }
 }

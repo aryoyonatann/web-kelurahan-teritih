@@ -451,11 +451,24 @@
         },
         {
             q: 'Jenis surat apa saja yang tersedia?',
-            a: '📄 <b>8 Jenis Surat Tersedia:</b><br><br>• Keterangan Domisili<br>• Keterangan Usaha<br>• Pengantar SKCK<br>• Keterangan Tidak Mampu (SKTM)<br>• Keterangan Kelahiran<br>• Keterangan Kematian<br>• Keterangan Pindah<br>• Keterangan Belum Menikah'
+            a: (function() {
+                @php
+                    $faqJenisSurat = \App\Models\JenisSurat::where('aktif', true)->pluck('nama_surat');
+                    if ($faqJenisSurat->isEmpty()) {
+                        $faqJenisSurat = collect([
+                            'Keterangan Domisili', 'Keterangan Usaha', 'Pengantar SKCK',
+                            'Keterangan Tidak Mampu (SKTM)', 'Keterangan Kelahiran',
+                            'Keterangan Kematian', 'Keterangan Pindah', 'Keterangan Belum Menikah',
+                        ]);
+                    }
+                @endphp
+                var list = @json($faqJenisSurat->values());
+                return '📄 <b>' + list.length + ' Jenis Surat Tersedia:</b><br><br>' + list.map(function(s){ return '• ' + s; }).join('<br>');
+            })()
         },
         {
             q: 'Berapa lama proses pembuatan surat?',
-            a: '⏱️ <b>Estimasi Waktu Proses:</b><br><br>• <b>Online:</b> 1–3 hari kerja<br>• <b>Langsung ke kantor:</b> Bisa selesai hari yang sama<br><br>📩 Notifikasi via <b>dashboard</b> dan <b>WhatsApp</b>.'
+            a: '⏱️ <b>Estimasi Waktu Proses:</b><br><br>• <b>Online:</b> 1–3 hari kerja<br>• <b>Langsung ke kantor:</b> Bisa selesai hari yang sama'
         },
         {
             q: 'Syarat dokumen yang dibutuhkan',
@@ -467,7 +480,7 @@
         },
         {
             q: 'Cara cek status permohonan saya',
-            a: '🔍 <b>Cara Cek Status:</b><br><br>1. Login ke akun masyarakat<br>2. Klik <b>Permohonan Saya</b><br>3. Lihat status:<br>   🟡 <b>Pending</b> — Sedang diproses<br>   🟢 <b>Disetujui</b> — Surat siap<br>   🔴 <b>Ditolak</b> — Lihat alasan<br><br>📲 Notifikasi juga dikirim via WhatsApp.'
+            a: '🔍 <b>Cara Cek Status:</b><br><br>1. Login ke akun masyarakat<br>2. Klik <b>Permohonan Saya</b><br>3. Lihat status:<br>   🟡 <b>Pending</b> — Sedang diproses<br>   🟢 <b>Disetujui</b> — Surat siap<br>   🔴 <b>Ditolak</b> — Lihat alasan'
         },
         {
             q: 'Cara daftar akun masyarakat',

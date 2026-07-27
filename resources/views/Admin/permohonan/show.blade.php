@@ -2,24 +2,20 @@
 
 @section('title', 'Detail Permohonan')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
-<style>
+@push('styles')<style>
     :root {
-        --primary:        #2563eb;
-        --primary-light:  #dbeafe;
-        --primary-dark:   #1d4ed8;
-        --success:        #059669;
-        --success-light:  #d1fae5;
-        --warning:        #d97706;
-        --warning-light:  #fef3c7;
-        --danger:         #dc2626;
-        --danger-light:   #fee2e2;
-        --purple:         #7c3aed;
-        --purple-light:   #ede9fe;
+        /* Brand — selaras dengan app.css */
+        --primary:        #1c64f2;
+        --primary-light:  #eff6ff;
+        --primary-dark:   #1a56db;
+        --success:        #10b981;
+        --success-light:  #ecfdf5;
+        --warning:        #f59e0b;
+        --warning-light:  #fffbeb;
+        --danger:         #ef4444;
+        --danger-light:   #fef2f2;
+        --purple:         #8b5cf6;
+        --purple-light:   #f5f3ff;
         --gray-50:  #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0;
         --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b;
         --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b; --gray-900: #0f172a;
@@ -48,7 +44,7 @@
 
     /* HERO */
     .detail-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d1b3e 0%, #1c64f2 60%, #60a5fa 100%);
         border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 24px;
         position: relative; overflow: hidden;
         box-shadow: 0 8px 32px rgba(37,99,235,.25);
@@ -99,7 +95,7 @@
     .section-head-icon.purple { background:var(--purple-light);color:var(--purple); }
     .section-head-icon.orange { background:var(--warning-light);color:var(--warning); }
     .section-head-icon.rose   { background:#fff1f2;color:#f43f5e; }
-    .section-head-icon.amber  { background:#fffbeb;color:#d97706; }
+    .section-head-icon.amber  { background:#fffbeb;color:#f59e0b; }
     .section-head h3 { font-size:13px;font-weight:700;color:var(--gray-700);margin:0; }
     .section-body { padding:20px; }
 
@@ -387,7 +383,7 @@
                     $isImg = in_array($ext, ['jpg','jpeg','png','gif','webp']);
                 @endphp
                 <a href="{{ asset('storage/'.$dok->path_file) }}" target="_blank" class="dok-item">
-                    <div class="dok-icon" style="{{ $isPdf ? 'background:#fee2e2' : 'background:var(--primary-light)' }}">
+                    <div class="dok-icon" style="{{ $isPdf ? 'background:#fef2f2' : 'background:var(--primary-light)' }}">
                         @if($isPdf)
                         <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--danger)"><path d="M7 18H17V16H7v2zm0-4h10v-2H7v2zm-2 8a2 2 0 01-2-2V4a2 2 0 012-2h8l6 6v14a2 2 0 01-2 2H5z"/></svg>
                         @elseif($isImg)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PermohonanSurat;
 use App\Models\Approval;
+use App\Models\Pengaturan;
 use Illuminate\Http\Request;
 
 class PermohonanController extends Controller
@@ -67,7 +68,20 @@ class PermohonanController extends Controller
 
         $bulanRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now()->month - 1];
 
-        return view('Admin.permohonan.print', compact('permohonan', 'nomorUrut', 'bulanRomawi'));
+        // Ambil data pegawai dari pengaturan untuk auto-fill TTD
+        $nodeKeys = ['lurah','sekretaris','kasi-pemum','pelaksana','op-sanusi','op-hawari','kasi-pmk','op-hasan','kasi-trantibum','op-afif','op-jamaludin'];
+        $pegawaiData = [];
+        foreach ($nodeKeys as $key) {
+            $pegawaiData[$key] = [
+                'nama' => Pengaturan::getValue('pegawai_'.$key.'_nama', ''),
+                'nip'  => Pengaturan::getValue('pegawai_'.$key.'_nip',  ''),
+            ];
+        }
+        // Nama & jabatan lurah (dari profil kepala kelurahan)
+        $namaLurah  = Pengaturan::getValue('nama_lurah', 'Jupran, SE, MM');
+        $jabatLurah = Pengaturan::getValue('jabat_lurah', 'Kepala Kelurahan Teritih');
+
+        return view('Admin.permohonan.print', compact('permohonan', 'nomorUrut', 'bulanRomawi', 'pegawaiData', 'namaLurah', 'jabatLurah'));
     }
 
     public function updateData(Request $request, $id)

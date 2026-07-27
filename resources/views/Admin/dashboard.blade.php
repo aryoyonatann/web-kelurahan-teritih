@@ -2,11 +2,7 @@
 
 @section('title', 'Dashboard')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<style>
+@push('styles')<style>
 :root {
     --blue:#1c64f2; --blue-dk:#1a56db; --blue-lt:#eff6ff;
     --navy:#0f172a; --slate:#334155; --muted:#64748b;
@@ -96,7 +92,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     background:var(--blue-lt); color:var(--blue); border:none; cursor:pointer;
     text-decoration:none; transition:background .18s; white-space:nowrap;
 }
-.btn-card-link:hover { background:#dbeafe; }
+.btn-card-link:hover { background:#eff6ff; }
 
 /* BERITA */
 .berita-item { display:flex; align-items:center; gap:14px; padding:16px 0; border-bottom:1px solid var(--border); }
@@ -176,7 +172,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
 /* HERO BANNER */
 .dash-hero {
-    background:linear-gradient(135deg,#1e3a8a 0%,var(--blue) 50%,#3b82f6 100%);
+    background:linear-gradient(135deg,#0d1b3e 0%,var(--blue) 50%,#60a5fa 100%);
     border-radius:14px; padding:20px; margin-bottom:20px;
     position:relative; overflow:hidden;
     display:flex; align-items:center; justify-content:space-between; gap:12px;

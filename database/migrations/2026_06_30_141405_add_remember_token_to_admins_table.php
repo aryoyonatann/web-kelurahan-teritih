@@ -8,14 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('admins', function (Blueprint $table) {
+        Schema::table('admin', function (Blueprint $table) {
             $table->rememberToken()->nullable()->after('password');
         });
     }
 
     public function down(): void
     {
-        Schema::table('admins', function (Blueprint $table) {
+        Schema::table('admin', function (Blueprint $table) {
             $table->dropColumn('remember_token');
         });
     }

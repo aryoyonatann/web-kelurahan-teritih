@@ -2,14 +2,12 @@
 
 @section('title', 'Pengaturan Kelurahan')
 
-@push('styles')
-<link rel="icon" type="image/png" href="{{ asset('images/logo kota serang.png') }}">
-<style>
+@push('styles')<style>
 .back-bar{display:flex;align-items:center;gap:8px;padding:14px 32px;background:white;border-bottom:1px solid #e2e8f0;font-size:13px}
 .back-btn{display:inline-flex;align-items:center;gap:6px;color:#64748b;text-decoration:none;font-weight:600;padding:5px 10px;border-radius:7px;transition:all .15s}
-.back-btn:hover{background:#f1f5f9;color:#2563eb}
+.back-btn:hover{background:#f1f5f9;color:#1c64f2}
 .bc-sep{color:#cbd5e1}.bc-cur{color:#0f172a;font-weight:600}
-.pg-hero{background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 60%,#3b82f6 100%);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.pg-hero{background:linear-gradient(135deg,#0d1b3e 0%,#1c64f2 60%,#60a5fa 100%);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .pg-hero-text h1{font-size:22px;font-weight:800;color:white;margin:0 0 4px}
 .pg-hero-text p{font-size:13px;color:rgba(255,255,255,.75);margin:0}
 .pg-hero-icon{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:26px;color:white;flex-shrink:0}
@@ -19,7 +17,7 @@
 
 /* Sidebar */
 .sidebar-card{background:white;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;position:sticky;top:80px}
-.sidebar-card-top{background:linear-gradient(135deg,#1e3a8a,#2563eb);padding:24px;text-align:center}
+.sidebar-card-top{background:linear-gradient(135deg,#0d1b3e,#1c64f2);padding:24px;text-align:center}
 .sidebar-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.4);margin:0 auto 12px;display:block}
 .sidebar-avatar-placeholder{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.4);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;color:white;font-size:32px}
 .sidebar-nama{font-size:15px;font-weight:700;color:white;margin:0 0 4px}
@@ -28,7 +26,7 @@
 .sidebar-info{padding:16px}
 .sidebar-info-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12.5px;color:#64748b}
 .sidebar-info-item:last-child{border-bottom:none}
-.sidebar-info-item i{font-size:14px;color:#2563eb;flex-shrink:0;width:16px;text-align:center}
+.sidebar-info-item i{font-size:14px;color:#1c64f2;flex-shrink:0;width:16px;text-align:center}
 .sidebar-info-item span{color:#0f172a;font-weight:600}
 
 /* Main form */
@@ -40,36 +38,36 @@
 .form-card-body{padding:22px}
 .form-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block}
 .form-control{border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:13px;font-family:inherit;transition:border-color .15s;width:100%;background:white;color:#0f172a}
-.form-control:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1);outline:none}
+.form-control:focus{border-color:#1c64f2;box-shadow:0 0 0 3px rgba(37,99,235,.1);outline:none}
 .form-hint{font-size:11px;color:#94a3b8;margin-top:4px}
-.form-error{font-size:11.5px;color:#dc2626;margin-top:4px}
+.form-error{font-size:11.5px;color:#ef4444;margin-top:4px}
 
 /* Foto upload area */
 .foto-upload-area{display:flex;align-items:center;gap:16px;padding:14px;background:#f8fafc;border-radius:12px;border:1.5px dashed #cbd5e1;transition:border-color .15s}
 .foto-upload-area:hover{border-color:#93c5fd}
 .foto-thumb{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2.5px solid #e2e8f0;flex-shrink:0}
 .foto-thumb-placeholder{width:64px;height:64px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:24px;flex-shrink:0}
-.btn-pilih-foto{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid #bfdbfe;background:#eff6ff;color:#2563eb;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
-.btn-pilih-foto:hover{background:#dbeafe}
+.btn-pilih-foto{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1c64f2;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-pilih-foto:hover{background:#eff6ff}
 
 /* Pegawai item */
 .pegawai-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start}
 .pegawai-item:last-child{margin-bottom:0}
 .pegawai-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0;flex-shrink:0}
 .pegawai-avatar-placeholder{width:52px;height:52px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px}
-.pegawai-role{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#2563eb;margin-bottom:8px}
+.pegawai-role{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1c64f2;margin-bottom:8px}
 .pegawai-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(max-width:580px){.pegawai-inputs{grid-template-columns:1fr}}
 .pegawai-foto-label{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;border:1.5px solid #e2e8f0;background:white;color:#64748b;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
-.pegawai-foto-label:hover{border-color:#93c5fd;color:#2563eb}
+.pegawai-foto-label:hover{border-color:#93c5fd;color:#1c64f2}
 input[type=file].hidden-file{display:none}
 
 /* Save btn */
-.btn-save{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:11px;border:none;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 4px 12px rgba(37,99,235,.25)}
+.btn-save{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:11px;border:none;background:linear-gradient(135deg,#0d1b3e,#1c64f2);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 4px 12px rgba(37,99,235,.25)}
 .btn-save:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,99,235,.35)}
 
 .alert-success{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;margin-bottom:20px;background:#ecfdf5;border:1px solid #6ee7b7;font-size:13px;color:#065f46;font-weight:500}
-.alert-error{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#dc2626}
+.alert-error{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#ef4444}
 </style>
 @endpush
 
@@ -130,7 +128,7 @@ input[type=file].hidden-file{display:none}
         {{-- Profil Lurah --}}
         <div class="form-card">
             <div class="form-card-header">
-                <div class="form-card-header-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-person-badge-fill"></i></div>
+                <div class="form-card-header-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-person-badge-fill"></i></div>
                 <div>
                     <h3>Profil Kepala Kelurahan</h3>
                     <p>Informasi yang tampil di halaman Beranda</p>

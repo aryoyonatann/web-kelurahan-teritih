@@ -2,13 +2,9 @@
 
 @section('title', 'Kelola Akun Masyarakat')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<style>
+@push('styles')<style>
 :root {
-    --blue:    #2563eb; --blue-dk: #1d4ed8; --blue-lt: #eff6ff;
+    --blue:    #1c64f2; --blue-dk: #1a56db; --blue-lt: #eff6ff;
     --navy:    #0f172a; --slate:   #334155;  --muted:   #64748b;
     --border:  #e2e8f0; --bg:      #f1f5f9;
     --green:   #10b981; --orange:  #f59e0b;
@@ -18,7 +14,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
 /* ── HERO ── */
 .kp-hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+    background: linear-gradient(135deg, #0d1b3e 0%, #1c64f2 50%, #60a5fa 100%);
     padding: 32px 32px 28px;
     position: relative; overflow: hidden;
 }
@@ -76,7 +72,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .btn-export:hover { background:rgba(255,255,255,.25); color:white; }
 
 /* Filter badge */
-.filter-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; background:#dbeafe; color:#1d4ed8; }
+.filter-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; background:#eff6ff; color:#1a56db; }
 
 /* Table */
 .table-card { background:white; border-radius:12px; border:1px solid var(--border); overflow:hidden; }
@@ -94,7 +90,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 .th-sort i { font-size:10px; margin-left:3px; }
 
 .av { width:36px; height:36px; border-radius:9px; font-size:12px; font-weight:700; color:white; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.av-blue   { background:linear-gradient(135deg,#2563eb,#60a5fa); }
+.av-blue   { background:linear-gradient(135deg,#1c64f2,#60a5fa); }
 .av-green  { background:linear-gradient(135deg,#10b981,#6ee7b7); }
 .av-purple { background:linear-gradient(135deg,#8b5cf6,#c4b5fd); }
 .av-orange { background:linear-gradient(135deg,#f59e0b,#fcd34d); }
@@ -136,7 +132,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 .dd-item:hover { background:var(--bg); color:var(--navy); }
 .dd-item.danger  { color:var(--red); }
 .dd-item.danger:hover  { background:#fef2f2; }
-.dd-item.warning { color:#d97706; }
+.dd-item.warning { color:#f59e0b; }
 .dd-item.warning:hover { background:#fffbeb; }
 .dd-item.success { color:var(--green); }
 .dd-item.success:hover { background:#ecfdf5; }
@@ -180,7 +176,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 .btn-primary { padding:8px 20px; border-radius:8px; border:none; background:var(--blue); color:white; font-size:13px; font-weight:600; cursor:pointer; }
 .btn-primary:hover { background:var(--blue-dk); }
 .btn-danger  { padding:8px 18px; border-radius:8px; border:none; background:var(--red); color:white; font-size:13px; font-weight:600; cursor:pointer; }
-.btn-danger:hover  { background:#dc2626; }
+.btn-danger:hover  { background:#ef4444; }
 </style>
 @endpush
 

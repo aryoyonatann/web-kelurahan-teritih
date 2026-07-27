@@ -2,19 +2,15 @@
 
 @section('title', 'Edit Statistik Demografi')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<style>
+@push('styles')<style>
 body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 .back-bar{display:flex;align-items:center;gap:8px;padding:14px 32px;background:white;border-bottom:1px solid #e2e8f0;font-size:13px}
 .back-btn{display:inline-flex;align-items:center;gap:6px;color:#64748b;text-decoration:none;font-weight:600;padding:5px 10px;border-radius:7px;transition:all .15s}
-.back-btn:hover{background:#f1f5f9;color:#2563eb}
+.back-btn:hover{background:#f1f5f9;color:#1c64f2}
 .bc-sep{color:#cbd5e1}.bc-cur{color:#0f172a;font-weight:600}
 
 .stat-hero{
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+    background: linear-gradient(135deg, #0d1b3e 0%, #1c64f2 50%, #60a5fa 100%);
     padding:28px 32px;
     position:relative; overflow:hidden;
 }
@@ -38,7 +34,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 .stat-row{display:block;padding:14px 16px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0}
 .stat-row-label{font-size:11.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 .stat-input{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;color:#0f172a;background:white;outline:none;transition:all .18s;box-sizing:border-box}
-.stat-input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.stat-input:focus{border-color:#1c64f2;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 .pct-note{font-size:11px;color:#94a3b8;margin-top:4px}
 
 /* Grid 2 kolom untuk Laki-Laki & Perempuan */
@@ -53,8 +49,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 .form-footer{padding:16px 20px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:flex-end;gap:10px}
 .btn-batal{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;border:1.5px solid #e2e8f0;background:white;font-size:13px;font-weight:600;color:#64748b;text-decoration:none;cursor:pointer;transition:all .15s}
 .btn-batal:hover{background:#f8fafc}
-.btn-simpan{display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:9px;border:none;background:#2563eb;font-size:13px;font-weight:700;color:white;cursor:pointer;transition:all .15s;font-family:inherit}
-.btn-simpan:hover{background:#1d4ed8}
+.btn-simpan{display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:9px;border:none;background:#1c64f2;font-size:13px;font-weight:700;color:white;cursor:pointer;transition:all .15s;font-family:inherit}
+.btn-simpan:hover{background:#1a56db}
 .info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 16px;font-size:12px;color:#1e40af;display:flex;align-items:flex-start;gap:8px}
 
 /* Kelompok umur */
@@ -111,9 +107,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
-                <div class="group-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-info-circle-fill"></i></div>
+                <div class="group-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-info-circle-fill"></i></div>
                 <div class="group-title">Data Singkat Kelurahan</div>
-                <span style="margin-left:auto;font-size:11px;font-weight:700;background:#dbeafe;color:#1d4ed8;border-radius:20px;padding:3px 10px">
+                <span style="margin-left:auto;font-size:11px;font-weight:700;background:#eff6ff;color:#1a56db;border-radius:20px;padding:3px 10px">
                     Tampil di halaman Profil
                 </span>
             </div>
@@ -125,7 +121,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 <div class="data-singkat-grid">
                     <div class="ds-item">
                         <div class="ds-item-label">
-                            <div class="ds-item-icon" style="background:#fef3c7;color:#d97706"><i class="bi bi-mailbox2"></i></div>
+                            <div class="ds-item-icon" style="background:#fffbeb;color:#f59e0b"><i class="bi bi-mailbox2"></i></div>
                             Kode Pos
                         </div>
                         <input type="hidden" name="singkat[kode_pos][label]" value="Kode Pos">
@@ -141,7 +137,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                     </div>
                     <div class="ds-item">
                         <div class="ds-item-label">
-                            <div class="ds-item-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-people-fill"></i></div>
+                            <div class="ds-item-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-people-fill"></i></div>
                             Jumlah Penduduk (Jiwa)
                         </div>
                         <input type="hidden" name="singkat[jumlah_penduduk][label]" value="Jumlah Penduduk">
@@ -181,7 +177,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
-                <div class="group-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-people-fill"></i></div>
+                <div class="group-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-people-fill"></i></div>
                 <div class="group-title">Data Kependudukan Utama</div>
             </div>
             <div class="group-body">
@@ -201,7 +197,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 {{-- ── Laki-Laki & Perempuan (2 kolom) ── --}}
                 <div style="margin-top:4px">
                     <div style="font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:8px">
-                        <i class="bi bi-gender-ambiguous" style="color:#2563eb"></i>
+                        <i class="bi bi-gender-ambiguous" style="color:#1c64f2"></i>
                         Jumlah Berdasarkan Jenis Kelamin
                     </div>
                     <div class="jk-grid">
@@ -211,7 +207,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                             $nilaiLaki = $sLaki ? $sLaki->nilai : 0;
                         @endphp
                         <div class="stat-row" style="border-color:#bfdbfe;background:#eff6ff">
-                            <div class="stat-row-label" style="color:#1d4ed8">
+                            <div class="stat-row-label" style="color:#1a56db">
                                 👨 Laki-Laki (Jiwa)
                             </div>
                             <input type="hidden" name="statistik[jiwa_lakilaki][label]" value="Laki-Laki">
@@ -270,7 +266,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                     $agamaKeys = ['jiwa_islam','jiwa_kristen','jiwa_katolik','jiwa_hindu','jiwa_buddha','jiwa_konghucu','jiwa_lainnya'];
                     $totalA    = collect($agamaKeys)->sum(fn($k) => $statistik[$k]->nilai ?? 0);
                     $agamaColors = [
-                        'jiwa_islam'    =>'#10b981','jiwa_kristen'  =>'#2563eb','jiwa_katolik'  =>'#f59e0b',
+                        'jiwa_islam'    =>'#10b981','jiwa_kristen'  =>'#1c64f2','jiwa_katolik'  =>'#f59e0b',
                         'jiwa_hindu'    =>'#a855f7','jiwa_buddha'   =>'#06b6d4','jiwa_konghucu' =>'#ef4444',
                         'jiwa_lainnya'  =>'#94a3b8'
                     ];
@@ -439,7 +435,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
-                <div class="group-icon" style="background:#eff6ff;color:#3b82f6"><i class="bi bi-graph-up"></i></div>
+                <div class="group-icon" style="background:#eff6ff;color:#60a5fa"><i class="bi bi-graph-up"></i></div>
                 <div class="group-title">Pertumbuhan Penduduk per Tahun</div>
             </div>
             <div class="group-body">
@@ -457,7 +453,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                         <div class="stat-row-label">📈 Tahun {{ $yr }}</div>
                         <input type="hidden" name="statistik[{{ $kunci }}][label]" value="Tahun {{ $yr }}">
                         <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sp->nilai ?? 0 }}" min="0">
-                        <button type="button" onclick="hapusTahun(this,'{{ $kunci }}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;border:none;background:#fef2f2;color:#dc2626;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Hapus">✕</button>
+                        <button type="button" onclick="hapusTahun(this,'{{ $kunci }}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;border:none;background:#fef2f2;color:#ef4444;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Hapus">✕</button>
                     </div>
                     @endforeach
                 </div>
@@ -652,7 +648,7 @@ function tambahTahun() {
         <div class="stat-row-label">📈 Tahun ${newYear}</div>
         <input type="hidden" name="statistik[penduduk_${newYear}][label]" value="Tahun ${newYear}">
         <input type="number" name="statistik[penduduk_${newYear}][nilai]" class="stat-input" value="0" min="0" placeholder="Isi jumlah penduduk">
-        <button type="button" onclick="hapusTahun(this,'penduduk_${newYear}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;border:none;background:#fef2f2;color:#dc2626;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Hapus">✕</button>
+        <button type="button" onclick="hapusTahun(this,'penduduk_${newYear}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;border:none;background:#fef2f2;color:#ef4444;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Hapus">✕</button>
     </div>`;
     grid.insertAdjacentHTML('beforeend', html);
 }

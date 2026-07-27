@@ -7,7 +7,7 @@ use App\Models\Berita;
 
 class Admin extends Authenticatable
 {
-    protected $table = 'admins';
+    protected $table = 'admin';
     protected $primaryKey = 'id_admin';
     public $timestamps = false;
 

@@ -2,22 +2,18 @@
 
 @section('title', 'Data Permohonan')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
-<style>
+@push('styles')<style>
     :root {
-        --primary:        #2563eb;
-        --primary-light:  #dbeafe;
-        --primary-dark:   #1d4ed8;
-        --success:        #059669;
-        --success-light:  #d1fae5;
-        --warning:        #d97706;
-        --warning-light:  #fef3c7;
-        --danger:         #dc2626;
-        --danger-light:   #fee2e2;
+        /* Brand — selaras dengan app.css */
+        --primary:        #1c64f2;
+        --primary-light:  #eff6ff;
+        --primary-dark:   #1a56db;
+        --success:        #10b981;
+        --success-light:  #ecfdf5;
+        --warning:        #f59e0b;
+        --warning-light:  #fffbeb;
+        --danger:         #ef4444;
+        --danger-light:   #fef2f2;
         --gray-50:        #f8fafc;
         --gray-100:       #f1f5f9;
         --gray-200:       #e2e8f0;
@@ -45,7 +41,7 @@
 
     /* ── PAGE HEADER ── */
     .page-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d1b3e 0%, #1c64f2 60%, #60a5fa 100%);
         border-radius: var(--radius-lg);
         padding: 32px 36px;
         margin-bottom: 28px;
@@ -182,12 +178,12 @@
         font-size: 11px; font-weight: 700; letter-spacing: .04em;
     }
     .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .status-pending  { background: #fef3c7; color: #92400e; }
-    .status-pending .status-dot  { background: #d97706; animation: pulse-warn 1.5s infinite; }
-    .status-approved { background: #d1fae5; color: #064e3b; }
-    .status-approved .status-dot { background: #059669; }
-    .status-rejected { background: #fee2e2; color: #7f1d1d; }
-    .status-rejected .status-dot { background: #dc2626; }
+    .status-pending  { background: #fffbeb; color: #92400e; }
+    .status-pending .status-dot  { background: #f59e0b; animation: pulse-warn 1.5s infinite; }
+    .status-approved { background: #ecfdf5; color: #064e3b; }
+    .status-approved .status-dot { background: #10b981; }
+    .status-rejected { background: #fef2f2; color: #7f1d1d; }
+    .status-rejected .status-dot { background: #ef4444; }
 
     @keyframes pulse-warn {
         0%, 100% { opacity: 1; transform: scale(1); }
@@ -210,8 +206,8 @@
     .btn-approve:hover { background: #a7f3d0; }
     .btn-reject  { background: var(--danger-light); color: #b91c1c; }
     .btn-reject:hover  { background: #fecaca; }
-    .btn-print   { background: #f3e8ff; color: #7c3aed; }
-    .btn-print:hover   { background: #ede9fe; }
+    .btn-print   { background: #f3e8ff; color: #8b5cf6; }
+    .btn-print:hover   { background: #f5f3ff; }
     .btn-dok     { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; width:32px; height:32px; padding:0; justify-content:center; border-radius: var(--radius-sm); position: relative; }
     .btn-dok:hover { background: #e0f2fe; }
     .btn-dok::after {
@@ -561,8 +557,8 @@ function openDokModal(data) {
         list.innerHTML = data.files.map((f, i) => {
             const isPdf = f.ext === 'pdf';
             const isImg = ['jpg','jpeg','png','gif','webp'].includes(f.ext);
-            const iconColor = isPdf ? '#dc2626' : '#2563eb';
-            const iconBg    = isPdf ? '#fee2e2' : '#dbeafe';
+            const iconColor = isPdf ? '#ef4444' : '#1c64f2';
+            const iconBg    = isPdf ? '#fef2f2' : '#eff6ff';
             const icon = isPdf
                 ? `<svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;color:${iconColor}"><path d="M7 18H17V16H7v2zm0-4h10v-2H7v2zm-2 8a2 2 0 01-2-2V4a2 2 0 012-2h8l6 6v14a2 2 0 01-2 2H5z"/></svg>`
                 : isImg
@@ -578,7 +574,7 @@ function openDokModal(data) {
                     <div style="font-size:11px;color:#94a3b8;margin-top:2px">${f.ext.toUpperCase()} · ${escHtml(f.tgl)}</div>
                 </div>
                 <a href="${escHtml(f.url)}" target="_blank"
-                   style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:7px;background:#dbeafe;color:#1d4ed8;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">
+                   style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:7px;background:#eff6ff;color:#1a56db;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                     </svg>

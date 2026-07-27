@@ -74,7 +74,7 @@
 
 /* Form elements */
 .fl{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px}
-.fl .req{color:#dc2626}
+.fl .req{color:#ef4444}
 .fi{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-family:inherit;color:#0f172a;outline:none;transition:all .15s;background:white}
 .fi:focus{border-color:#1c64f2;box-shadow:0 0 0 3px rgba(28,100,242,.08)}
 textarea.fi{resize:vertical;min-height:90px}
@@ -93,7 +93,7 @@ textarea.fi{resize:vertical;min-height:90px}
 .preset-grid{display:flex;flex-wrap:wrap;gap:8px}
 .preset-tag{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:22px;border:1.5px solid #e2e8f0;background:white;color:#334155;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;font-family:inherit}
 .preset-tag:hover{border-color:#93c5fd;background:#eff6ff;color:#1c64f2}
-.preset-tag.used{border-color:#a7f3d0;background:#ecfdf5;color:#059669;pointer-events:none}
+.preset-tag.used{border-color:#a7f3d0;background:#ecfdf5;color:#10b981;pointer-events:none}
 .preset-tag i{font-size:11px}
 
 /* Added fields list */
@@ -101,7 +101,7 @@ textarea.fi{resize:vertical;min-height:90px}
 .field-item-icon{width:28px;height:28px;border-radius:7px;background:#eff6ff;color:#1c64f2;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
 .field-item-label{flex:1;font-weight:600;color:#0f172a}
 .field-item-type{font-size:11px;color:#94a3b8;background:#f1f5f9;border-radius:5px;padding:2px 8px}
-.field-item-rm{width:26px;height:26px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.field-item-rm{width:26px;height:26px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
 
 /* Navigation buttons */
 .wizard-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
@@ -361,7 +361,7 @@ textarea[name=template_pembuka],textarea[name=template_isi],textarea[name=templa
                         <div class="fl" style="margin-bottom:8px">Baris Khusus <span style="color:#94a3b8;font-weight:400">(opsional)</span></div>
                         <div style="font-size:12px;color:#64748b;margin-bottom:10px">Tambahkan baris yang tampil dengan format khusus setelah kalimat di atas — misalnya tujuan penggunaan surat yang ditulis warga saat mengajukan.</div>
                         <button type="button" onclick="addCenterBoldField()"
-                            style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;border:1.5px dashed #e9d5ff;background:#faf5ff;color:#7c3aed;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
+                            style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;border:1.5px dashed #e9d5ff;background:#faf5ff;color:#8b5cf6;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
                             <i class="bi bi-type-bold"></i> Tambah Baris Bold + Center
                         </button>
                         <div class="hint" style="margin-top:6px">Admin bisa isi template teks awal, sisanya diisi warga. Contoh hasil: <em style="font-weight:bold;text-decoration:underline">Surat Keterangan ini dipergunakan untuk Persyaratan Bansos Tahun 2027</em></div>
@@ -405,8 +405,8 @@ textarea[name=template_pembuka],textarea[name=template_isi],textarea[name=templa
                     <div class="sp-nomor">Nomor: <span id="pv_nomor">470 / ___ / Kel.1010/SK/ VI /2026</span></div>
                     <p class="sp-pembuka">Yang bertanda tangan di bawah ini Kepala Kelurahan Teritih Kecamatan Walantaka Kota Serang Provinsi Banten, menerangkan dengan sebenarnya bahwa:</p>
                     <table class="sp-bio" id="pv_bio"></table>
-                    <p class="sp-isi" id="pv_isi"></p>
                     <div id="pv_extra"></div>
+                    <p class="sp-isi" id="pv_isi"></p>
                     <div id="pv_center_bold"></div>
                     <p class="sp-penutup">Demikian surat keterangan ini kami buat dengan sebenar-benarnya dan untuk dipergunakan sebagaimana mestinya.</p>
                     <div class="sp-ttd">
@@ -515,7 +515,7 @@ function editCenterBold(i, key) {
     const labelEl = document.getElementById('cb_label_'+i);
     const current = labelEl?.textContent || '';
     openInputModal(
-        'bi-type-bold', '#7c3aed',
+        'bi-type-bold', '#8b5cf6',
         'Edit Teks Bold Center',
         'Teks pembuka',
         'Contoh: Surat ini dipergunakan untuk',
@@ -550,11 +550,11 @@ function renderField(key, label, type, req, onPrint, printStyle, templateText) {
     item.id = 'fi_'+i;
     item.style.cssText = isSection ? 'background:#f0fdf4;border-color:#bbf7d0' : (isCenterBold ? 'background:#faf5ff;border-color:#e9d5ff' : '');
     item.innerHTML = `
-        <div class="field-item-icon" style="${isSection?'background:#dcfce7;color:#16a34a':(isCenterBold?'background:#f3e8ff;color:#7c3aed':'')}">
+        <div class="field-item-icon" style="${isSection?'background:#dcfce7;color:#16a34a':(isCenterBold?'background:#f3e8ff;color:#8b5cf6':'')}">
             <i class="bi bi-${isSection?'text-left':(isCenterBold?'type-bold':'input-cursor-text')}"></i>
         </div>
         <div class="field-item-label" style="${isSection?'color:#15803d;font-style:italic':(isCenterBold?'color:#6d28d9;font-weight:700':'')}">${label}</div>
-        <span class="field-item-type" style="${isSection?'background:#dcfce7;color:#16a34a':(isCenterBold?'background:#f3e8ff;color:#7c3aed':'')}">${displayLabel}</span>
+        <span class="field-item-type" style="${isSection?'background:#dcfce7;color:#16a34a':(isCenterBold?'background:#f3e8ff;color:#8b5cf6':'')}">${displayLabel}</span>
         <button type="button" class="field-item-rm" onclick="removeField(${i},'${key}')"><i class="bi bi-x-lg"></i></button>`;
     document.getElementById('addedFields').appendChild(item);
     if (isCenterBold) item.style.display = 'none'; // ditampilkan di centerBoldList step 3
@@ -746,9 +746,9 @@ function submitCenterBoldModal() {
         div.className = 'field-item';
         div.id = 'cb_item_'+i;
         div.style.cssText = 'background:#faf5ff;border-color:#e9d5ff';
-        div.innerHTML = `<div class="field-item-icon" style="background:#f3e8ff;color:#7c3aed"><i class="bi bi-type-bold"></i></div>
+        div.innerHTML = `<div class="field-item-icon" style="background:#f3e8ff;color:#8b5cf6"><i class="bi bi-type-bold"></i></div>
             <div class="field-item-label" style="color:#6d28d9"><span style="color:#94a3b8;font-weight:400">${tmpl} </span>...</div>
-            <span class="field-item-type" style="background:#f3e8ff;color:#7c3aed">Bold Center</span>
+            <span class="field-item-type" style="background:#f3e8ff;color:#8b5cf6">Bold Center</span>
             <button type="button" class="field-item-rm" onclick="removeCenterBold(${i},'${key}')"><i class="bi bi-x-lg"></i></button>`;
         list.appendChild(div);
     }
@@ -759,7 +759,7 @@ function submitCenterBoldModal() {
 <div id="cbModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center">
     <div style="background:white;border-radius:16px;padding:28px 28px 24px;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2)">
         <div style="font-size:15px;font-weight:700;color:#0d1b3e;margin-bottom:6px;display:flex;align-items:center;gap:8px">
-            <i class="bi bi-type-bold" style="color:#7c3aed"></i> Tambah Baris Bold + Center
+            <i class="bi bi-type-bold" style="color:#8b5cf6"></i> Tambah Baris Bold + Center
         </div>
         <div style="font-size:12px;color:#64748b;margin-bottom:18px">Isi teks pembuka — sisanya dilengkapi oleh warga saat mengajukan</div>
         <div style="margin-bottom:20px">
@@ -774,7 +774,7 @@ function submitCenterBoldModal() {
         </div>
         <div style="display:flex;justify-content:flex-end;gap:8px">
             <button type="button" onclick="closeCenterBoldModal()" style="padding:9px 18px;border-radius:8px;border:1.5px solid #e2e8f0;background:white;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit">Batal</button>
-            <button type="button" onclick="submitCenterBoldModal()" style="padding:9px 18px;border-radius:8px;border:none;background:#7c3aed;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Tambah</button>
+            <button type="button" onclick="submitCenterBoldModal()" style="padding:9px 18px;border-radius:8px;border:none;background:#8b5cf6;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Tambah</button>
         </div>
     </div>
 </div>

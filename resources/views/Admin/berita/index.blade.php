@@ -2,17 +2,13 @@
 
 @section('title', 'Manajemen Berita')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<style>
+@push('styles')<style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; }
     .inf-page { padding: 0; min-height: 100vh; }
 
     /* ── HERO ── */
     .inf-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d1b3e 0%, #1c64f2 50%, #60a5fa 100%);
         padding: 32px 32px 28px; position: relative; overflow: hidden;
     }
     .inf-hero::before {
@@ -25,12 +21,12 @@
     .btn-tulis {
         display: inline-flex; align-items: center; gap: 8px;
         padding: 10px 20px; border-radius: 10px;
-        background: white; color: #2563eb;
+        background: white; color: #1c64f2;
         font-size: 13px; font-weight: 700;
         text-decoration: none; transition: all .2s;
         box-shadow: 0 4px 12px rgba(0,0,0,.15); white-space: nowrap;
     }
-    .btn-tulis:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.2); color: #1d4ed8; }
+    .btn-tulis:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.2); color: #1a56db; }
 
     /* ── STATS BAR ── */
     .stats-bar { display: grid; grid-template-columns: repeat(3,1fr); background: white; border-bottom: 1px solid #e2e8f0; }
@@ -59,7 +55,7 @@
         padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;
     }
     .table-card-title { font-size: 14px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-    .table-card-title i { color: #2563eb; }
+    .table-card-title i { color: #1c64f2; }
 
     /* ── TABLE ── */
     .inf-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -73,7 +69,7 @@
     .inf-tbl tbody tr { transition: background .15s; }
     .inf-tbl tbody tr:hover td { background: #f8fafc; }
 
-    .row-num { width: 28px; height: 28px; border-radius: 7px; background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+    .row-num { width: 28px; height: 28px; border-radius: 7px; background: #eff6ff; color: #1c64f2; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
 
     /* thumb */
     .berita-thumb {
@@ -88,18 +84,18 @@
 
     /* status badges */
     .bdg { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-    .bdg-publish { background: #ecfdf5; color: #059669; }
-    .bdg-draft   { background: #fffbeb; color: #d97706; }
+    .bdg-publish { background: #ecfdf5; color: #10b981; }
+    .bdg-draft   { background: #fffbeb; color: #f59e0b; }
     .bdg-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .bdg-publish .bdg-dot { background: #059669; }
-    .bdg-draft   .bdg-dot { background: #d97706; }
+    .bdg-publish .bdg-dot { background: #10b981; }
+    .bdg-draft   .bdg-dot { background: #f59e0b; }
 
     /* action buttons */
     .act-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; transition: all .15s; }
-    .act-edit  { background: #eff6ff; color: #2563eb; }
-    .act-edit:hover  { background: #dbeafe; color: #1d4ed8; }
-    .act-del   { background: #fef2f2; color: #dc2626; }
-    .act-del:hover   { background: #fee2e2; color: #b91c1c; }
+    .act-edit  { background: #eff6ff; color: #1c64f2; }
+    .act-edit:hover  { background: #eff6ff; color: #1a56db; }
+    .act-del   { background: #fef2f2; color: #ef4444; }
+    .act-del:hover   { background: #fef2f2; color: #b91c1c; }
 
     /* ── EMPTY STATE ── */
     .empty-state { text-align: center; padding: 60px 20px; }
@@ -112,14 +108,14 @@
     .modal-overlay.show { display: flex; }
     .modal-box { background: white; border-radius: 16px; padding: 28px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,.2); animation: popIn .2s ease; }
     @keyframes popIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
-    .modal-icon { width: 52px; height: 52px; border-radius: 50%; background: #fef2f2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
+    .modal-icon { width: 52px; height: 52px; border-radius: 50%; background: #fef2f2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
     .modal-title { font-size: 17px; font-weight: 800; color: #0f172a; text-align: center; margin: 0 0 8px; }
     .modal-desc  { font-size: 13px; color: #64748b; text-align: center; margin: 0 0 24px; }
     .modal-name  { font-weight: 700; color: #0f172a; }
     .modal-btns  { display: flex; gap: 10px; }
     .btn-cancel  { flex: 1; padding: 10px; border-radius: 9px; border: 1px solid #e2e8f0; background: white; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all .15s; }
     .btn-cancel:hover { background: #f8fafc; }
-    .btn-hapus   { flex: 1; padding: 10px; border-radius: 9px; border: none; background: #dc2626; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: all .15s; }
+    .btn-hapus   { flex: 1; padding: 10px; border-radius: 9px; border: none; background: #ef4444; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: all .15s; }
     .btn-hapus:hover { background: #b91c1c; }
 </style>
 @endpush
@@ -150,11 +146,11 @@
             <div class="stat-lbl">Total Berita</div>
         </div>
         <div class="stat-item">
-            <div class="stat-num" style="color:#059669">{{ $data->where('status','publish')->count() }}</div>
+            <div class="stat-num" style="color:#10b981">{{ $data->where('status','publish')->count() }}</div>
             <div class="stat-lbl">Publish</div>
         </div>
         <div class="stat-item">
-            <div class="stat-num" style="color:#d97706">{{ $data->where('status','draft')->count() }}</div>
+            <div class="stat-num" style="color:#f59e0b">{{ $data->where('status','draft')->count() }}</div>
             <div class="stat-lbl">Draft</div>
         </div>
     </div>

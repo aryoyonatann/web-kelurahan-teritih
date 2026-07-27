@@ -127,7 +127,7 @@
 }
 .notif-dd-item:hover { background:#f8fafc; }
 .notif-dd-item.unread { background:#eff6ff; }
-.notif-dd-item.unread:hover { background:#dbeafe; }
+.notif-dd-item.unread:hover { background:#eff6ff; }
 .notif-dd-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
 .notif-icon-blue   { background:#eff6ff; color:#1c64f2; }
 .notif-icon-orange { background:#fffbeb; color:#f59e0b; }
@@ -157,7 +157,7 @@
 .btn-logout-cancel{flex:1;padding:10px;border-radius:9px;border:1.5px solid #e2e8f0;background:white;font-size:13px;font-weight:600;color:#334155;cursor:pointer;transition:all .15s;font-family:inherit}
 .btn-logout-cancel:hover{background:#f8fafc;border-color:#cbd5e1}
 .btn-logout-confirm{flex:1;padding:10px;border-radius:9px;border:none;background:#ef4444;font-size:13px;font-weight:700;color:white;cursor:pointer;transition:background .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-logout-confirm:hover{background:#dc2626}
+.btn-logout-confirm:hover{background:#ef4444}
 
 /* =========================================================
    HAMBURGER & MOBILE MENU

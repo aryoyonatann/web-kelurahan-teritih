@@ -1,4 +1,4 @@
-﻿@extends('Admin.layouts.app')
+@extends('Admin.layouts.app')
 @section('title', 'Edit Jenis Surat')
 
 @push('styles')
@@ -159,7 +159,7 @@
     color: #374151;
     margin-bottom: 6px;
 }
-.fl .req { color: #dc2626; }
+.fl .req { color: #ef4444; }
 .fl .opt { color: #94a3b8; font-weight: 400; }
 .fi {
     width: 100%;
@@ -236,7 +236,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
     font-family: inherit;
 }
 .preset-tag:hover { border-color: #93c5fd; background: #eff6ff; color: #1c64f2; }
-.preset-tag.used { border-color: #a7f3d0; background: #ecfdf5; color: #059669; pointer-events: none; }
+.preset-tag.used { border-color: #a7f3d0; background: #ecfdf5; color: #10b981; pointer-events: none; }
 .preset-tag i { font-size: 11px; }
 
 .field-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
@@ -259,7 +259,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
     font-size: 13px; flex-shrink: 0;
 }
 .field-item-icon--section { background: #dcfce7; color: #16a34a; }
-.field-item-icon--bold { background: #f3e8ff; color: #7c3aed; }
+.field-item-icon--bold { background: #f3e8ff; color: #8b5cf6; }
 .field-item-label { flex: 1; font-weight: 600; color: #0f172a; }
 .field-item-label--section { color: #15803d; font-style: italic; }
 .field-item-label--bold { color: #6d28d9; font-weight: 700; }
@@ -268,10 +268,10 @@ textarea.fi { resize: vertical; min-height: 90px; }
     border-radius: 5px; padding: 2px 8px;
 }
 .field-item-type--section { background: #dcfce7; color: #16a34a; }
-.field-item-type--bold { background: #f3e8ff; color: #7c3aed; }
+.field-item-type--bold { background: #f3e8ff; color: #8b5cf6; }
 .field-item-rm {
     width: 26px; height: 26px; border-radius: 6px;
-    border: 1px solid #fecaca; background: #fef2f2; color: #dc2626;
+    border: 1px solid #fecaca; background: #fef2f2; color: #ef4444;
     cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px;
 }
 
@@ -306,7 +306,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
 }
 .btn-add-field--custom { border: 1.5px dashed #93c5fd; background: #f0f9ff; color: #0284c7; }
 .btn-add-field--section { border: 1.5px dashed #bbf7d0; background: #f0fdf4; color: #16a34a; margin-left: 6px; }
-.btn-add-field--bold { border: 1.5px dashed #e9d5ff; background: #faf5ff; color: #7c3aed; padding: 9px 16px; font-size: 13px; }
+.btn-add-field--bold { border: 1.5px dashed #e9d5ff; background: #faf5ff; color: #8b5cf6; padding: 9px 16px; font-size: 13px; }
 
 .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
 .icon-opt {
@@ -318,7 +318,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
     background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px;
     padding: 12px 16px; margin-bottom: 16px; font-size: 12px; color: #1e40af; line-height: 1.7;
 }
-.info-placeholder code { background: #dbeafe; padding: 1px 5px; border-radius: 4px; }
+.info-placeholder code { background: #eff6ff; padding: 1px 5px; border-radius: 4px; }
 .info-order {
     background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
     padding: 14px; margin-bottom: 16px; font-size: 12px; color: #334155; line-height: 1.8;
@@ -440,7 +440,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
 
             <div style="margin-bottom:24px">
                 <h2 class="page-title">{{ $data->nama_surat }}</h2>
-                <p class="page-subtitle">Sesuaikan isi surat ini sesuka hati 👋</p>
+                <p class="page-subtitle">Sesuaikan isi surat ini sesuka hati ??</p>
             </div>
 
             {{-- Step Indicator --}}
@@ -705,8 +705,8 @@ textarea.fi { resize: vertical; min-height: 90px; }
                         <div class="sp-nomor">Nomor: <span id="pv_nomor">{{ $data->kode_klasifikasi }} / ___ / Kel.1010/{{ $data->kode_surat }}/ VI /2026</span></div>
                         <p class="sp-pembuka" id="pv_pembuka">{{ $data->template_pembuka }}</p>
                         <table class="sp-bio" id="pv_bio"></table>
-                        <p class="sp-isi" id="pv_isi" style="{{ $data->template_isi ? '' : 'display:none' }}">{{ $data->template_isi }}</p>
                         <div id="pv_extra"></div>
+                        <p class="sp-isi" id="pv_isi" style="{{ $data->template_isi ? '' : 'display:none' }}">{{ $data->template_isi }}</p>
                         <div id="pv_center_bold"></div>
                         <p class="sp-penutup" id="pv_penutup">{{ $data->template_penutup }}</p>
                         <div class="sp-ttd">
@@ -729,9 +729,9 @@ textarea.fi { resize: vertical; min-height: 90px; }
 <div id="cbModal" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-title" style="margin-bottom:6px">
-            <i class="bi bi-type-bold" style="color:#7c3aed"></i> Tambah Baris Khusus
+            <i class="bi bi-type-bold" style="color:#8b5cf6"></i> Tambah Baris Khusus
         </div>
-        <div class="modal-desc">Tulis awalan kalimatnya — nanti warga yang melengkapi</div>
+        <div class="modal-desc">Tulis awalan kalimatnya � nanti warga yang melengkapi</div>
         <div class="modal-field">
             <input id="cbModalTmpl" type="text" class="modal-input"
                    placeholder="Misal: Surat Keterangan ini dipergunakan untuk"
@@ -743,7 +743,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
         </div>
         <div class="modal-actions">
             <button type="button" class="modal-btn modal-btn--cancel" onclick="closeCBModal()">Batal</button>
-            <button type="button" class="modal-btn modal-btn--ok" style="background:#7c3aed" onclick="submitCBModal()">Tambah</button>
+            <button type="button" class="modal-btn modal-btn--ok" style="background:#8b5cf6" onclick="submitCBModal()">Tambah</button>
         </div>
     </div>
 </div>

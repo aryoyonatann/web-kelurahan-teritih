@@ -2,24 +2,20 @@
 
 @section('title', 'Edit Berita')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<style>
+@push('styles')<style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; }
     .form-page { padding: 0; min-height: 100vh; }
 
     /* ── BACK BAR ── */
     .back-bar { display: flex; align-items: center; gap: 8px; padding: 14px 32px; background: white; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
     .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-weight: 600; padding: 5px 10px; border-radius: 7px; transition: all .15s; }
-    .back-btn:hover { background: #f1f5f9; color: #2563eb; }
+    .back-btn:hover { background: #f1f5f9; color: #1c64f2; }
     .bc-sep { color: #cbd5e1; }
     .bc-cur { color: #0f172a; font-weight: 600; }
 
     /* ── HERO — unified blue ── */
     .form-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d1b3e 0%, #1c64f2 50%, #60a5fa 100%);
         padding: 28px 32px; position: relative; overflow: hidden;
     }
     .form-hero::before {
@@ -51,7 +47,7 @@
     /* ── FORM CARD ── */
     .form-card { background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 16px; }
     .form-card-header { padding: 16px 24px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; display: flex; align-items: center; gap: 10px; }
-    .form-card-icon { width: 36px; height: 36px; border-radius: 9px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+    .form-card-icon { width: 36px; height: 36px; border-radius: 9px; background: #eff6ff; color: #1c64f2; display: flex; align-items: center; justify-content: center; font-size: 17px; }
     .form-card-title { font-size: 14px; font-weight: 700; color: #0f172a; }
     .form-card-body  { padding: 24px; }
 
@@ -59,14 +55,14 @@
     .field-group { margin-bottom: 20px; }
     .field-group:last-child { margin-bottom: 0; }
     .field-label { display: block; font-size: 12px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
-    .field-label span { color: #dc2626; margin-left: 2px; }
+    .field-label span { color: #ef4444; margin-left: 2px; }
     .field-input { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 9px; font-size: 13px; font-family: inherit; color: #0f172a; background: white; transition: all .2s; outline: none; }
-    .field-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+    .field-input:focus { border-color: #1c64f2; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
     .field-input::placeholder { color: #94a3b8; }
     textarea.field-input { resize: vertical; min-height: 200px; }
     .field-hint  { font-size: 11px; color: #94a3b8; margin-top: 5px; }
-    .field-error { font-size: 12px; color: #dc2626; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
-    .field-input.is-error { border-color: #dc2626; }
+    .field-error { font-size: 12px; color: #ef4444; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+    .field-input.is-error { border-color: #ef4444; }
 
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
@@ -80,7 +76,7 @@
     .current-img-label { padding: 8px 12px; background: #f8fafc; font-size: 11px; color: #64748b; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 
     .file-upload-area { border: 2px dashed #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all .2s; background: #fafafa; }
-    .file-upload-area:hover { border-color: #2563eb; background: #eff6ff; }
+    .file-upload-area:hover { border-color: #1c64f2; background: #eff6ff; }
     .file-upload-area i { font-size: 28px; color: #94a3b8; display: block; margin-bottom: 6px; }
     .file-upload-area p { font-size: 13px; color: #64748b; margin: 0; }
     .file-upload-area small { font-size: 11px; color: #94a3b8; }
@@ -92,13 +88,13 @@
     .footer-right { display: flex; gap: 10px; }
     .btn-batal { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 9px; border: 1.5px solid #e2e8f0; background: white; font-size: 13px; font-weight: 600; color: #64748b; text-decoration: none; cursor: pointer; transition: all .15s; }
     .btn-batal:hover { background: #f8fafc; color: #334155; }
-    .btn-update { display: inline-flex; align-items: center; gap: 6px; padding: 9px 22px; border-radius: 9px; border: none; background: #2563eb; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: all .15s; }
-    .btn-update:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.3); }
+    .btn-update { display: inline-flex; align-items: center; gap: 6px; padding: 9px 22px; border-radius: 9px; border: none; background: #1c64f2; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: all .15s; }
+    .btn-update:hover { background: #1a56db; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.3); }
 
     /* error list */
     .error-list { background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; }
     .error-list ul { margin: 0; padding-left: 18px; }
-    .error-list li { font-size: 13px; color: #dc2626; }
+    .error-list li { font-size: 13px; color: #ef4444; }
 </style>
 @endpush
 

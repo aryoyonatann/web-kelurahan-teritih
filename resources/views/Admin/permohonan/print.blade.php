@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Surat – #{{ $permohonan->id_permohonan }}</title>
-    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
+    <title>Cetak Surat – #{{ $permohonan->id_permohonan }}</title>    <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9;font-size:14px;color:#334155}
     .panel-wrap{max-width:900px;margin:28px auto;padding:0 20px 60px}
@@ -36,7 +33,7 @@
     .dp.c2{grid-column:span 2}.dp.c4{grid-column:span 4}
     .ttd-entry{border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px;background:#f8fafc}
     .ttd-entry-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:12px;display:flex;justify-content:space-between}
-    .btn-hapus-ttd{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:7px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+    .btn-hapus-ttd{background:#fef2f2;border:1px solid #fecaca;color:#ef4444;border-radius:7px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
     .btn-tambah-ttd{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;border:1.5px dashed #93c5fd;background:#f0f9ff;color:#0284c7;font-size:13px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:20px}
     #suratCetak{display:none}
     @media print{
@@ -244,7 +241,29 @@
         <hr class="divider">
 
         {{-- TTD --}}
+        @php
+        // Mapping jabatan ke data pegawai
+        $jabatanOptions = [
+            ['val' => 'An. Kepala Kelurahan Teritih', 'label' => 'An. Kepala Kelurahan Teritih',
+             'nama' => $pegawaiData['lurah']['nama'] ?? $namaLurah, 'nip' => $pegawaiData['lurah']['nip'] ?? ''],
+            ['val' => 'Kepala Kelurahan Teritih', 'label' => 'Kepala Kelurahan Teritih',
+             'nama' => $pegawaiData['lurah']['nama'] ?? $namaLurah, 'nip' => $pegawaiData['lurah']['nip'] ?? ''],
+            ['val' => 'Sekretaris Kelurahan', 'label' => 'Sekretaris Kelurahan',
+             'nama' => $pegawaiData['sekretaris']['nama'] ?? '', 'nip' => $pegawaiData['sekretaris']['nip'] ?? ''],
+            ['val' => 'Kasi Pemerintahan dan Umum', 'label' => 'Kasi Pemerintahan dan Umum',
+             'nama' => $pegawaiData['kasi-pemum']['nama'] ?? '', 'nip' => $pegawaiData['kasi-pemum']['nip'] ?? ''],
+            ['val' => 'Kasi Pemberdayaan Masyarakat', 'label' => 'Kasi Pemberdayaan Masyarakat',
+             'nama' => $pegawaiData['kasi-pmk']['nama'] ?? '', 'nip' => $pegawaiData['kasi-pmk']['nip'] ?? ''],
+            ['val' => 'Kasi Trantibum', 'label' => 'Kasi Trantibum',
+             'nama' => $pegawaiData['kasi-trantibum']['nama'] ?? '', 'nip' => $pegawaiData['kasi-trantibum']['nip'] ?? ''],
+            ['val' => 'custom', 'label' => 'Jabatan lain...', 'nama' => '', 'nip' => ''],
+        ];
+        @endphp
         <div class="section-sep">Pejabat Penandatangan</div>
+        {{-- Embed data pegawai as JSON for JS --}}
+        <script>
+        const jabatanPegawaiMap = @json(collect($jabatanOptions)->keyBy('val')->map(fn($v) => ['nama' => $v['nama'], 'nip' => $v['nip']]));
+        </script>
         <div id="ttd_list">
             <div class="ttd-entry" id="ttd_0">
                 <div class="ttd-entry-label"><span>Penandatangan 1</span></div>
@@ -252,9 +271,9 @@
                     <div class="form-group">
                         <label class="form-label">Jabatan</label>
                         <select class="form-select" id="inp_jabatan_0" onchange="onJabatanChange(0)">
-                            <option value="An.Kepala Kelurahan Teritih|">An. Kepala Kelurahan Teritih</option>
-                            <option value="Kepala Kelurahan Teritih|">Kepala Kelurahan Teritih</option>
-                            <option value="custom|">Jabatan lain...</option>
+                            @foreach($jabatanOptions as $opt)
+                                <option value="{{ $opt['val'] }}">{{ $opt['label'] }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group" id="grp_jabatan_custom_0" style="display:none;flex-direction:column;gap:6px">
@@ -272,6 +291,7 @@
                         <input type="text" class="form-input" id="inp_nip_0" placeholder="NIP (opsional)">
                     </div>
                 </div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:6px">Nama dan NIP terisi otomatis dari data pegawai, bisa diubah manual.</div>
             </div>
         </div>
         <button type="button" class="btn-tambah-ttd" onclick="tambahTTD()">➕ Tambah Penandatangan</button>
@@ -384,9 +404,6 @@
     @endforeach
     @if($tableOpened)</table>@endif
 
-    {{-- ISI SURAT --}}
-    <p class="isi-surat" id="pr_isi"></p>
-
     {{-- Extra fields: render per group (support section separator) --}}
     @php $extras = collect($fieldsConfig)->where('group', 'extra')->values(); $extraTableOpened = false; @endphp
     @foreach($extras as $ef)
@@ -407,6 +424,9 @@
         @endif
     @endforeach
     @if($extraTableOpened)</table>@endif
+
+    {{-- ISI SURAT --}}
+    <p class="isi-surat" id="pr_isi_after_extra"></p>
 
     {{-- Extra fields dengan print_style center_bold --}}
     @foreach(collect($fieldsConfig)->where('group','extra') as $ef)
@@ -430,25 +450,46 @@
 <script>
 let ttdCount = 1;
 
+function buildJabatanOptions(selectedVal) {
+    const opts = @json($jabatanOptions);
+    return opts.map(o => {
+        const sel = o.val === selectedVal ? ' selected' : '';
+        return `<option value="${o.val}"${sel}>${o.label}</option>`;
+    }).join('');
+}
+
 function onJabatanChange(idx) {
+    const sel = document.getElementById('inp_jabatan_' + idx);
     const grp = document.getElementById('grp_jabatan_custom_' + idx);
-    const val = document.getElementById('inp_jabatan_' + idx)?.value || '';
-    if (grp) grp.style.display = val.startsWith('custom') ? 'flex' : 'none';
-    if (grp) grp.style.flexDirection = 'column';
-    if (grp) grp.style.gap = '6px';
+    const val = sel?.value || '';
+
+    // Tampil/sembunyikan input jabatan custom
+    if (grp) {
+        grp.style.display     = val === 'custom' ? 'flex' : 'none';
+        grp.style.flexDirection = 'column';
+        grp.style.gap           = '6px';
+    }
+
+    // Auto-fill nama & NIP dari data pegawai
+    if (val !== 'custom' && jabatanPegawaiMap[val]) {
+        const pegawai = jabatanPegawaiMap[val];
+        const namaInp = document.getElementById('inp_nama_pejabat_' + idx);
+        const nipInp  = document.getElementById('inp_nip_' + idx);
+        if (namaInp && pegawai.nama) namaInp.value = pegawai.nama;
+        if (nipInp)                  nipInp.value  = pegawai.nip || '';
+    }
 }
 
 function tambahTTD() {
     const i = ttdCount++;
+    const optsHtml = buildJabatanOptions('');
     document.getElementById('ttd_list').insertAdjacentHTML('beforeend', `
         <div class="ttd-entry" id="ttd_${i}">
             <div class="ttd-entry-label"><span>Penandatangan ${i+1}</span><button type="button" class="btn-hapus-ttd" onclick="this.closest('.ttd-entry').remove()">✕</button></div>
             <div class="form-grid">
                 <div class="form-group"><label class="form-label">Jabatan</label>
                     <select class="form-select" id="inp_jabatan_${i}" onchange="onJabatanChange(${i})">
-                        <option value="An.Kepala Kelurahan Teritih|">An. Kepala Kelurahan Teritih</option>
-                        <option value="Kepala Kelurahan Teritih|">Kepala Kelurahan Teritih</option>
-                        <option value="custom|">Jabatan lain...</option>
+                        ${optsHtml}
                     </select></div>
                 <div class="form-group" id="grp_jabatan_custom_${i}" style="display:none;flex-direction:column;gap:6px">
                     <label class="form-label">Jabatan (ketik)</label>
@@ -456,11 +497,19 @@ function tambahTTD() {
                 </div>
             </div>
             <div class="form-grid" style="margin-bottom:0">
-                <div class="form-group" style="margin-bottom:0"><label class="form-label">Nama</label><input type="text" class="form-input" id="inp_nama_pejabat_${i}"></div>
-                <div class="form-group" style="margin-bottom:0"><label class="form-label">NIP</label><input type="text" class="form-input" id="inp_nip_${i}"></div>
+                <div class="form-group" style="margin-bottom:0"><label class="form-label">Nama</label><input type="text" class="form-input" id="inp_nama_pejabat_${i}" placeholder="Nama + gelar"></div>
+                <div class="form-group" style="margin-bottom:0"><label class="form-label">NIP</label><input type="text" class="form-input" id="inp_nip_${i}" placeholder="NIP (opsional)"></div>
             </div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:6px">Nama dan NIP terisi otomatis dari data pegawai, bisa diubah manual.</div>
         </div>`);
+    // Trigger auto-fill untuk TTD baru (ambil pilihan pertama)
+    onJabatanChange(i);
 }
+
+// Auto-fill saat halaman pertama kali dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    onJabatanChange(0);
+});
 
 function toggleSaksi() {
     const show = document.getElementById('chk_saksi').checked;
@@ -483,13 +532,15 @@ function collectTTDs() {
     document.querySelectorAll('.ttd-entry').forEach(entry => {
         const i = entry.id.replace('ttd_', '');
         const jabSel = document.getElementById('inp_jabatan_' + i)?.value || '';
-        let jab1, jab2 = '';
-        if (jabSel.startsWith('custom')) {
+        let jab1 = '';
+        if (jabSel === 'custom') {
             jab1 = document.getElementById('inp_jab1_' + i)?.value.trim() || '';
-            jab2 = document.getElementById('inp_jab2_' + i)?.value.trim() || '';
-        } else { const p = jabSel.split('|'); jab1 = p[0]||''; jab2 = p[1]||''; }
+        } else {
+            jab1 = jabSel;
+        }
         ttds.push({
-            jab1, jab2,
+            jab1,
+            jab2: '',
             nama: document.getElementById('inp_nama_pejabat_' + i)?.value.trim() || '____________________',
             nip: document.getElementById('inp_nip_' + i)?.value.trim() || '',
         });
@@ -530,10 +581,10 @@ function cetakSurat() {
     const nomor = prefix + ' / ' + num + ' / Kel.1010/' + kode + '/ {{ $bulanRomawi }} /{{ now()->format("Y") }}';
     document.getElementById('pr_nomor').textContent = nomor;
 
-    // Isi surat
+    // Isi surat (tampil setelah semua data, sebelum penutup)
     const parsed = isi.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g,'<br>');
-    document.getElementById('pr_isi').innerHTML = parsed;
+    document.getElementById('pr_isi_after_extra').innerHTML = parsed;
 
     // Data tambahan (bisa diedit admin sebelum cetak, mendukung **bold**)
     function parseBold(str) {

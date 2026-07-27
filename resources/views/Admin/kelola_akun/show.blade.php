@@ -2,11 +2,7 @@
 
 @section('title', 'Detail Warga')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<style>
+@push('styles')<style>
 :root {
     --blue:    #1c64f2; --blue-dk: #1a56db; --blue-lt: #eff6ff;
     --navy:    #0f172a; --slate:   #334155;  --muted:   #64748b;
@@ -66,11 +62,11 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
 .action-bar { display:flex; gap:10px; flex-wrap:wrap; }
 .btn-toggle-aktif    { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; background:#ecfdf5; color:#065f46; cursor:pointer; transition:all .18s; font-family:inherit; }
-.btn-toggle-aktif:hover { background:#d1fae5; }
+.btn-toggle-aktif:hover { background:#ecfdf5; }
 .btn-toggle-nonaktif { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; background:#fffbeb; color:#92400e; cursor:pointer; transition:all .18s; font-family:inherit; }
-.btn-toggle-nonaktif:hover { background:#fef3c7; }
+.btn-toggle-nonaktif:hover { background:#fffbeb; }
 .btn-hapus { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; background:#fef2f2; color:#991b1b; cursor:pointer; transition:all .18s; font-family:inherit; }
-.btn-hapus:hover { background:#fee2e2; }
+.btn-hapus:hover { background:#fef2f2; }
 
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:999; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
 .modal-overlay.show { opacity:1; pointer-events:all; }
@@ -81,7 +77,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
 .btn-cancel { padding:8px 18px; border-radius:8px; border:1px solid var(--border); background:white; font-size:13px; font-weight:600; color:var(--slate); cursor:pointer; font-family:inherit; }
 .btn-danger { padding:8px 18px; border-radius:8px; border:none; background:var(--red); color:white; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
-.btn-danger:hover { background:#dc2626; }
+.btn-danger:hover { background:#ef4444; }
 .alert-success { background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:12px 16px; font-size:13px; color:#065f46; display:flex; align-items:center; gap:8px; margin-bottom:16px; }
 </style>
 @endpush

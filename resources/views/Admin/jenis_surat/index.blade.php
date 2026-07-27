@@ -2,18 +2,14 @@
 
 @section('title', 'Data Jenis Surat')
 
-@push('styles')
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo kota serang.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<style>
+@push('styles')<style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; }
 
     .js-page { padding: 0; min-height: 100vh; }
 
     /* ── HERO ── */
     .js-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d1b3e 0%, #1c64f2 50%, #60a5fa 100%);
         padding: 32px 32px 28px;
         position: relative; overflow: hidden;
     }
@@ -28,13 +24,13 @@
     .btn-tambah {
         display: inline-flex; align-items: center; gap: 8px;
         padding: 10px 20px; border-radius: 10px;
-        background: white; color: #2563eb;
+        background: white; color: #1c64f2;
         font-size: 13px; font-weight: 700;
         text-decoration: none; border: none; cursor: pointer;
         transition: all .2s; white-space: nowrap;
         box-shadow: 0 4px 12px rgba(0,0,0,.15);
     }
-    .btn-tambah:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.2); color: #1d4ed8; }
+    .btn-tambah:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.2); color: #1a56db; }
 
     /* ── STATS BAR ── */
     .stats-bar {
@@ -79,7 +75,7 @@
         font-size: 14px; font-weight: 700; color: #0f172a;
         display: flex; align-items: center; gap: 8px;
     }
-    .table-card-title i { color: #2563eb; }
+    .table-card-title i { color: #1c64f2; }
 
     /* ── TABLE ── */
     .js-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -101,7 +97,7 @@
 
     .row-num {
         width: 28px; height: 28px; border-radius: 7px;
-        background: #eff6ff; color: #2563eb;
+        background: #eff6ff; color: #1c64f2;
         font-size: 11px; font-weight: 700;
         display: inline-flex; align-items: center; justify-content: center;
     }
@@ -109,7 +105,7 @@
     .surat-name { font-weight: 700; color: #0f172a; font-size: 13px; }
     .surat-icon {
         width: 34px; height: 34px; border-radius: 8px;
-        background: #eff6ff; color: #2563eb;
+        background: #eff6ff; color: #1c64f2;
         display: inline-flex; align-items: center; justify-content: center;
         font-size: 16px; flex-shrink: 0;
     }
@@ -127,10 +123,10 @@
         border: none; cursor: pointer; text-decoration: none;
         transition: all .15s;
     }
-    .act-edit  { background: #eff6ff; color: #2563eb; }
-    .act-edit:hover  { background: #dbeafe; color: #1d4ed8; }
-    .act-del   { background: #fef2f2; color: #dc2626; }
-    .act-del:hover   { background: #fee2e2; color: #b91c1c; }
+    .act-edit  { background: #eff6ff; color: #1c64f2; }
+    .act-edit:hover  { background: #eff6ff; color: #1a56db; }
+    .act-del   { background: #fef2f2; color: #ef4444; }
+    .act-del:hover   { background: #fef2f2; color: #b91c1c; }
 
     /* ── EMPTY STATE ── */
     .empty-state { text-align: center; padding: 60px 20px; }
@@ -160,7 +156,7 @@
     @keyframes popIn { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
     .modal-icon {
         width: 52px; height: 52px; border-radius: 50%;
-        background: #fef2f2; color: #dc2626;
+        background: #fef2f2; color: #ef4444;
         display: flex; align-items: center; justify-content: center;
         font-size: 24px; margin: 0 auto 16px;
     }
@@ -177,7 +173,7 @@
     .btn-cancel:hover { background: #f8fafc; }
     .btn-hapus {
         flex: 1; padding: 10px; border-radius: 9px;
-        border: none; background: #dc2626;
+        border: none; background: #ef4444;
         font-size: 13px; font-weight: 700; color: white;
         cursor: pointer; transition: all .15s;
     }
@@ -211,11 +207,11 @@
             <div class="stat-lbl">Total Jenis Surat</div>
         </div>
         <div class="stat-item">
-            <div class="stat-num" style="color:#059669">{{ $data->count() }}</div>
+            <div class="stat-num" style="color:#10b981">{{ $data->count() }}</div>
             <div class="stat-lbl">Aktif</div>
         </div>
         <div class="stat-item">
-            <div class="stat-num" style="color:#2563eb">{{ \App\Models\PermohonanSurat::count() }}</div>
+            <div class="stat-num" style="color:#1c64f2">{{ \App\Models\PermohonanSurat::count() }}</div>
             <div class="stat-lbl">Total Permohonan</div>
         </div>
     </div>
