@@ -14,19 +14,11 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -38,7 +30,6 @@ class RegisteredUserController extends Controller
             'tempat_lahir'  => ['nullable', 'string', 'max:255'],
             'tanggal_lahir' => ['nullable', 'date'],
             'password'      => ['required', 'confirmed', Rules\Password::defaults()],
-            // ✅ username DIHAPUS total — login masyarakat hanya menggunakan NIK atau email.
         ]);
 
         $user = User::create([

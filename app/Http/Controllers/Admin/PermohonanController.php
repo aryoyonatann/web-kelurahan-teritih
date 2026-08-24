@@ -118,9 +118,7 @@ class PermohonanController extends Controller
             }
         }
 
-        \DB::table('permohonan_surat')
-            ->where('id_permohonan', $permohonan->id_permohonan)
-            ->update(['data_tambahan' => json_encode($dt)]);
+        $permohonan->update(['data_tambahan' => $dt]);
 
         return redirect()->back()->with('success', 'Data permohonan berhasil diperbarui.');
     }

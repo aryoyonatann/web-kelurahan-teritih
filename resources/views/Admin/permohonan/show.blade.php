@@ -546,8 +546,6 @@
 
 </div>
 
-{{-- ── MODAL EDIT DATA ── --}}
-
 @include('Admin.partials.footer')
 
 @push('scripts')

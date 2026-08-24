@@ -17,7 +17,6 @@ class ChatbotController extends Controller
 {
     public function ask(Request $request): JsonResponse
     {
-        // Validasi input
         $validated = $request->validate([
             'message' => 'required|string|min:2|max:500',
         ], [
@@ -26,7 +25,6 @@ class ChatbotController extends Controller
             'message.max'      => 'Pertanyaan terlalu panjang (maksimal 500 karakter).',
         ]);
 
-        // Rate limiting — cegah spam (10 request per menit per IP)
         $key = 'chatbot:' . $request->ip();
         if (RateLimiter::tooManyAttempts($key, 10)) {
             $seconds = RateLimiter::availableIn($key);
@@ -37,16 +35,13 @@ class ChatbotController extends Controller
         }
         RateLimiter::hit($key, 60);
 
-        // Cek konfigurasi API key
-        $apiKey = config('services.gemini.api_key');
-        $model  = config('services.gemini.model');
-
+        $apiKey     = config('services.gemini.api_key');
+        $model      = config('services.gemini.model');
         $groqApiKey = config('services.groq.api_key');
         $groqModel  = config('services.groq.model');
 
         $systemPrompt = $this->buildSystemPrompt();
 
-        // Kalau Gemini tidak dikonfigurasi sama sekali, langsung pakai Groq
         if (empty($apiKey)) {
             if (empty($groqApiKey)) {
                 Log::error('Baik Gemini maupun Groq API key belum dikonfigurasi di .env');
@@ -67,8 +62,6 @@ class ChatbotController extends Controller
                 ], 500);
             }
         }
-
-        // Coba Gemini dulu, kalau gagal fallback ke Groq
         try {
             $reply = $this->callGemini(
                 apiKey: $apiKey,
@@ -114,28 +107,20 @@ class ChatbotController extends Controller
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
 
         $payload = [
-            // System instruction = "otak" chatbot, kasih konteks ke AI
             'system_instruction' => [
-                'parts' => [
-                    ['text' => $systemPrompt],
-                ],
+                'parts' => [['text' => $systemPrompt]],
             ],
-            // Pesan dari user
             'contents' => [
                 [
                     'role'  => 'user',
-                    'parts' => [
-                        ['text' => $userMessage],
-                    ],
+                    'parts' => [['text' => $userMessage]],
                 ],
             ],
-            // Konfigurasi generasi — kontrol gaya jawaban
             'generationConfig' => [
                 'temperature'     => 0.4,
                 'maxOutputTokens' => 500,
                 'topP'            => 0.9,
             ],
-            // Safety settings — blokir konten berbahaya
             'safetySettings' => [
                 ['category' => 'HARM_CATEGORY_HARASSMENT',        'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
                 ['category' => 'HARM_CATEGORY_HATE_SPEECH',       'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
@@ -144,26 +129,21 @@ class ChatbotController extends Controller
             ],
         ];
 
-        // Retry otomatis: coba sampai 3 kali untuk error sementara (503, timeout, koneksi putus)
-        $maxAttempts = 3;
+        $maxAttempts   = 3;
         $lastException = null;
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             try {
                 $response = Http::timeout(30)
-                    ->withOptions([
-                        // Pastikan SSL verify aktif di production, nonaktifkan hanya jika hosting bermasalah
-                        'verify' => $this->getSslVerify(),
-                    ])
+                    ->withOptions(['verify' => $this->getSslVerify()])
                     ->withHeaders([
                         'Content-Type'   => 'application/json',
                         'x-goog-api-key' => $apiKey,
                     ])
                     ->post($url, $payload);
 
-                // Jika 503 atau 429 (overload/rate limit), tunggu lalu retry
                 if (in_array($response->status(), [429, 503]) && $attempt < $maxAttempts) {
-                    $waitSeconds = $attempt * 2; // 2 detik, lalu 4 detik
+                    $waitSeconds = $attempt * 2;
                     Log::warning("Gemini API returned {$response->status()}, retrying in {$waitSeconds}s (attempt {$attempt}/{$maxAttempts})");
                     sleep($waitSeconds);
                     continue;
@@ -228,7 +208,7 @@ class ChatbotController extends Controller
 
         // Default: aktifkan SSL verify (aman untuk production)
         // Set GEMINI_SSL_VERIFY=false di .env HANYA jika hosting bermasalah dengan SSL
-        return env('GEMINI_SSL_VERIFY', true);
+        return (bool) config('services.gemini.ssl_verify', true);
     }
 
     /**
@@ -271,10 +251,8 @@ class ChatbotController extends Controller
         return trim($reply);
     }
 
-    
     private function buildSystemPrompt(): string
     {
-        // ── 1. JENIS SURAT AKTIF ───────────────────────────────────────────────
         $jenisSuratList = JenisSurat::where('aktif', true)->get(['nama_surat', 'deskripsi']);
         if ($jenisSuratList->isEmpty()) {
             $jenisSuratText = '• Keterangan Domisili' . "\n"
@@ -292,7 +270,6 @@ class ChatbotController extends Controller
             })->implode("\n");
         }
 
-        // ── 2. DATA PEGAWAI KELURAHAN ──────────────────────────────────────────
         $namaLurah  = Pengaturan::getValue('nama_lurah',  'Jupran, SE, MM');
         $jabatLurah = Pengaturan::getValue('jabat_lurah', 'Kepala Kelurahan Teritih');
 
@@ -325,14 +302,12 @@ class ChatbotController extends Controller
             ? implode("\n", $pegawaiLines)
             : "• {$jabatLurah}: {$namaLurah}\n• (Data pegawai lainnya belum diisi)";
 
-        // ── 3. INFO KELURAHAN  ──────────────────────────────────────────
         $kecamatan   = Pengaturan::getValue('kecamatan',    'Walantaka');
         $kota        = Pengaturan::getValue('kota',         'Serang');
         $provinsi    = Pengaturan::getValue('provinsi',     'Banten');
         $kodPos      = Pengaturan::getValue('kode_pos',     '42183');
         $luasWilayah = Pengaturan::getValue('luas_wilayah', '4.33');
 
-        // ── 4. STATISTIK DEMOGRAFI ─────────────────────────────────────────────
         $statistik     = StatistikDemografi::asCollection();
         $totalPenduduk = isset($statistik['total_penduduk']) ? number_format($statistik['total_penduduk']->nilai, 0, ',', '.') : '-';
         $jumlahKK      = isset($statistik['jumlah_kk'])      ? number_format($statistik['jumlah_kk']->nilai,      0, ',', '.') : '-';
@@ -346,7 +321,6 @@ class ChatbotController extends Controller
         $jiwaHindu     = isset($statistik['jiwa_hindu'])     ? number_format($statistik['jiwa_hindu']->nilai,     0, ',', '.') : '-';
         $jiwaBuddha    = isset($statistik['jiwa_buddha'])    ? number_format($statistik['jiwa_buddha']->nilai,    0, ',', '.') : '-';
 
-        // ── 5. BERITA & PENGUMUMAN ─────────────────────────────────────
         $beritaTerbaru = Berita::where('status', 'publish')
             ->orderByDesc('tanggal_publish')
             ->limit(5)

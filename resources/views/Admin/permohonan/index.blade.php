@@ -251,8 +251,6 @@
         .page-hero h1 { font-size: 20px; }
         .search-wrap input { width: 200px; }
     }
-    .btn-dok { background:#f0f9ff; color:#0369a1; border:1px solid #bae6fd; }
-    .btn-dok:hover { background:#e0f2fe; }
 </style>
 @endpush
 

@@ -197,7 +197,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         $dokCount = $permohonan->persyaratan->count();
     @endphp
 
-    {{-- HERO BANNER --}}
     <div class="hero">
         <div class="hero-top {{ $status }}">
             <div class="hero-inner">

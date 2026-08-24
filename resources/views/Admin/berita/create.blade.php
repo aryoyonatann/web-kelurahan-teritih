@@ -96,7 +96,6 @@
         <span class="bc-cur">Tulis Baru</span>
     </div>
 
-    {{-- ✅ HERO BIRU --}}
     <div class="form-hero">
         <div class="form-hero-inner">
             <h1><i class="bi bi-pencil-square me-2"></i>Tulis Berita Baru</h1>
@@ -104,7 +103,6 @@
         </div>
     </div>
 
-    {{-- ✅ FULL WIDTH — tidak ada max-width --}}
     <div class="form-wrapper">
 
         @if($errors->any())

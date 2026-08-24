@@ -22,8 +22,8 @@ class Approval extends Model
         return $this->belongsTo(PermohonanSurat::class, 'id_permohonan');
     }
 
-            public function admin()
-        {
-            return $this->belongsTo(Admin::class, 'id_admin');
-        }
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'id_admin');
+    }
 }

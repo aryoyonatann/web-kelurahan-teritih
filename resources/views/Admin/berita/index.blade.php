@@ -80,7 +80,6 @@
     }
     .berita-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .berita-title { font-weight: 700; color: #0f172a; font-size: 13px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .berita-cat   { font-size: 11px; color: #64748b; margin-top: 2px; }
 
     /* status badges */
     .bdg { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }

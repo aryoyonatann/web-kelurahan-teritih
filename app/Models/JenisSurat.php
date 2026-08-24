@@ -16,7 +16,6 @@ class JenisSurat extends Model
         'slug',
         'is_custom',
         'template',
-        'field_config',
         'icon',
         'warna',
         'aktif',
@@ -29,7 +28,6 @@ class JenisSurat extends Model
     ];
 
     protected $casts = [
-        'field_config'  => 'array',
         'fields_config' => 'array',
         'is_custom'     => 'boolean',
         'aktif'         => 'boolean',

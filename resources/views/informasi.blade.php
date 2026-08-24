@@ -261,37 +261,70 @@
                             <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
                         </linearGradient>
                     </defs>
+                    @php
+                        // Hitung step pembulatan Y axis yang adaptif
+                        $yRange  = $trendMax - $trendMin;
+                        $yPad    = max(1, round($yRange * 0.1));          // 10% padding atas/bawah
+                        $yAxisMax = $trendMax + $yPad;
+                        $yAxisMin = max(0, $trendMin - $yPad);
+                        // Tentukan unit pembulatan berdasarkan skala nilai
+                        $ySpan = $yAxisMax - $yAxisMin;
+                        $yNice = match(true) {
+                            $ySpan <= 20     => 5,
+                            $ySpan <= 100    => 10,
+                            $ySpan <= 500    => 50,
+                            $ySpan <= 2000   => 100,
+                            $ySpan <= 10000  => 500,
+                            $ySpan <= 50000  => 1000,
+                            default          => 5000,
+                        };
+                        $yAxisMax = ceil($yAxisMax / $yNice) * $yNice;
+                        $yAxisMin = floor($yAxisMin / $yNice) * $yNice;
+                    @endphp
                     @for($i = 0; $i <= 3; $i++)
                     <line x1="70" y1="{{ 20 + $i * 40 }}" x2="680" y2="{{ 20 + $i * 40 }}" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
-                    <text x="60" y="{{ 24 + $i * 40 }}" text-anchor="end" fill="rgba(255,255,255,.4)" font-size="11" font-family="'Plus Jakarta Sans',sans-serif">{{ number_format(round(($trendMax - ($trendMax - $trendMin) * $i / 3)/100)*100) }}</text>
+                    <text x="60" y="{{ 24 + $i * 40 }}" text-anchor="end" fill="rgba(255,255,255,.4)" font-size="11" font-family="'Plus Jakarta Sans',sans-serif">{{ number_format($yAxisMax - ($yAxisMax - $yAxisMin) * $i / 3) }}</text>
                     @endfor
                     @php
                         $points = [];
                         $chartW = 600; $chartH = 120; $padL = 75; $padT = 20;
-                        $range = max(1, $trendMax - $trendMin);
+                        $range = max(1, $yAxisMax - $yAxisMin);
+                        $trendCount = count($trendYears);
                         foreach ($trendYears as $i => $t) {
-                            $x = $padL + ($i / (count($trendYears)-1)) * $chartW;
-                            $y = $padT + (1 - ($t['val'] - $trendMin) / $range) * $chartH;
+                            // Guard division by zero saat hanya 1 titik data
+                            $x = $trendCount > 1
+                                ? $padL + ($i / ($trendCount - 1)) * $chartW
+                                : $padL + $chartW / 2;
+                            $y = $padT + (1 - ($t['val'] - $yAxisMin) / $range) * $chartH;
                             $points[] = ['x'=>round($x,1),'y'=>round($y,1),'val'=>$t['val'],'year'=>$t['year']];
                         }
-                        // Build smooth cubic bezier curve
-                        $linePath = 'M'.$points[0]['x'].','.$points[0]['y'];
-                        for ($i=1; $i<count($points); $i++) {
-                            $prev = $points[$i-1];
-                            $curr = $points[$i];
-                            $cpx = ($prev['x'] + $curr['x']) / 2;
-                            $linePath .= ' C'.$cpx.','.$prev['y'].' '.$cpx.','.$curr['y'].' '.$curr['x'].','.$curr['y'];
+                        // Build smooth cubic bezier curve (hanya jika ada data)
+                        $linePath = '';
+                        $areaPath = '';
+                        if (count($points) >= 1) {
+                            $linePath = 'M'.$points[0]['x'].','.$points[0]['y'];
+                            for ($i=1; $i<count($points); $i++) {
+                                $prev = $points[$i-1];
+                                $curr = $points[$i];
+                                $cpx = ($prev['x'] + $curr['x']) / 2;
+                                $linePath .= ' C'.$cpx.','.$prev['y'].' '.$cpx.','.$curr['y'].' '.$curr['x'].','.$curr['y'];
+                            }
+                            $lastP  = end($points);
+                            $firstP = $points[0];
+                            $areaPath = $linePath.' L'.$lastP['x'].','.($padT+$chartH).' L'.$firstP['x'].','.($padT+$chartH).' Z';
                         }
-                        $lastP = end($points); $firstP = $points[0];
-                        $areaPath = $linePath.' L'.$lastP['x'].','.($padT+$chartH).' L'.$firstP['x'].','.($padT+$chartH).' Z';
                     @endphp
                     <clipPath id="areaClip"><rect id="areaClipRect" x="0" y="0" width="0" height="170"/></clipPath>
+                    @if(count($points) >= 1)
                     <path d="{{ $areaPath }}" fill="url(#lineGrad)" clip-path="url(#areaClip)"/>
                     <path d="{{ $linePath }}" fill="none" stroke="#22d3ee" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                     @foreach($points as $i => $p)
                     <circle class="line-dot" cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="4" fill="#0f172a" stroke="#22d3ee" stroke-width="2" style="cursor:pointer;opacity:0;transition:opacity .2s,r .15s,stroke-width .15s" data-year="{{ $p['year'] }}" data-val="{{ number_format($p['val']) }}"/>
                     <text x="{{ $p['x'] }}" y="{{ $padT + $chartH + 22 }}" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="11" font-weight="600" font-family="'Plus Jakarta Sans',sans-serif">{{ $p['year'] }}</text>
                     @endforeach
+                    @else
+                    <text x="350" y="85" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="13" font-family="'Plus Jakarta Sans',sans-serif">Data pertumbuhan penduduk belum tersedia</text>
+                    @endif
                 </svg>
                 <div id="lineTip" style="position:absolute;background:white;border-radius:8px;padding:6px 12px;font-size:11px;pointer-events:none;opacity:0;transition:all .12s;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10">
                     <div style="font-weight:700;color:#0f172a" id="lineTipYear"></div>
@@ -844,31 +877,65 @@ document.addEventListener('keydown', function(e) {
 
 // ── Line Chart Hover ──────────────────────────────────────────────
 (function(){
-    const tip=document.getElementById('lineTip');
-    if(!tip)return;
-    const container=tip.parentElement;
-    const svg=container.querySelector('svg');
-    const dots=document.querySelectorAll('.line-dot');
-    svg.addEventListener('mouseenter',()=>dots.forEach(d=>d.style.opacity='1'));
-    svg.addEventListener('mouseleave',()=>{dots.forEach(d=>{d.style.opacity='0';d.setAttribute('r','4');d.setAttribute('stroke-width','2')});tip.style.opacity='0';});
-    dots.forEach(dot=>{
-        dot.addEventListener('mouseenter',function(){
-            document.getElementById('lineTipYear').textContent=this.dataset.year;
-            document.getElementById('lineTipVal').textContent=this.dataset.val;
-            tip.style.opacity='1';
-            this.setAttribute('r','7');this.setAttribute('stroke-width','3');
+    const tip       = document.getElementById('lineTip');
+    if (!tip) return;
+    const container = tip.parentElement;
+    const svg       = container.querySelector('svg');
+    const dots      = document.querySelectorAll('.line-dot');
+
+    // Sembunyikan dots default, tampilkan saat hover SVG
+    svg.addEventListener('mouseenter', () => dots.forEach(d => d.style.opacity = '1'));
+    svg.addEventListener('mouseleave', () => {
+        dots.forEach(d => { d.style.opacity = '0'; d.setAttribute('r','4'); d.setAttribute('stroke-width','2'); });
+        tip.style.opacity = '0';
+    });
+
+    dots.forEach(dot => {
+        dot.addEventListener('mouseenter', function () {
+            document.getElementById('lineTipYear').textContent = this.dataset.year;
+            document.getElementById('lineTipVal').textContent  = this.dataset.val;
+            this.setAttribute('r', '7');
+            this.setAttribute('stroke-width', '3');
+
+            // Posisi tooltip: hitung dari posisi dot di SVG relatif ke container
+            const svgRect       = svg.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const cx            = parseFloat(this.getAttribute('cx'));
+            const cy            = parseFloat(this.getAttribute('cy'));
+
+            // Konversi koordinat SVG viewBox ke pixel aktual
+            const scaleX = svgRect.width  / 700;   // viewBox width = 700
+            const scaleY = svgRect.height / 170;   // viewBox height = 170
+            const dotX   = (svgRect.left - containerRect.left) + cx * scaleX;
+            const dotY   = (svgRect.top  - containerRect.top)  + cy * scaleY;
+
+            // Ukuran tooltip estimasi
+            const tipW = 80;
+            const tipH = 44;
+            const gap  = 10;
+
+            // Default: tooltip di atas dot, center-aligned
+            let x = dotX - tipW / 2;
+            let y = dotY - tipH - gap;
+
+            // Jika keluar kanan — geser ke kiri
+            if (x + tipW > containerRect.width - 8) {
+                x = containerRect.width - tipW - 8;
+            }
+            // Jika keluar kiri
+            if (x < 8) x = 8;
+            // Jika keluar atas — tampilkan di bawah dot
+            if (y < 4) y = dotY + gap;
+
+            tip.style.left    = x + 'px';
+            tip.style.top     = y + 'px';
+            tip.style.opacity = '1';
         });
-        dot.addEventListener('mousemove',function(e){
-            const rect=container.getBoundingClientRect();
-            let x=e.clientX-rect.left+12;
-            let y=e.clientY-rect.top-50;
-            if(x+120>rect.width)x=x-140;
-            if(y<0)y=y+70;
-            tip.style.left=x+'px';tip.style.top=y+'px';
-        });
-        dot.addEventListener('mouseleave',function(){
-            tip.style.opacity='0';
-            this.setAttribute('r','4');this.setAttribute('stroke-width','2');
+
+        dot.addEventListener('mouseleave', function () {
+            tip.style.opacity = '0';
+            this.setAttribute('r', '4');
+            this.setAttribute('stroke-width', '2');
         });
     });
 })();
@@ -931,159 +998,179 @@ document.addEventListener('keydown', function(e) {
 // ── GSAP Animations ──────────────────────────────────────────────
 gsap.registerPlugin(ScrollTrigger);
 
-// Hero (immediate, top of page)
-gsap.from('.info-hero', {opacity:0, y:40, duration:1, ease:'power3.out'});
-gsap.from('.hero-badge', {opacity:0, y:20, duration:.6, delay:.3, ease:'back.out(1.7)'});
-gsap.from('.hero-title', {opacity:0, y:30, duration:.8, delay:.4, ease:'power3.out'});
-gsap.from('.hero-desc', {opacity:0, y:20, duration:.7, delay:.6, ease:'power2.out'});
-gsap.from('.hero-emblem', {opacity:0, scale:.5, rotation:-15, duration:1, delay:.5, ease:'elastic.out(1,.5)'});
+// Konfigurasi global ScrollTrigger agar lebih smooth
+ScrollTrigger.config({ limitCallbacks: true, ignoreMobileResize: true });
 
-// Line chart draw
-(function(){
-    const el = document.querySelector('#lineChart path[stroke="#22d3ee"]');
-    if (!el || !el.getTotalLength) return;
-    const len = el.getTotalLength();
-    el.style.strokeDasharray = len;
-    el.style.strokeDashoffset = len;
-    const clipRect = document.getElementById('areaClipRect');
-    gsap.to(el, {strokeDashoffset:0, duration:3.5, ease:'power1.inOut', delay:.8});
-    if (clipRect) gsap.to(clipRect, {attr:{width:700}, duration:3.5, ease:'power1.inOut', delay:.8});
-})();
-
-// ── Scroll-triggered animations using timeline approach ──
-// Each section: set CSS hidden state, then gsap.to on scroll
-
-// Helper: create scroll animation
+// Helper onScroll yang lebih aman — pakai requestAnimationFrame agar tidak blocking
 function onScroll(trigger, fn) {
-    ScrollTrigger.create({trigger:trigger, start:'top 82%', once:true, onEnter:fn});
+    if (!trigger) return;
+    ScrollTrigger.create({
+        trigger: trigger,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => requestAnimationFrame(fn)
+    });
 }
 
-// Stat cards (KK/RT/RW)
-(function(){
-    const cards = document.querySelectorAll('.big-stat-card');
-    gsap.set(cards, {opacity:0, y:30});
-    onScroll(cards[0], ()=> gsap.to(cards, {opacity:1, y:0, duration:1, stagger:.2, ease:'power3.out'}));
-})();
+// Tunggu sampai semua resource load (font, gambar) baru jalankan semua animasi
+// Ini mencegah layout shift yang menyebabkan ScrollTrigger salah hitung posisi
+window.addEventListener('load', function () {
 
-// Gender cards
-(function(){
-    const cards = document.querySelectorAll('.gender-side-card');
-    if (!cards.length) return;
-    gsap.set(cards, {opacity:0, y:40, scale:.9});
-    onScroll('.demo-card', ()=> gsap.to(cards, {opacity:1, y:0, scale:1, duration:1, stagger:.2, ease:'back.out(1.4)'}));
-})();
+    // Refresh ScrollTrigger setelah layout stabil
+    ScrollTrigger.refresh();
 
-// Piramida bars - grow width from 0
-(function(){
-    const bars = document.querySelectorAll('.pyr-bar');
-    if (!bars.length) return;
-    const origData = [];
-    bars.forEach(bar => {
-        origData.push({w: bar.getAttribute('width'), x: bar.getAttribute('x')});
-        const fill = bar.getAttribute('fill') || '';
-        if (fill.includes('60a5fa')) {
-            // Laki-laki: grow from right edge (center)
-            bar.setAttribute('x', parseFloat(bar.getAttribute('x')) + parseFloat(bar.getAttribute('width')));
-        }
-        bar.setAttribute('width', '0');
-    });
-    onScroll('#pyrSvg', ()=>{
-        bars.forEach((bar, i) => {
-            gsap.to(bar, {
-                attr:{width: origData[i].w, x: origData[i].x},
-                duration:1.5, delay:i*.05, ease:'power2.out'
+    // ── Hero (langsung, tanpa scroll) ──────────────────────────
+    gsap.from('.info-hero', { opacity: 0, y: 30, duration: 1.2, ease: 'power3.out', clearProps: 'all' });
+    gsap.from('.hero-badge',  { opacity: 0, y: 15, duration: 0.8, delay: 0.3, ease: 'back.out(1.5)', clearProps: 'all' });
+    gsap.from('.hero-title',  { opacity: 0, y: 20, duration: 1.0, delay: 0.4, ease: 'power3.out', clearProps: 'all' });
+    gsap.from('.hero-desc',   { opacity: 0, y: 15, duration: 0.9, delay: 0.6, ease: 'power2.out', clearProps: 'all' });
+    gsap.from('.hero-emblem', { opacity: 0, scale: 0.6, duration: 1.2, delay: 0.5, ease: 'back.out(1.7)', clearProps: 'all' });
+
+    // ── Line chart draw ─────────────────────────────────────────
+    (function () {
+        const el = document.querySelector('#lineChart path[stroke="#22d3ee"]');
+        if (!el || !el.getTotalLength) return;
+        const len = el.getTotalLength();
+        gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
+        const clipRect = document.getElementById('areaClipRect');
+        gsap.to(el, { strokeDashoffset: 0, duration: 3.5, ease: 'power2.inOut', delay: 0.6 });
+        if (clipRect) gsap.to(clipRect, { attr: { width: 700 }, duration: 3.5, ease: 'power2.inOut', delay: 0.6 });
+        // Tampilkan dots setelah line selesai
+        setTimeout(() => {
+            document.querySelectorAll('.line-dot').forEach((d, i) => {
+                gsap.to(d, { opacity: 1, duration: 0.4, delay: i * 0.12, ease: 'power2.out' });
+            });
+        }, 3800);
+    })();
+
+    // ── Stat cards (KK/RT/RW) ─────────────────────────────────
+    (function () {
+        const cards = document.querySelectorAll('.big-stat-card');
+        if (!cards.length) return;
+        gsap.set(cards, { opacity: 0, y: 25, force3D: true });
+        onScroll(cards[0], () => gsap.to(cards, { opacity: 1, y: 0, duration: 1.0, stagger: 0.2, ease: 'power2.out', clearProps: 'transform' }));
+    })();
+
+    // ── Gender cards ───────────────────────────────────────────
+    (function () {
+        const cards = document.querySelectorAll('.gender-side-card');
+        if (!cards.length) return;
+        gsap.set(cards, { opacity: 0, y: 30, force3D: true });
+        onScroll('.demo-card', () => gsap.to(cards, { opacity: 1, y: 0, duration: 1.1, stagger: 0.2, ease: 'power2.out', clearProps: 'transform' }));
+    })();
+
+    // ── Piramida bars ─────────────────────────────────────────
+    (function () {
+        const bars = document.querySelectorAll('.pyr-bar');
+        if (!bars.length) return;
+        const origData = [];
+        bars.forEach(bar => {
+            origData.push({ w: bar.getAttribute('width'), x: bar.getAttribute('x') });
+            const fill = bar.getAttribute('fill') || '';
+            if (fill.includes('60a5fa')) {
+                bar.setAttribute('x', parseFloat(bar.getAttribute('x')) + parseFloat(bar.getAttribute('width')));
+            }
+            bar.setAttribute('width', '0');
+        });
+        onScroll('#pyrSvg', () => {
+            bars.forEach((bar, i) => {
+                gsap.to(bar, { attr: { width: origData[i].w, x: origData[i].x }, duration: 1.8, delay: i * 0.04, ease: 'power2.out' });
+            });
+        });
+    })();
+
+    // ── Donut chart ────────────────────────────────────────────
+    (function () {
+        const el = document.getElementById('donutChart');
+        if (!el) return;
+        gsap.set(el, { scale: 0.7, opacity: 0, transformOrigin: 'center center', force3D: true });
+        onScroll(el, () => gsap.to(el, { scale: 1, opacity: 1, duration: 1.4, ease: 'back.out(1.4)', clearProps: 'transform' }));
+    })();
+
+    // ── Agama legend cards ─────────────────────────────────────
+    (function () {
+        const rows = document.querySelectorAll('.legend-row');
+        if (!rows.length) return;
+        gsap.set(rows, { opacity: 0, x: 20, force3D: true });
+        onScroll(rows[0], () => gsap.to(rows, { opacity: 1, x: 0, duration: 0.8, stagger: 0.08, ease: 'power2.out', clearProps: 'transform' }));
+    })();
+
+    // ── Horizontal bars (semua .chart-card) ───────────────────
+    document.querySelectorAll('.chart-card').forEach(card => {
+        const bars = card.querySelectorAll('.hbar-fill');
+        if (!bars.length) return;
+        const widths = [];
+        bars.forEach(bar => {
+            widths.push(bar.style.width);
+            bar.style.width = '0';
+            bar.style.transition = 'none';
+        });
+        onScroll(card, () => {
+            bars.forEach((bar, i) => {
+                gsap.to(bar, { width: widths[i], duration: 1.8, delay: i * 0.09, ease: 'power2.out' });
             });
         });
     });
-})();
 
-// Donut chart
-(function(){
-    const el = document.getElementById('donutChart');
-    if (!el) return;
-    gsap.set(el, {scale:.6, rotation:-30, transformOrigin:'center center'});
-    onScroll(el, ()=> gsap.to(el, {scale:1, rotation:0, duration:1.5, ease:'back.out(1.5)'}));
-})();
-
-// Agama legend cards
-(function(){
-    const rows = document.querySelectorAll('.legend-row');
-    if (!rows.length) return;
-    gsap.set(rows, {opacity:0, x:25});
-    onScroll(rows[0], ()=> gsap.to(rows, {opacity:1, x:0, duration:.6, stagger:.08, ease:'power2.out'}));
-})();
-
-// ALL horizontal bars (kelompok umur, pekerjaan, pendidikan)
-document.querySelectorAll('.chart-card').forEach(card => {
-    const bars = card.querySelectorAll('.hbar-fill');
-    if (!bars.length) return;
-    const widths = [];
-    bars.forEach(bar => {
-        widths.push(bar.style.width);
-        bar.style.width = '0';
-        bar.style.transition = 'none';
-    });
-    onScroll(card, ()=>{
-        bars.forEach((bar, i) => {
-            gsap.to(bar, {width:widths[i], duration:1.8, delay:i*.1, ease:'power2.out'});
+    // ── Counter count-up ───────────────────────────────────────
+    document.querySelectorAll('.big-stat-number,.gs-num').forEach(el => {
+        const target = parseInt(el.textContent.replace(/\D/g, '')) || 0;
+        if (!target) return;
+        const originalText = el.textContent;
+        el.textContent = '0';
+        onScroll(el, () => {
+            const obj = { val: 0 };
+            gsap.to(obj, {
+                val: target, duration: 2.5, ease: 'power2.out',
+                onUpdate: () => { el.textContent = Math.round(obj.val).toLocaleString('id-ID'); },
+                onComplete: () => { el.textContent = originalText; }
+            });
         });
     });
-});
 
-// Fasilitas cards
-(function(){
-    const cards = document.querySelectorAll('.col-md-6.col-lg-3 .chart-card');
-    if (!cards.length) return;
-    gsap.set(cards, {opacity:0, y:30});
-    onScroll(cards[0], ()=> gsap.to(cards, {opacity:1, y:0, duration:.9, stagger:.15, ease:'back.out(1.3)'}));
-})();
-
-// Peta
-(function(){
-    const el = document.querySelector('.peta-card');
-    if (!el) return;
-    gsap.set(el, {opacity:0, y:30});
-    onScroll(el, ()=> gsap.to(el, {opacity:1, y:0, duration:1, ease:'power3.out'}));
-})();
-
-// Berita cards
-(function(){
-    const grid = document.getElementById('beritaGrid');
-    if (!grid) return;
-    const cards = grid.querySelectorAll('.berita-overlay-card');
-    if (!cards.length) return;
-    gsap.set(cards, {opacity:0, y:50, scale:.95});
-    onScroll(grid, ()=> gsap.to(cards, {opacity:1, y:0, scale:1, duration:1, stagger:.2, ease:'power3.out'}));
-})();
-
-// Counter count-up
-document.querySelectorAll('.big-stat-number,.gs-num').forEach(el => {
-    const target = parseInt(el.textContent.replace(/\D/g,'')) || 0;
-    if (!target) return;
-    el.textContent = '0';
-    onScroll(el, ()=>{
-        const obj = {val:0};
-        gsap.to(obj, {val:target, duration:2.5, ease:'power2.out', onUpdate:()=>{
-            el.textContent = Math.round(obj.val).toLocaleString('id-ID');
-        }});
+    // ── Section titles ─────────────────────────────────────────
+    document.querySelectorAll('.sec-title').forEach(t => {
+        gsap.set(t, { opacity: 0, x: -20, force3D: true });
+        onScroll(t, () => gsap.to(t, { opacity: 1, x: 0, duration: 0.9, ease: 'power2.out', clearProps: 'transform' }));
     });
-});
+    document.querySelectorAll('.sec-sub').forEach(t => {
+        gsap.set(t, { opacity: 0, x: -12, force3D: true });
+        onScroll(t, () => gsap.to(t, { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out', clearProps: 'transform' }));
+    });
 
-// Section titles
-document.querySelectorAll('.sec-title').forEach(t => {
-    gsap.set(t, {opacity:0, x:-25});
-    onScroll(t, ()=> gsap.to(t, {opacity:1, x:0, duration:.8, ease:'power2.out'}));
-});
-document.querySelectorAll('.sec-sub').forEach(t => {
-    gsap.set(t, {opacity:0, x:-15});
-    onScroll(t, ()=> gsap.to(t, {opacity:1, x:0, duration:.7, ease:'power2.out'}));
-});
+    // ── Fasilitas cards ────────────────────────────────────────
+    (function () {
+        const cards = document.querySelectorAll('.col-md-6.col-lg-3 .chart-card');
+        if (!cards.length) return;
+        gsap.set(cards, { opacity: 0, y: 25, force3D: true });
+        onScroll(cards[0], () => gsap.to(cards, { opacity: 1, y: 0, duration: 1.0, stagger: 0.15, ease: 'power2.out', clearProps: 'transform' }));
+    })();
+
+    // ── Peta ───────────────────────────────────────────────────
+    (function () {
+        const el = document.querySelector('.peta-card');
+        if (!el) return;
+        gsap.set(el, { opacity: 0, y: 25, force3D: true });
+        onScroll(el, () => gsap.to(el, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', clearProps: 'transform' }));
+    })();
+
+    // ── Berita cards ───────────────────────────────────────────
+    (function () {
+        const grid = document.getElementById('beritaGrid');
+        if (!grid) return;
+        const cards = grid.querySelectorAll('.berita-overlay-card');
+        if (!cards.length) return;
+        gsap.set(cards, { opacity: 0, y: 35, force3D: true });
+        onScroll(grid, () => gsap.to(cards, { opacity: 1, y: 0, duration: 1.1, stagger: 0.18, ease: 'power3.out', clearProps: 'transform' }));
+    })();
+
+}); // end window.load
 
 // Scroll to hash on load
-window.addEventListener('load', ()=>{
-    if(window.location.hash){
+window.addEventListener('load', () => {
+    if (window.location.hash) {
         const el = document.querySelector(window.location.hash);
-        if(el) setTimeout(()=> el.scrollIntoView({behavior:'smooth', block:'start'}), 300);
+        if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 400);
     }
 });
 </script>

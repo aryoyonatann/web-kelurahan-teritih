@@ -142,11 +142,6 @@
     .hero-desc{animation:heroFadeUp .65s ease both;animation-delay:.38s}
     .btn-hero-detail{animation:heroFadeUp .55s ease both;animation-delay:.55s}
 
-    /* ── ANIMATIONS (GSAP handles scroll animations) ── */
-    .fade-up-1{animation-delay:.08s}
-    .fade-up-2{animation-delay:.18s}
-    .fade-up-3{animation-delay:.28s}
-
     /* ── RESPONSIVE ── */
     @media(max-width:991px){
         .hero-section{margin:16px;padding:40px 24px}
@@ -164,7 +159,6 @@
 
 @include('partials.navbar')
 
-{{-- ═══ HERO ═══ --}}
 <div class="hero-section">
     <div style="position:relative;z-index:2;max-width:580px">
         <div class="hero-badge">
@@ -184,14 +178,11 @@
     <div class="hero-emblem"><i class="bi bi-bank2"></i></div>
 </div>
 
-{{-- ═══ MAIN CONTENT ═══ --}}
 <div class="content-area">
     <div class="row g-4 mt-1">
 
-        {{-- ══ LEFT COLUMN ══ --}}
         <div class="col-lg-8">
 
-            {{-- Akses Cepat --}}
             <div id="layanan" class="mb-4">
                 <div class="section-label">
                     <i class="bi bi-grid-fill"></i> Akses Cepat
@@ -225,7 +216,6 @@
                 </div>
             </div>
 
-            {{-- ══ BERITA ══ --}}
             <div class="">
                 <div class="berita-section-header">
                     <div class="section-label mb-0">
@@ -273,12 +263,9 @@
             </div>
 
         </div>
-        {{-- /LEFT --}}
 
-        {{-- ══ RIGHT COLUMN ══ --}}
         <div class="col-lg-4">
 
-            {{-- SAMBUTAN LURAH --}}
             <div class="kepala-card">
                 <div class="kepala-card-header">
                     <div class="kepala-card-header-icon"><i class="bi bi-person-badge-fill"></i></div>
@@ -305,7 +292,6 @@
                 </div>
             </div>
 
-            {{-- Jam Operasional --}}
             <div class="sidebar-card">
                 <div class="jam-header">
                     <div class="jam-header-icon"><i class="bi bi-clock-fill"></i></div>
@@ -327,18 +313,15 @@
                         <span class="jam-day">Sabtu – Minggu</span>
                         <span class="jam-tutup">Tutup</span>
                     </div>
-                    {{-- STATUS REAL-TIME --}}
                     <div class="jam-row" style="border-bottom:none;padding-top:12px;margin-top:2px;border-top:1px dashed var(--border)">
                         <span class="jam-day" style="font-size:13px;font-weight:600">Status Sekarang</span>
                         <span id="jam-status-home"></span>
                     </div>
-                    {{-- TANGGAL & HARI LIBUR --}}
                     <div id="jam-date-home" class="jam-date"></div>
                     <div id="jam-holiday-home"></div>
                 </div>
             </div>
 
-            {{-- Pengumuman Penting --}}
             <div class="sidebar-card">
                 <div class="pengumuman-body">
                     <div class="pengumuman-title">
@@ -353,14 +336,12 @@
 
 
         </div>
-        {{-- /RIGHT --}}
 
     </div>
 </div>
 
 @include('partials.footer')
 
-{{-- ═══ SCRIPT: STATUS JAM OPERASIONAL + HARI LIBUR NASIONAL ═══ --}}
 <script>
 (function () {
     var HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];

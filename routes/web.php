@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\KelolaAkunController;
 use App\Http\Controllers\User\PermohonanUserController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Admin\StatistikController;
+use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\ChatbotController;
@@ -52,6 +53,16 @@ Route::prefix('admin')->group(function () {
         // Statistik Demografi
         Route::get('statistik-demografi',  [StatistikController::class, 'edit'])  ->name('admin.statistik.edit');
         Route::put('statistik-demografi',  [StatistikController::class, 'update'])->name('admin.statistik.update');
+
+        // Data Warga (CRUD individual, sumber perhitungan otomatis statistik demografi)
+        Route::get('data-warga',                 [PendudukController::class, 'index'])           ->name('admin.warga.index');
+        Route::get('data-warga/template',        [PendudukController::class, 'downloadTemplate']) ->name('admin.warga.template');
+        Route::post('data-warga/import',         [PendudukController::class, 'import'])          ->name('admin.warga.import');
+        Route::get('data-warga/tambah',          [PendudukController::class, 'create'])           ->name('admin.warga.create');
+        Route::post('data-warga',                [PendudukController::class, 'store'])            ->name('admin.warga.store');
+        Route::get('data-warga/{warga}/edit',    [PendudukController::class, 'edit'])             ->name('admin.warga.edit');
+        Route::put('data-warga/{warga}',         [PendudukController::class, 'update'])           ->name('admin.warga.update');
+        Route::delete('data-warga/{warga}',      [PendudukController::class, 'destroy'])          ->name('admin.warga.destroy');
 
         // Dashboard
         Route::get('/dashboard',                    [DashboardController::class, 'index'])           ->name('admin.dashboard');

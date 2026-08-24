@@ -26,7 +26,7 @@ class PublicController extends Controller
 
     public function demografi()
     {
-        $statistik = \App\Models\StatistikDemografi::asCollection();
+        $statistik = \App\Models\StatistikDemografi::withPendudukOverride();
         return view('informasi', compact('statistik'));
     }
 
@@ -37,31 +37,25 @@ class PublicController extends Controller
             ->where('slug', '!=', '')
             ->orderBy('tanggal_publish', 'desc');
 
-        // Filter kategori
         if ($request->filled('kategori')) {
             $query->where('kategori', $request->kategori);
         }
 
-        // Filter search
         if ($request->filled('q')) {
             $q = $request->q;
-            $query->where(function($qb) use ($q) {
-                $qb->where('judul', 'ilike', "%{$q}%")
-                    ->orWhere('isi', 'ilike', "%{$q}%");
+            $query->where(function ($qb) use ($q) {
+                $qb->where('judul', 'like', "%{$q}%")
+                    ->orWhere('isi', 'like', "%{$q}%");
             });
         }
 
-        $totalBerita = (clone $query)->count();
-        $beritaList = $query->paginate(12);
-
-        // Keep backward compat
+        $totalBerita    = (clone $query)->count();
+        $beritaList     = $query->paginate(12);
         $beritaFeatured = $beritaList->first();
-        $beritaSamping = collect();
-        $beritaGrid = $beritaList;
+        $beritaGrid     = $beritaList;
 
         return view('informasi-berita', compact(
             'beritaFeatured',
-            'beritaSamping',
             'beritaGrid',
             'beritaList',
             'totalBerita'

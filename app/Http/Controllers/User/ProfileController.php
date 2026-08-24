@@ -11,17 +11,11 @@ use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
-    /**
-     * Tampilkan halaman edit profil.
-     */
     public function edit()
     {
         return view('User.profile.edit');
     }
 
-    /**
-     * Simpan perubahan profil.
-     */
     public function update(Request $request)
     {
         $user       = Auth::user();

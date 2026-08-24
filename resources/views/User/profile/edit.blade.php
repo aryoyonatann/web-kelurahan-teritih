@@ -255,7 +255,6 @@
 
     <div class="row g-4">
 
-        {{-- SIDEBAR KIRI --}}
         <div class="col-lg-3">
             <div class="profile-sidebar-card">
                 <div class="profile-cover"></div>
@@ -304,13 +303,11 @@
             </div>
         </div>
 
-        {{-- FORM KANAN --}}
         <div class="col-lg-9">
             <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" id="profileForm">
                 @csrf
                 @method('PUT')
 
-                {{-- ══ INFORMASI PRIBADI ══ --}}
                 <div class="form-card" id="seksi-pribadi">
                     <div class="form-card-header">
                         <div class="form-card-icon" style="background:#eff6ff;color:#1c64f2">
@@ -399,7 +396,6 @@
                     </div>
                 </div>
 
-                {{-- ══ ALAMAT DOMISILI ══ --}}
                 <div class="form-card" id="seksi-domisili">
                     <div class="form-card-header">
                         <div class="form-card-icon" style="background:#ecfdf5;color:#10b981">
@@ -451,7 +447,6 @@
                     </div>
                 </div>
 
-                {{-- ══ KEAMANAN AKUN ══ --}}
                 <div class="form-card" id="seksi-sandi">
                     <div class="form-card-header">
                         <div class="form-card-icon" style="background:#fff7ed;color:#d97706">
@@ -517,7 +512,6 @@
                     </div>
                 </div>
 
-                {{-- ACTION BAR --}}
                 <div class="action-bar">
                     <button type="button" class="btn-batal" onclick="window.history.back()">Batal</button>
                     <button type="submit" class="btn-simpan">

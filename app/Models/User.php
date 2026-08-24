@@ -46,10 +46,8 @@ class User extends Authenticatable
             'email' => $this->email,
         ], false));
 
-        $user = $this;
-
-        Mail::send('emails.reset-password', ['url' => $url, 'notifiable' => $user], function ($message) use ($user) {
-            $message->to($user->email)
+        Mail::send('emails.reset-password', ['url' => $url, 'notifiable' => $this], function ($message) {
+            $message->to($this->email)
                     ->subject('Reset Kata Sandi – Kelurahan Teritih');
         });
     }

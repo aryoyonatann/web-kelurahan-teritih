@@ -100,7 +100,6 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
     </div>
     @endif
 
-    {{-- STATISTIK --}}
     <div class="stats-row">
         <div class="stat-card">
             <div class="stat-icon blue">
@@ -176,14 +175,12 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
                     </td>
                     <td>
                         <div class="action-group">
-                            {{-- Detail --}}
                             <a href="{{ route('user.permohonan.show', $d->id_permohonan) }}" class="btn-sm btn-detail">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                                 </svg>
                                 Detail
                             </a>
-                            {{-- Hapus (hanya jika masih pending) --}}
                             @if(!$d->approval || $d->approval->status === 'pending')
                             <form action="{{ route('user.permohonan.destroy', $d->id_permohonan) }}" method="POST" style="display:inline" id="form-del-{{ $d->id_permohonan }}">
                                 @csrf @method('DELETE')

@@ -35,7 +35,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 .stat-row-label{font-size:11.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 .stat-input{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;color:#0f172a;background:white;outline:none;transition:all .18s;box-sizing:border-box}
 .stat-input:focus{border-color:#1c64f2;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.stat-input:disabled{background:#f1f5f9;color:#64748b;cursor:not-allowed;border-style:dashed;border-color:#cbd5e1}
 .pct-note{font-size:11px;color:#94a3b8;margin-top:4px}
+
+.lock-badge{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;background:#f1f5f9;color:#64748b;border-radius:20px;padding:3px 10px;flex-shrink:0}
 
 /* Grid 2 kolom untuk Laki-Laki & Perempuan */
 .jk-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -99,6 +102,69 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         <div class="alert-success"><i class="bi bi-check-circle-fill"></i> {{ session('success') }}</div>
         @endif
 
+        @if(session('import_summary'))
+            @php $sum = session('import_summary'); @endphp
+            <div class="alert-success" style="align-items:flex-start;flex-direction:column;gap:6px;background:{{ $sum['berhasil'] > 0 ? '#ecfdf5' : '#fef2f2' }};border-color:{{ $sum['berhasil'] > 0 ? '#6ee7b7' : '#fca5a5' }};color:{{ $sum['berhasil'] > 0 ? '#065f46' : '#991b1b' }}">
+                <div><i class="bi bi-file-earmark-check-fill"></i> <strong>Import selesai:</strong> {{ $sum['berhasil'] }} baris berhasil disimpan, {{ count($sum['gagal']) }} baris dilewati.</div>
+                @if(count($sum['gagal']))
+                    <ul style="margin:4px 0 0 18px;font-size:12px;padding:0">
+                        @foreach($sum['gagal'] as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        @endif
+
+        @if(session('import_errors'))
+            <div class="alert-success" style="background:#fef2f2;border-color:#fca5a5;color:#991b1b;flex-direction:column;align-items:flex-start;gap:4px">
+                @foreach(session('import_errors') as $err)
+                    <div><i class="bi bi-exclamation-triangle-fill"></i> {{ $err }}</div>
+                @endforeach
+            </div>
+        @endif
+
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- DATA WARGA (sumber perhitungan otomatis)   --}}
+        {{-- ══════════════════════════════════════════ --}}
+        <div class="group-card">
+            <div class="group-header">
+                <div class="group-icon" style="background:#eef2ff;color:#6366f1"><i class="bi bi-people-fill"></i></div>
+                <div class="group-title">Data Warga (Kependudukan Individual)</div>
+            </div>
+            <div class="group-body">
+                @if($adaDataPenduduk)
+                    <div class="info-box" style="background:#ecfdf5;border-color:#6ee7b7;color:#065f46">
+                        <i class="bi bi-check-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
+                        <div>
+                            Terdapat <strong>{{ \App\Models\Penduduk::count() }} data warga</strong> tersimpan. Seluruh angka
+                            jenis kelamin, agama, kelompok umur, pekerjaan, pendidikan, dan status kawin di bawah
+                            <strong>dihitung otomatis</strong> dari data warga tersebut, sehingga field-nya
+                            <strong>dikunci (tidak bisa diketik manual)</strong>. Untuk mengubah angka-angka itu,
+                            tambah/edit/hapus datanya lewat tombol "Tambah Warga Baru" atau "Kelola Data Warga" di bawah.
+                        </div>
+                    </div>
+                @else
+                    <div class="info-box">
+                        <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
+                        <div>
+                            Belum ada data warga individual. Selama belum ada, statistik di bawah memakai
+                            angka manual/import CSV di atas. Setelah data warga ditambahkan, angka terkait
+                            akan otomatis dihitung ulang dari data warga.
+                        </div>
+                    </div>
+                @endif
+                <div style="display:flex;gap:12px;flex-wrap:wrap">
+                    <a href="{{ route('admin.warga.index') }}" class="btn-simpan" style="text-decoration:none">
+                        <i class="bi bi-search"></i> Cari, Lihat &amp; Kelola Data Warga
+                    </a>
+                    <a href="{{ route('admin.warga.create') }}" class="btn-batal" style="text-decoration:none">
+                        <i class="bi bi-person-plus-fill"></i> Tambah Warga Baru
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <form action="{{ route('admin.statistik.update') }}" method="POST">
         @csrf @method('PUT')
 
@@ -139,10 +205,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                         <div class="ds-item-label">
                             <div class="ds-item-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-people-fill"></i></div>
                             Jumlah Penduduk (Jiwa)
+                            @if($adaDataPenduduk)
+                            <span class="lock-badge" style="margin-left:6px"><i class="bi bi-lock-fill"></i> Otomatis</span>
+                            @endif
                         </div>
                         <input type="hidden" name="singkat[jumlah_penduduk][label]" value="Jumlah Penduduk">
-                        <input type="text" name="singkat[jumlah_penduduk][nilai]" class="stat-input" value="{{ $dataSingkat['jumlah_penduduk'] ?? '4.520' }}" placeholder="Contoh: 4.520">
-                        <div class="pct-note">Tampil dengan satuan "Jiwa" di halaman profil</div>
+                        <input type="text" name="singkat[jumlah_penduduk][nilai]" class="stat-input" value="{{ $dataSingkat['jumlah_penduduk'] ?? '4.520' }}" placeholder="Contoh: 4.520" @disabled($adaDataPenduduk)>
+                        <div class="pct-note">
+                            @if($adaDataPenduduk)
+                                Otomatis dari jumlah data warga ({{ $totalPendudukDB }} jiwa) — ubah lewat Data Warga.
+                            @else
+                                Tampil dengan satuan "Jiwa" di halaman profil
+                            @endif
+                        </div>
                     </div>
                     <div class="ds-item">
                         <div class="ds-item-label">
@@ -179,6 +254,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             <div class="group-header">
                 <div class="group-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-people-fill"></i></div>
                 <div class="group-title">Data Kependudukan Utama</div>
+                @if($adaDataPenduduk)
+                <span class="lock-badge"><i class="bi bi-lock-fill"></i> Otomatis dari Data Warga</span>
+                @endif
             </div>
             <div class="group-body">
 
@@ -189,7 +267,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 <div class="stat-row">
                     <div class="stat-row-label">{{ $s->label }}</div>
                     <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $s->label }}">
-                    <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $s->nilai }}" min="0" required>
+                    <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $s->nilai }}" min="0" required @disabled($adaDataPenduduk)>
                 </div>
                 @endif
                 @endforeach
@@ -216,7 +294,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                                    class="stat-input jk-input"
                                    value="{{ $nilaiLaki }}" min="0"
                                    style="border-color:#bfdbfe"
-                                   oninput="hitungJK()">
+                                   oninput="hitungJK()" @disabled($adaDataPenduduk)>
                             <div class="pct-note" id="pct_laki">
                                 {{ ($nilaiLaki + ($statistik['jiwa_perempuan']->nilai ?? 0)) > 0
                                     ? round($nilaiLaki / ($nilaiLaki + ($statistik['jiwa_perempuan']->nilai ?? 0)) * 100, 1)
@@ -239,7 +317,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                                    class="stat-input jk-input"
                                    value="{{ $nilaiPrmp }}" min="0"
                                    style="border-color:#fecdd3"
-                                   oninput="hitungJK()">
+                                   oninput="hitungJK()" @disabled($adaDataPenduduk)>
                             <div class="pct-note" id="pct_perempuan">
                                 {{ ($nilaiLaki + $nilaiPrmp) > 0
                                     ? round($nilaiPrmp / ($nilaiLaki + $nilaiPrmp) * 100, 1)
@@ -260,6 +338,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             <div class="group-header">
                 <div class="group-icon" style="background:#ecfdf5;color:#10b981"><i class="bi bi-stars"></i></div>
                 <div class="group-title">Sebaran Agama (7 Jenis)</div>
+                @if($adaDataPenduduk)
+                <span class="lock-badge"><i class="bi bi-lock-fill"></i> Otomatis dari Data Warga</span>
+                @endif
             </div>
             <div class="group-body">
                 @php
@@ -273,7 +354,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 @endphp
                 <div class="info-box">
                     <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
-                    <div>Isi jumlah jiwa per agama — persentase dihitung otomatis dari total semua agama.</div>
+                    <div>
+                        @if($adaDataPenduduk)
+                            Jumlah jiwa per agama dihitung otomatis dari data warga — ubah lewat Data Warga. Persentase dihitung otomatis dari total semua agama.
+                        @else
+                            Isi jumlah jiwa per agama — persentase dihitung otomatis dari total semua agama.
+                        @endif
+                    </div>
                 </div>
                 <div class="agama-grid">
                 @foreach($agamaKeys as $kunci)
@@ -295,7 +382,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                     <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $sLabel }}">
                     <input type="number" name="statistik[{{ $kunci }}][nilai]"
                            id="input_{{ $kunci }}" class="stat-input agama-input"
-                           value="{{ $sNilai }}" min="0" required oninput="hitungAgama()">
+                           value="{{ $sNilai }}" min="0" required oninput="hitungAgama()" @disabled($adaDataPenduduk)>
                     <div class="pct-note">Preview: <span id="pct_{{ $kunci }}">{{ $totalA > 0 ? round($sNilai / $totalA * 100, 1) : 0 }}%</span></div>
                 </div>
                 @endforeach
@@ -310,11 +397,20 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             <div class="group-header">
                 <div class="group-icon" style="background:#f5f3ff;color:#8b5cf6"><i class="bi bi-calendar2-range-fill"></i></div>
                 <div class="group-title">Kelompok Umur – 4 Kategori (Data DDK)</div>
+                @if($adaDataPenduduk)
+                <span class="lock-badge"><i class="bi bi-lock-fill"></i> Otomatis dari Data Warga</span>
+                @endif
             </div>
             <div class="group-body">
                 <div class="info-box">
                     <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
-                    <div>Data dari pemdes.kemendagri.go.id. Isi Laki-laki dan Perempuan per kategori.</div>
+                    <div>
+                        @if($adaDataPenduduk)
+                            Dihitung otomatis dari tanggal lahir data warga — ubah lewat Data Warga.
+                        @else
+                            Data dari pemdes.kemendagri.go.id. Isi Laki-laki dan Perempuan per kategori.
+                        @endif
+                    </div>
                 </div>
                 @php
                     $umur4Keys = [
@@ -337,11 +433,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                         <div class="umur-sub">
                             <div>
                                 <label>👨 Laki-laki</label>
-                                <input type="number" class="stat-input umur4-input" data-key="{{ $kunci }}" data-gender="l" value="{{ $su4parts[0] ?? 0 }}" min="0" oninput="hitungUmur4('{{ $kunci }}')">
+                                <input type="number" class="stat-input umur4-input" data-key="{{ $kunci }}" data-gender="l" value="{{ $su4parts[0] ?? 0 }}" min="0" oninput="hitungUmur4('{{ $kunci }}')" @disabled($adaDataPenduduk)>
                             </div>
                             <div>
                                 <label>👩 Perempuan</label>
-                                <input type="number" class="stat-input umur4-input" data-key="{{ $kunci }}" data-gender="p" value="{{ $su4parts[1] ?? 0 }}" min="0" oninput="hitungUmur4('{{ $kunci }}')">
+                                <input type="number" class="stat-input umur4-input" data-key="{{ $kunci }}" data-gender="p" value="{{ $su4parts[1] ?? 0 }}" min="0" oninput="hitungUmur4('{{ $kunci }}')" @disabled($adaDataPenduduk)>
                             </div>
                         </div>
                         <input type="hidden" name="statistik[{{ $kunci }}][nilai]" id="umur4_nilai_{{ $kunci }}" value="{{ $su4->nilai ?? 0 }}">
@@ -359,6 +455,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             <div class="group-header">
                 <div class="group-icon" style="background:#fff7ed;color:#f59e0b"><i class="bi bi-briefcase-fill"></i></div>
                 <div class="group-title">Mata Pencaharian (Data DDK)</div>
+                @if($adaDataPenduduk)
+                <span class="lock-badge"><i class="bi bi-lock-fill"></i> Otomatis dari Data Warga</span>
+                @endif
             </div>
             <div class="group-body">
                 @php
@@ -381,7 +480,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                     <div class="stat-row">
                         <div class="stat-row-label">{{ $labelK }}</div>
                         <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelK }}">
-                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sk->nilai ?? 0 }}" min="0">
+                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sk->nilai ?? 0 }}" min="0" @disabled($adaDataPenduduk)>
                     </div>
                     @endforeach
                 </div>
@@ -395,6 +494,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             <div class="group-header">
                 <div class="group-icon" style="background:#fff1f2;color:#f43f5e"><i class="bi bi-heart-fill"></i></div>
                 <div class="group-title">Status Perkawinan (Data DDK)</div>
+                @if($adaDataPenduduk)
+                <span class="lock-badge"><i class="bi bi-lock-fill"></i> Otomatis dari Data Warga</span>
+                @endif
             </div>
             <div class="group-body">
                 @php
@@ -416,11 +518,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                     <div class="umur-sub" style="margin-top:8px">
                         <div>
                             <label style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:3px;display:block">👨 Laki-laki</label>
-                            <input type="number" class="stat-input kawin-input" data-key="{{ $kunci }}" data-gender="l" value="{{ $skwparts[0] ?? 0 }}" min="0" oninput="hitungKawin('{{ $kunci }}')">
+                            <input type="number" class="stat-input kawin-input" data-key="{{ $kunci }}" data-gender="l" value="{{ $skwparts[0] ?? 0 }}" min="0" oninput="hitungKawin('{{ $kunci }}')" @disabled($adaDataPenduduk)>
                         </div>
                         <div>
                             <label style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:3px;display:block">👩 Perempuan</label>
-                            <input type="number" class="stat-input kawin-input" data-key="{{ $kunci }}" data-gender="p" value="{{ $skwparts[1] ?? 0 }}" min="0" oninput="hitungKawin('{{ $kunci }}')">
+                            <input type="number" class="stat-input kawin-input" data-key="{{ $kunci }}" data-gender="p" value="{{ $skwparts[1] ?? 0 }}" min="0" oninput="hitungKawin('{{ $kunci }}')" @disabled($adaDataPenduduk)>
                         </div>
                     </div>
                     <input type="hidden" name="statistik[{{ $kunci }}][nilai]" id="kawin_nilai_{{ $kunci }}" value="{{ $skw->nilai ?? 0 }}">
@@ -430,38 +532,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             </div>
         </div>
 
-        {{-- ══════════════════════════════════════════ --}}
-        {{-- ⑧ PERTUMBUHAN PENDUDUK PER TAHUN           --}}
-        {{-- ══════════════════════════════════════════ --}}
-        <div class="group-card">
-            <div class="group-header">
-                <div class="group-icon" style="background:#eff6ff;color:#60a5fa"><i class="bi bi-graph-up"></i></div>
-                <div class="group-title">Pertumbuhan Penduduk per Tahun</div>
-            </div>
-            <div class="group-body">
-                <div class="info-box">
-                    <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
-                    <div>Data ini ditampilkan sebagai grafik garis (line chart) di halaman publik. Klik "Tambah Tahun" untuk menambah data tahun baru.</div>
-                </div>
-                <div class="agama-grid" id="tahunGrid">
-                    @php
-                        $tahunKeys = $statistik->keys()->filter(fn($k) => str_starts_with($k, 'penduduk_'))->sort()->values();
-                    @endphp
-                    @foreach($tahunKeys as $kunci)
-                    @php $sp = $statistik[$kunci]; $yr = str_replace('penduduk_', '', $kunci); @endphp
-                    <div class="stat-row" style="position:relative">
-                        <div class="stat-row-label">📈 Tahun {{ $yr }}</div>
-                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="Tahun {{ $yr }}">
-                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sp->nilai ?? 0 }}" min="0">
-                        <button type="button" onclick="hapusTahun(this,'{{ $kunci }}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;border:none;background:#fef2f2;color:#ef4444;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Hapus">✕</button>
-                    </div>
-                    @endforeach
-                </div>
-                <button type="button" onclick="tambahTahun()" style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1.5px dashed #93c5fd;background:#f0f9ff;color:#0284c7;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">➕ Tambah Tahun</button>
-            </div>
-        </div>
-
-        {{-- ══════════════════════════════════════════ --}}
         {{-- ⑨ FASILITAS KELURAHAN                      --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
@@ -504,6 +574,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             <div class="group-header">
                 <div class="group-icon" style="background:#f5f3ff;color:#8b5cf6"><i class="bi bi-mortarboard-fill"></i></div>
                 <div class="group-title">Tingkat Pendidikan</div>
+                @if($adaDataPenduduk)
+                <span class="lock-badge"><i class="bi bi-lock-fill"></i> Otomatis dari Data Warga</span>
+                @endif
             </div>
             <div class="group-body">
                 @php
@@ -525,7 +598,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                     <div class="stat-row">
                         <div class="stat-row-label">{{ $labelPd }}</div>
                         <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelPd }}">
-                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sp->nilai ?? 0 }}" min="0">
+                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sp->nilai ?? 0 }}" min="0" @disabled($adaDataPenduduk)>
                     </div>
                     @endforeach
                 </div>
@@ -539,6 +612,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             <div class="group-header">
                 <div class="group-icon" style="background:#fff7ed;color:#f59e0b"><i class="bi bi-calendar3"></i></div>
                 <div class="group-title">Keterangan Update</div>
+                @if($adaDataPenduduk)
+                <span class="lock-badge"><i class="bi bi-lock-fill"></i> Otomatis dari Data Warga</span>
+                @endif
             </div>
             <div class="group-body">
                 @php
@@ -557,7 +633,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                         }
                     }
                 @endphp
-                @if($s)
+                @if($adaDataPenduduk)
+                <div class="stat-row">
+                    <div class="stat-row-label">Periode Update Data</div>
+                    <div class="stat-input" style="background:#f1f5f9;color:#374151;font-weight:700;border-style:dashed;border-color:#cbd5e1">
+                        {{ $nilaiTeks ?: '—' }}
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:5px">
+                        <i class="bi bi-info-circle me-1"></i>Otomatis ter-set ke bulan &amp; tahun saat ini setiap kali data warga ditambah/diubah/dihapus — tidak perlu dipilih manual lagi.
+                    </div>
+                </div>
+                @elseif($s)
                 <div class="stat-row">
                     <div class="stat-row-label">Periode Update Data</div>
                     <input type="hidden" name="statistik[update_terakhir][label]" value="{{ $s->label }}">
@@ -629,38 +715,5 @@ function hitungKawin(key) {
     document.getElementById('kawin_teks_' + key).value = l + '|' + p;
 }
 
-// Hitung hubungan keluarga - removed (replaced by fasilitas)
-
-// Tambah tahun baru untuk pertumbuhan penduduk
-function tambahTahun() {
-    const grid = document.getElementById('tahunGrid');
-    const existing = grid.querySelectorAll('.stat-row:not([style*="display: none"])');
-    let maxYear = 2026;
-    existing.forEach(row => {
-        const label = row.querySelector('.stat-row-label');
-        if (label) {
-            const m = label.textContent.match(/\d{4}/);
-            if (m && parseInt(m[0]) > maxYear) maxYear = parseInt(m[0]);
-        }
-    });
-    const newYear = maxYear + 1;
-    const html = `<div class="stat-row" style="position:relative">
-        <div class="stat-row-label">📈 Tahun ${newYear}</div>
-        <input type="hidden" name="statistik[penduduk_${newYear}][label]" value="Tahun ${newYear}">
-        <input type="number" name="statistik[penduduk_${newYear}][nilai]" class="stat-input" value="0" min="0" placeholder="Isi jumlah penduduk">
-        <button type="button" onclick="hapusTahun(this,'penduduk_${newYear}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;border:none;background:#fef2f2;color:#ef4444;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Hapus">✕</button>
-    </div>`;
-    grid.insertAdjacentHTML('beforeend', html);
-}
-
-function hapusTahun(btn, kunci) {
-    showConfirm('Hapus data statistik tahun ini?', function() {
-        const row = btn.closest('.stat-row');
-        row.style.display = 'none';
-        row.querySelectorAll('input').forEach(inp => inp.disabled = true);
-        const grid = document.getElementById('tahunGrid');
-    grid.insertAdjacentHTML('afterend', `<input type="hidden" name="hapus_statistik[]" value="${kunci}">`);
-    }, {confirmText:'Ya, Hapus', type:'danger'});
-}
 </script>
 @endpush

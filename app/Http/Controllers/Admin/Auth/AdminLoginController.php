@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AdminLoginController extends Controller
 {
@@ -53,11 +54,11 @@ class AdminLoginController extends Controller
 
         $admin = Auth::guard('admin')->user();
 
-        if (!\Illuminate\Support\Facades\Hash::check($request->password_lama, $admin->password)) {
+        if (!Hash::check($request->password_lama, $admin->password)) {
             return back()->with('error', 'Password lama tidak sesuai.');
         }
 
-        $admin->update(['password' => \Illuminate\Support\Facades\Hash::make($request->password_baru)]);
+        $admin->update(['password' => Hash::make($request->password_baru)]);
 
         return back()->with('success', 'Password berhasil diubah.');
     }

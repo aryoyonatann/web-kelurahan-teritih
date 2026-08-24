@@ -128,7 +128,6 @@ textarea[name=template_pembuka],textarea[name=template_isi],textarea[name=templa
 
 @section('content')
 <div class="page-layout">
-{{-- ── KIRI: FORM ── --}}
 <div class="form-col">
 <div class="wizard-wrap">
     <a href="{{ route('jenis-surat.index') }}" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#64748b;text-decoration:none;margin-bottom:20px">
@@ -379,10 +378,9 @@ textarea[name=template_pembuka],textarea[name=template_isi],textarea[name=templa
         </div>
 
     </form>
-</div>{{-- wizard-wrap --}}
-</div>{{-- form-col --}}
+</div>
+</div>
 
-{{-- ── KANAN: PREVIEW ── --}}
 <div class="preview-col">
     <div class="preview-panel">
         <div class="preview-panel-head">
@@ -424,13 +422,12 @@ textarea[name=template_pembuka],textarea[name=template_isi],textarea[name=templa
     </div>
 </div>
 
-</div>{{-- page-layout --}}
+</div>
 
 <script>
 let extraCount = 0;
 let currentStep = 1;
 
-// ── Step navigation ──
 function goStep(n) {
     if (n > currentStep && !validateStep(currentStep)) return;
     document.getElementById('step' + currentStep).classList.remove('active');
@@ -454,14 +451,14 @@ function validateStep(n) {
     return true;
 }
 
-// ── Auto-fill kode from nama ──
+// Auto-fill kode from nama
 function autoFillKode(val) {
     const words = val.trim().toUpperCase().split(/\s+/);
     const kode  = words.map(w => w[0] || '').join('').substring(0, 6);
     document.getElementById('kode_surat_hidden').value = kode || 'SK';
 }
 
-// ── Icon picker ──
+// Icon picker
 function setIcon(icon, color) {
     document.getElementById('icon_hidden').value = icon;
     document.getElementById('warna_hidden').value = color;
@@ -473,7 +470,7 @@ function setIcon(icon, color) {
 // Default select first icon
 setIcon('bi-file-earmark-text', '#1c64f2');
 
-// ── Preset fields ──
+// Preset fields
 function addPreset(preset) {
     const btn = document.querySelector(`[data-key="${preset.key}"]`);
     if (btn && btn.classList.contains('used')) return;
@@ -594,7 +591,7 @@ renderField('{{ $ek }}', @json($lbl), '{{ $et }}', true, true);
 goStep({{ $errors->has('nama_surat') ? 1 : ($errors->has('bio_fields') ? 2 : 3) }});
 @endif
 
-// ── Bio field print_label map ──
+// Bio field print_label map
 const BIO_LABELS = {
     nama:'N a m a', nik:'N I K', tempat_tgl_lahir:'Tempat / Tgl Lahir', umur:'Umur',
     jenis_kelamin:'Jenis Kelamin', agama:'Bangsa / Agama', status_kawin:'Status Perkawinan',

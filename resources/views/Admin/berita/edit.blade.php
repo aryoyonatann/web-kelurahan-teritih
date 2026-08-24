@@ -112,7 +112,6 @@
         <span class="bc-cur">Edit</span>
     </div>
 
-    {{-- ✅ HERO BIRU --}}
     <div class="form-hero">
         <div class="form-hero-inner">
             <div>
@@ -123,7 +122,6 @@
         </div>
     </div>
 
-    {{-- ✅ FULL WIDTH — tidak ada max-width --}}
     <div class="form-wrapper">
 
         <div class="current-val">
