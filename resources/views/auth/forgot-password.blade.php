@@ -20,7 +20,6 @@
             padding: 20px;
         }
 
-        /* Background dekorasi */
         body::before {
             content: '';
             position: fixed;
@@ -51,7 +50,6 @@
             z-index: 1;
         }
 
-        /* Header card */
         .card-header {
             background: linear-gradient(135deg, #0d1b3e, #1c64f2);
             padding: 32px 32px 28px;
@@ -104,7 +102,6 @@
             position: relative; z-index: 1;
         }
 
-        /* Body card */
         .card-body { padding: 28px 32px 32px; }
 
         .info-box {
@@ -126,7 +123,6 @@
             line-height: 1.55;
         }
 
-        /* Alert status */
         .alert-status {
             background: #ecfdf5;
             border: 1.5px solid #6ee7b7;
@@ -141,7 +137,6 @@
             font-weight: 500;
         }
 
-        /* Form */
         .form-group { margin-bottom: 20px; }
         .form-label {
             display: block;
@@ -182,7 +177,6 @@
             display: flex; align-items: center; gap: 4px;
         }
 
-        /* Submit button */
         .btn-submit {
             width: 100%;
             padding: 13px;
@@ -204,7 +198,6 @@
         }
         .btn-submit:active { transform: translateY(0); }
 
-        /* Back link */
         .back-link {
             display: flex; align-items: center; justify-content: center; gap: 6px;
             font-size: 13px; font-weight: 600; color: #64748b;
@@ -213,7 +206,6 @@
         }
         .back-link:hover { color: #1c64f2; }
 
-        /* Footer */
         .card-footer {
             padding: 14px 32px;
             border-top: 1px solid #f1f5f9;

@@ -277,7 +277,6 @@
 <footer class="main-footer">
     <div class="row g-4">
 
-        <!-- Brand -->
         <div class="col-lg-3 col-md-6">
             <div class="d-flex align-items-center gap-2 mb-1">
                 <div class="footer-brand-icon"><i class="bi bi-bank2"></i></div>
@@ -297,7 +296,6 @@
             </div>
         </div>
 
-        <!-- Tautan Cepat -->
         <div class="col-lg-2 col-md-6">
             <div class="footer-heading">Tautan Cepat</div>
             <ul class="footer-links">
@@ -339,7 +337,6 @@
             </ul>
         </div>
 
-        <!-- Kontak -->
         <div class="col-lg-4 col-md-6">
             <div class="footer-heading">Kontak Kami</div>
             <ul class="footer-contact">
@@ -350,7 +347,6 @@
             </ul>
         </div>
 
-        <!-- Peta -->
         <div class="col-lg-3 col-md-6">
             <div class="footer-heading">Lokasi Kantor</div>
             <div class="footer-map">
@@ -371,10 +367,9 @@
     </div>
 </footer>
 
-{{-- ═══ FLOATING CHATBOT (Hybrid: FAQ + AI Gemini) ═══ --}}
+{{-- FLOATING CHATBOT (Hybrid: FAQ + AI Gemini) --}}
 <div id="chatbot-wrap">
 
-    {{-- Panel --}}
     <div id="chatbot-panel">
         <div class="chat-header">
             <div class="chat-header-left">
@@ -406,7 +401,6 @@
             <button class="chat-faq-item" onclick="askFaq(6)"><i class="bi bi-person-plus"></i> Cara daftar akun masyarakat</button>
         </div>
 
-        {{-- Input area untuk chat bebas dengan AI --}}
         <div class="chat-input-wrap">
             <input
                 type="text"
@@ -431,7 +425,6 @@
         </div>
     </div>
 
-    {{-- button ikon robot + teks "Tanya Kami" --}}
     <button id="chatbot-btn" onclick="toggleChat()" aria-label="Tanya Kami - Asisten Kelurahan">
         <span id="chatbot-notif">1</span>
         <span class="cb-label">Tanya Kami</span>
@@ -584,7 +577,6 @@
         msgs.scrollTop = msgs.scrollHeight;
 
         try {
-            // Timeout 35 detik (lebih dari timeout backend 30 detik × 3 retry)
             var controller = new AbortController();
             var timeoutId = setTimeout(function () { controller.abort(); }, 35000);
 
@@ -635,7 +627,6 @@
 
             var bubbleErr = document.createElement('div');
             bubbleErr.className = 'chat-bubble-bot';
-            // Bedakan timeout vs error koneksi lain
             if (err.name === 'AbortError') {
                 bubbleErr.innerHTML = '⏳ Asisten butuh waktu terlalu lama untuk merespons. Silakan coba lagi beberapa saat.';
             } else {

@@ -1,4 +1,3 @@
-<!-- LAMPIRAN DOKUMEN -->
 <div class="card-section">
     <div class="card-section-head">
         <div class="card-section-head-icon" style="background:#fffbeb;color:#f59e0b"><i class="bi bi-paperclip"></i></div>

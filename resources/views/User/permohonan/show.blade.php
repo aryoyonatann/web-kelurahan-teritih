@@ -246,7 +246,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </div>
     </div>
 
-    {{-- CATATAN PENOLAKAN --}}
     @if($status === 'ditolak' && ($permohonan->approval->catatan ?? false))
     <div class="tolak-box">
         <i class="bi bi-exclamation-triangle-fill"></i>
@@ -257,7 +256,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     </div>
     @endif
 
-    {{-- ══ DATA PERMOHONAN (biodata + extra fields, dinamis dari fields_config) ══ --}}
     @php
         $allFields = collect($permohonan->jenisSurat->fields_config ?? []);
         if (is_string($permohonan->jenisSurat->fields_config)) $allFields = collect(json_decode($permohonan->jenisSurat->fields_config, true) ?? []);
@@ -338,7 +336,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </div>
     </div>
 
-    {{-- DOKUMEN --}}
     <div class="sec">
         <div class="sec-head">
             <div class="sec-icon" style="background:var(--blue-lt);color:var(--blue)"><i class="bi bi-paperclip"></i></div>
@@ -376,7 +373,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         @endforelse
     </div>
 
-    {{-- TIMELINE --}}
     <div class="sec">
         <div class="sec-head">
             <div class="sec-icon" style="background:#fffbeb;color:var(--orange)"><i class="bi bi-clock-history"></i></div>
@@ -421,7 +417,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </div>
     </div>
 
-    {{-- ACTIONS --}}
     <div class="act">
         <a href="{{ route('user.permohonan.index') }}" class="btn-back-act">
             <i class="bi bi-arrow-left"></i> Kembali ke Daftar Permohonan

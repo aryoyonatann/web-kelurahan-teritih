@@ -117,7 +117,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         @endif
 
         @if(session('import_errors'))
-            <div class="alert-success" style="background:#fef2f2;border-color:#fca5a5;color:#991b1b;flex-direction:column;align-items:flex-start;gap:4px">
+            <div class="alert-danger" style="background:#fef2f2;border-color:#fca5a5;color:#991b1b;flex-direction:column;align-items:flex-start;gap:4px;display:flex;padding:14px 18px;border-radius:8px;border:1px solid;margin-bottom:16px;font-size:13px">
                 @foreach(session('import_errors') as $err)
                     <div><i class="bi bi-exclamation-triangle-fill"></i> {{ $err }}</div>
                 @endforeach
@@ -391,7 +391,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         </div>
 
         {{-- ══════════════════════════════════════════ --}}
-        {{-- ⑤ KELOMPOK UMUR 4 KATEGORI (DDK)           --}}
+        {{-- ④ KELOMPOK UMUR 4 KATEGORI (DDK)           --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
@@ -449,7 +449,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         </div>
 
         {{-- ══════════════════════════════════════════ --}}
-        {{-- ⑥ MATA PENCAHARIAN                         --}}
+        {{-- ⑤ MATA PENCAHARIAN                         --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
@@ -488,7 +488,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         </div>
 
         {{-- ══════════════════════════════════════════ --}}
-        {{-- ⑦ STATUS PERKAWINAN                        --}}
+        {{-- ⑥ STATUS PERKAWINAN                        --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
@@ -532,7 +532,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             </div>
         </div>
 
-        {{-- ⑨ FASILITAS KELURAHAN                      --}}
+        {{-- ⑦ FASILITAS KELURAHAN                      --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">
@@ -568,7 +568,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
         </div>
 
         {{-- ══════════════════════════════════════════ --}}
-        {{-- ⑨ PENDIDIKAN                               --}}
+        {{-- ⑧ PENDIDIKAN                               --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
             <div class="group-header">

@@ -44,21 +44,6 @@
     .agama-card-label{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px}
     .agama-card-num{font-size:30px;font-weight:800;line-height:1.1}
     .agama-card-jiwa{font-size:13px;color:var(--muted);margin-top:3px}
-    .chart-area{display:flex;align-items:center;gap:32px;flex-wrap:wrap}
-    .donut-wrap{position:relative;flex-shrink:0}
-    .donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-    .donut-total{font-size:22px;font-weight:800;color:var(--navy);line-height:1}
-    .donut-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase}
-    .chart-legend{flex:1;min-width:200px}
-    .legend-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--bg)}
-    .legend-row:last-child{border-bottom:none}
-    .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-    .legend-name{font-size:14px;font-weight:600;color:var(--navy);flex:1}
-    .legend-jiwa{font-size:13px;color:var(--muted)}
-    .legend-pct{font-size:14px;font-weight:800;color:var(--navy);min-width:44px;text-align:right}
-
-    /* ── PETA WILAYAH (gambar dengan lightbox) ── */
-
     /* ── MODERN INTERACTIVE CHARTS ── */
     .chart-card{background:white;border:1px solid var(--border);border-radius:20px;padding:28px;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:visible}
     .chart-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#f43f5e);opacity:0;transition:opacity .3s;border-radius:20px 20px 0 0}
@@ -90,12 +75,9 @@
     .split-bar-p::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),transparent)}
     .donut-mini{position:relative;display:inline-block}
     .donut-mini-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-    /* GSAP handles all scroll animations */
-    /* Glow effect on hover for stat cards */
     .big-stat-card{position:relative;overflow:hidden}
     .big-stat-card::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(28,100,242,.04) 0%,transparent 70%);opacity:0;transition:opacity .3s}
     .big-stat-card:hover::after{opacity:1}
-    /* Piramida hover */
     .pyr-bar{transition:opacity .2s ease,filter .2s ease;transform-origin:center}
     .pyr-tooltip{position:fixed;background:white;border:1px solid #e2e8f0;border-radius:12px;padding:12px 16px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;pointer-events:none;opacity:0;transition:all .2s cubic-bezier(.4,0,.2,1);z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.15);min-width:180px;backdrop-filter:blur(8px)}
     .pyr-tooltip .pt{font-size:14px;font-weight:700;color:#0d1b3e;margin-bottom:8px}
@@ -240,7 +222,6 @@
     <div class="sec-sub" style="margin-bottom:16px">Data kependudukan terbaru Kelurahan Teritih <span class="update-badge" style="margin-left:8px"><span class="update-dot"></span> {{ $updateTerakhir }}</span></div>
 
     <div class="row g-3 mb-5">
-        {{-- LEFT: Line Chart + Total Penduduk --}}
         @php
             $trendYears = [];
             $s->keys()->filter(fn($k) => str_starts_with($k, 'penduduk_'))->sort()->each(function($k) use (&$trendYears, $v) {
@@ -330,7 +311,6 @@
                     <div style="font-weight:700;color:#0f172a" id="lineTipYear"></div>
                     <div style="font-size:13px;font-weight:800;color:#22d3ee" id="lineTipVal"></div>
                 </div>
-                {{-- Total penduduk di bawah chart, masih dalam 1 frame --}}
                 <div style="display:flex;align-items:center;gap:12px;margin-top:8px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
                     <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center"><i class="bi bi-people-fill" style="color:#60a5fa;font-size:18px"></i></div>
                     <div>
@@ -340,7 +320,6 @@
                 </div>
             </div>
         </div>
-        {{-- RIGHT: KK, RT, RW stacked --}}
         <div class="col-lg-4 d-flex flex-column gap-3">
             <div class="big-stat-card" style="flex:1">
                 <div class="big-stat-icon" style="background:#ecfdf5"><i class="bi bi-house-fill" style="color:#10b981"></i></div>
@@ -357,7 +336,6 @@
         </div>
     </div>
 
-    {{-- ===== JENIS KELAMIN ===== --}}
     <div class="sec-title mb-1"><i class="bi bi-gender-ambiguous" style="color:var(--blue)"></i> Berdasarkan Jenis Kelamin</div>
     <div class="sec-sub">Perbandingan jumlah penduduk laki-laki dan perempuan</div>
 
@@ -376,7 +354,6 @@
         @else
         <div class="row g-4 align-items-center">
 
-            {{-- Kartu Laki-Laki --}}
             <div class="col-md-4">
                 <div class="gender-side-card" style="background:#eff6ff">
                     <div class="gsb" style="background:rgba(28,100,242,.06)"></div>
@@ -390,7 +367,6 @@
                 </div>
             </div>
 
-            {{-- Tengah: Total + Split Bar (kotak "Dari setiap 100 perempuan" sudah dihapus) --}}
             <div class="col-md-4">
                 <div style="text-align:center">
                     <div style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Total Penduduk</div>
@@ -408,7 +384,6 @@
                 </div>
             </div>
 
-            {{-- Kartu Perempuan --}}
             <div class="col-md-4">
                 <div class="gender-side-card" style="background:#fff1f2">
                     <div class="gsb" style="background:rgba(244,63,94,.06)"></div>
@@ -426,7 +401,6 @@
         @endif
     </div>
 
-    {{-- ===== PIRAMIDA PENDUDUK ===== --}}
     @if($anyUmur > 0)
     <div class="sec-title mb-1"><i class="bi bi-bar-chart-steps" style="color:var(--blue)"></i> Piramida Penduduk</div>
     <div class="sec-sub">Distribusi penduduk per kelompok usia 5-tahunan</div>
@@ -487,14 +461,12 @@
     </div>
     @endif
 
-    {{-- BERDASARKAN AGAMA --}}
     <div class="sec-title mb-1"><i class="bi bi-stars" style="color:var(--orange)"></i> Berdasarkan Agama</div>
     <div class="sec-sub">Sebaran penduduk berdasarkan agama yang dianut</div>
 
     <div class="chart-card mb-5">
         <div class="row g-4 align-items-center">
-            {{-- Kiri: Donut --}}
-            <div class="col-lg-4" style="text-align:center">
+        <div class="col-lg-4" style="text-align:center">
                 <div style="display:inline-block;position:relative">
                     <svg id="donutChart" width="220" height="220" viewBox="0 0 240 240" style="cursor:pointer"></svg>
                     <div id="donutCenter" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
@@ -503,7 +475,6 @@
                     </div>
                 </div>
             </div>
-            {{-- Kanan: Cards grid agama --}}
             <div class="col-lg-8">
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
                     @foreach($agamaList as $ag)
@@ -528,7 +499,6 @@
         </div>
     </div>
 
-    {{-- ═══ KELOMPOK UMUR + STATUS PERKAWINAN (2 kolom) ═══ --}}
     @php
         $umur4Data = [
             ['key'=>'umur4_anak','label'=>'Anak (< 7 Thn)','emoji'=>'👶','color'=>'#f59e0b'],
@@ -546,7 +516,6 @@
     @endphp
 
     <div class="row g-4 mb-5">
-        {{-- LEFT: Kelompok Umur --}}
         <div class="col-lg-7">
             <div class="sec-title mb-1"><i class="bi bi-calendar2-range-fill" style="color:#8b5cf6"></i> Kelompok Umur</div>
             <div class="sec-sub">Distribusi penduduk berdasarkan usia</div>
@@ -576,7 +545,6 @@
             </div>
         </div>
 
-        {{-- RIGHT: Status Perkawinan --}}
         <div class="col-lg-5">
             <div class="sec-title mb-1"><i class="bi bi-heart-fill" style="color:#f43f5e"></i> Status Perkawinan</div>
             <div class="sec-sub">Sebaran status perkawinan</div>
@@ -598,7 +566,6 @@
                     $ringGap = $ringCirc - $ringDash;
                 @endphp
                 <div style="display:flex;align-items:center;gap:14px;padding:14px 12px;border-radius:12px;transition:all .2s;cursor:default;{{ !$loop->last ? 'margin-bottom:8px;' : '' }}background:#f8fafc;border:1px solid #e2e8f0" onmouseenter="this.style.background='white';this.style.boxShadow='0 4px 16px rgba(0,0,0,.08)'" onmouseleave="this.style.background='#f8fafc';this.style.boxShadow='none'">
-                    {{-- Mini progress ring --}}
                     <div style="position:relative;width:52px;height:52px;flex-shrink:0">
                         <svg width="52" height="52" viewBox="0 0 52 52">
                             <circle cx="26" cy="26" r="{{ $ringR }}" fill="none" stroke="#e2e8f0" stroke-width="5"/>
@@ -606,12 +573,10 @@
                         </svg>
                         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px">{{ $kwIcons[$kw['key']] ?? '💍' }}</div>
                     </div>
-                    {{-- Info --}}
                     <div style="flex:1;min-width:0">
                         <div style="font-size:13px;font-weight:700;color:var(--navy)">{{ $kw['label'] }}</div>
                         <div style="font-size:20px;font-weight:800;color:{{ $kw['color'] }};line-height:1.2">{{ number_format($kwval) }}</div>
                     </div>
-                    {{-- Percentage + gender --}}
                     <div style="text-align:right">
                         <div style="font-size:16px;font-weight:800;color:{{ $kw['color'] }}">{{ $kwpct }}%</div>
                         <div style="font-size:11px;margin-top:2px"><span style="color:#3b82f6;font-weight:600">👨 {{ number_format($kwl) }}</span> · <span style="color:#f43f5e;font-weight:600">👩 {{ number_format($kwp) }}</span></div>
@@ -622,7 +587,6 @@
         </div>
     </div>
 
-    {{-- ═══ PEKERJAAN + PENDIDIKAN (2 kolom) ═══ --}}
     @php
         $kerjaData = [
             ['key'=>'kerja_pelajar','color'=>'#3b82f6'],
@@ -654,7 +618,6 @@
     @endphp
 
     <div class="row g-4 mb-5" style="padding-top:12px">
-        {{-- LEFT: Mata Pencaharian --}}
         <div class="col-lg-6 d-flex flex-column">
             <div class="sec-title mb-1" style="font-size:18px"><i class="bi bi-briefcase-fill" style="color:#f59e0b"></i> Mata Pencaharian</div>
             <div class="sec-sub">Top 10 pekerjaan penduduk</div>
@@ -681,7 +644,6 @@
             </div>
         </div>
 
-        {{-- RIGHT: Pendidikan --}}
         <div class="col-lg-6 d-flex flex-column">
             <div class="sec-title mb-1" style="font-size:18px"><i class="bi bi-mortarboard-fill" style="color:#8b5cf6"></i> Tingkat Pendidikan</div>
             <div class="sec-sub">Pendidikan terakhir penduduk</div>
@@ -709,8 +671,6 @@
         </div>
     </div>
 
-    {{-- ═══ STATUS PERKAWINAN ═══ --}}
-    {{-- ═══ FASILITAS KELURAHAN ═══ --}}
     @php
         $fasGroups = [
             ['title'=>'Ibadah','icon'=>'bi-moon-stars-fill','color'=>'#10b981','bg'=>'#ecfdf5','items'=>[
@@ -760,7 +720,6 @@
         @endforeach
     </div>
 
-    {{-- ══ PETA WILAYAH ══ --}}
     <div class="sec-title mb-1"><i class="bi bi-geo-alt-fill" style="color:var(--red)"></i> Peta Wilayah</div>
     <div class="sec-sub">Pembagian lingkungan, batas wilayah, dan fasilitas umum Kelurahan Teritih.</div>
 
@@ -777,7 +736,6 @@
         </div>
 
         <div style="display:flex;gap:0;flex-wrap:wrap">
-            {{-- Gambar peta --}}
             <div style="flex:0 0 auto;width:min(420px,100%);border-right:1px solid var(--border);cursor:zoom-in;overflow:hidden;position:relative;background:#f8fafc"
                  onclick="openLightbox('{{ $petaUrl }}', 'Peta Wilayah Kelurahan Teritih')"
                  title="Klik untuk perbesar">
@@ -795,7 +753,6 @@
                 </div>
             </div>
 
-            {{-- Info panel --}}
             <div style="flex:1;min-width:220px;padding:24px 28px;display:flex;flex-direction:column;gap:20px">
                 <div>
                     <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:6px">
@@ -839,7 +796,6 @@
 
 </div>
 
-{{-- ══ LIGHTBOX MODAL ══ --}}
 <div class="lightbox" id="lightbox" onclick="closeLightbox(event)" role="dialog" aria-modal="true" aria-label="Pratinjau peta">
     <div class="lightbox-content" onclick="event.stopPropagation()">
         <button type="button" class="lightbox-close" onclick="closeLightbox()" aria-label="Tutup">

@@ -191,7 +191,6 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
             <p>Kelola akun masyarakat yang terdaftar di sistem layanan Kelurahan Teritih</p>
         </div>
         <div class="hero-actions">
-            {{-- Export CSV — bawa filter yang aktif --}}
             <a href="{{ route('kelola-akun.export', request()->query()) }}"
                class="btn-export">
                 <i class="bi bi-download"></i> Export CSV
@@ -294,7 +293,6 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                 @endif
             </div>
 
-            {{-- Baris 2: Filter RT/RW --}}
             <div class="toolbar-row">
                 <div style="font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:6px">
                     <i class="bi bi-map"></i> Filter Wilayah:
@@ -312,7 +310,6 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                     @endforeach
                 </select>
 
-                {{-- Tampilkan filter aktif sebagai badge --}}
                 @if(request('rt') || request('rw') || request('status') || request('search'))
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:4px">
                     <span style="font-size:11px;color:var(--muted)">Filter aktif:</span>
@@ -406,7 +403,6 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                             <div class="kontak-telp">{{ $user->no_hp ?? '-' }}</div>
                         </td>
 
-                        {{-- Jumlah Permohonan --}}
                         <td>
                             <span class="permohonan-badge {{ $pbClass }}">
                                 <i class="bi bi-file-text" style="font-size:10px"></i>
@@ -414,7 +410,6 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                             </span>
                         </td>
 
-                        {{-- Tgl Daftar --}}
                         <td>
                             <span class="tgl-text">
                                 {{ $user->created_at ? \Carbon\Carbon::parse($user->created_at)->format('d M Y') : '-' }}
@@ -439,7 +434,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                         <td>
                             @if($status === 'aktif')
                                 <span class="bdg bdg-aktif">Aktif</span>
-                            @else($status === 'blokir')
+                            @elseif($status === 'blokir')
                                 <span class="bdg bdg-blokir">Blokir</span>
                             @endif
                         </td>

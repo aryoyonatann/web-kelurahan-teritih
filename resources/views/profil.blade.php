@@ -17,7 +17,6 @@
         --muted:#64748b; --border:#e2e8f0; --bg:#f1f5f9;
         --green:#10b981; --orange:#f59e0b; --red:#ef4444;
         --pink:#ec4899; --pink-lt:#fdf2f8; --pink-dk:#be185d;
-        --line:#94a3b8;
         --fs-base: 17px; --fs-sm: 15px; --fs-xs: 13px;
         --fs-lg: 20px; --fs-xl: 24px; --fs-2xl: 32px; --fs-3xl: 42px;
     }
@@ -388,7 +387,6 @@
 
 @include('partials.navbar')
 
-<!-- PAGE HEADER -->
 <div class="page-header">
     <div>
         <div class="breadcrumb-custom mb-1">
@@ -406,7 +404,6 @@
 
 <div class="content-area">
 
-    <!-- ══ TENTANG ══ -->
     <div class="about-section">
         <div class="about-hero-img">
             <picture>
@@ -434,7 +431,6 @@
         </div>
     </div>
 
-    <!-- ══ DATA SINGKAT ══ -->
     @php
         $ds = $dataSingkat ?? [];
         $dsItems = [
@@ -475,7 +471,6 @@
         </div>
     </div>
 
-    <!-- ══ SEJARAH ══ -->
     <div class="sejarah-section">
         <div class="sejarah-header-card">
             <div class="sejarah-header-content">
@@ -492,7 +487,6 @@
         </div>
     </div>
 
-    <!-- ══ VISI MISI ══ -->
     <div class="visimisi-section">
         <div class="visi-full-card">
             <div class="visi-label">Visi</div>
@@ -516,10 +510,7 @@
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-         STRUKTUR ORGANISASI (SOTK) — SVG auto-connector
-         data-node attribute → ID untuk JS gambar garisnya
-         ══════════════════════════════════════════════════════════ -->
+    <!-- STRUKTUR ORGANISASI (SOTK) — SVG auto-connector, data-node attribute → ID untuk JS gambar garisnya -->
     <div class="struktur-section">
         <div class="struktur-label">Pemerintahan</div>
         <h2 class="struktur-title">Struktur Organisasi</h2>
@@ -533,18 +524,18 @@
             {{-- Row 1: Lurah --}}
             {{-- Helper: render avatar dari DB --}}
             @php
-            function orgAvatar($p, $alt='') {
+            $orgAvatar = function($p, $alt='') {
                 if (!empty($p['foto'])) {
                     return '<div class="org-avatar"><img src="'.asset('storage/'.$p['foto']).'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" alt="'.e($alt).'"><i class="bi bi-person-fill" style="display:none"></i></div>';
                 }
                 return '<div class="org-avatar"><i class="bi bi-person-fill"></i></div>';
-            }
+            };
             @endphp
 
             {{-- Row 1: Lurah --}}
             <div class="org-row">
                 <div class="org-node lurah" data-node="lurah">
-                    {!! orgAvatar($pegawai['lurah'], 'Lurah') !!}
+                    {!! $orgAvatar($pegawai['lurah'], 'Lurah') !!}
                     <div class="org-name">{{ $pegawai['lurah']['nama'] }}</div>
                     <div class="org-nip">NIP. {{ $pegawai['lurah']['nip'] }}</div>
                     <span class="org-role-badge badge-lurah">Kepala Kelurahan</span>
@@ -555,7 +546,7 @@
             {{-- Row 2: Sekretaris --}}
             <div class="org-row">
                 <div class="org-node sekre" data-node="sekretaris">
-                    {!! orgAvatar($pegawai['sekretaris'], 'Sekretaris') !!}
+                    {!! $orgAvatar($pegawai['sekretaris'], 'Sekretaris') !!}
                     <div class="org-name">{{ $pegawai['sekretaris']['nama'] }}</div>
                     <div class="org-nip">NIP. {{ $pegawai['sekretaris']['nip'] }}</div>
                     <span class="org-role-badge badge-sekre">Sekretaris Kelurahan</span>
@@ -570,26 +561,26 @@
             <div class="org-col-wrapper">
                 <div class="org-col">
                     <div class="org-node kasi" data-node="kasi-pemum">
-                        {!! orgAvatar($pegawai['kasi-pemum'], 'Kasi Pemum') !!}
+                        {!! $orgAvatar($pegawai['kasi-pemum'], 'Kasi Pemum') !!}
                         <div class="org-name">{{ $pegawai['kasi-pemum']['nama'] }}</div>
                         <div class="org-nip">NIP. {{ $pegawai['kasi-pemum']['nip'] }}</div>
                         <span class="org-role-badge badge-kasi">Kasi Pemum</span>
                     </div>
                     <div class="org-node pelaksana" data-node="pelaksana">
-                        {!! orgAvatar($pegawai['pelaksana'], 'Pelaksana') !!}
+                        {!! $orgAvatar($pegawai['pelaksana'], 'Pelaksana') !!}
                         <div class="org-name">{{ $pegawai['pelaksana']['nama'] }}</div>
                         <div class="org-nip">NIP. {{ $pegawai['pelaksana']['nip'] }}</div>
                         <span class="org-role-badge badge-pelaksana">Pelaksana Pelayanan Umum</span>
                     </div>
                     <div class="org-subgroup">
                         <div class="org-node operator" data-node="op-sanusi">
-                            {!! orgAvatar($pegawai['op-sanusi']) !!}
+                            {!! $orgAvatar($pegawai['op-sanusi']) !!}
                             <div class="org-name">{{ $pegawai['op-sanusi']['nama'] }}</div>
                             <div class="org-nip">NIP. {{ $pegawai['op-sanusi']['nip'] }}</div>
                             <span class="org-role-badge badge-operator">Operator Layanan Operasional</span>
                         </div>
                         <div class="org-node operator" data-node="op-hawari">
-                            {!! orgAvatar($pegawai['op-hawari']) !!}
+                            {!! $orgAvatar($pegawai['op-hawari']) !!}
                             <div class="org-name">{{ $pegawai['op-hawari']['nama'] }}</div>
                             <div class="org-nip">NIP. {{ $pegawai['op-hawari']['nip'] }}</div>
                             <span class="org-role-badge badge-operator">Operator Layanan Operasional</span>
@@ -599,13 +590,13 @@
 
                 <div class="org-col">
                     <div class="org-node kasi" data-node="kasi-pmk">
-                        {!! orgAvatar($pegawai['kasi-pmk'], 'Kasi PMK') !!}
+                        {!! $orgAvatar($pegawai['kasi-pmk'], 'Kasi PMK') !!}
                         <div class="org-name">{{ $pegawai['kasi-pmk']['nama'] }}</div>
                         <div class="org-nip">NIP. {{ $pegawai['kasi-pmk']['nip'] }}</div>
                         <span class="org-role-badge badge-kasi">Kasi PMK</span>
                     </div>
                     <div class="org-node operator" data-node="op-hasan">
-                        {!! orgAvatar($pegawai['op-hasan']) !!}
+                        {!! $orgAvatar($pegawai['op-hasan']) !!}
                         <div class="org-name">{{ $pegawai['op-hasan']['nama'] }}</div>
                         <div class="org-nip">NIP. {{ $pegawai['op-hasan']['nip'] }}</div>
                         <span class="org-role-badge badge-operator">Penata Layanan Operasional</span>
@@ -614,20 +605,20 @@
 
                 <div class="org-col">
                     <div class="org-node kasi" data-node="kasi-trantibum">
-                        {!! orgAvatar($pegawai['kasi-trantibum'], 'Kasi Trantibum') !!}
+                        {!! $orgAvatar($pegawai['kasi-trantibum'], 'Kasi Trantibum') !!}
                         <div class="org-name">{{ $pegawai['kasi-trantibum']['nama'] }}</div>
                         <div class="org-nip">NIP. {{ $pegawai['kasi-trantibum']['nip'] }}</div>
                         <span class="org-role-badge badge-kasi">Kasi Trantibum</span>
                     </div>
                     <div class="org-subgroup">
                         <div class="org-node operator" data-node="op-afif">
-                            {!! orgAvatar($pegawai['op-afif']) !!}
+                            {!! $orgAvatar($pegawai['op-afif']) !!}
                             <div class="org-name">{{ $pegawai['op-afif']['nama'] }}</div>
                             <div class="org-nip">NIP. {{ $pegawai['op-afif']['nip'] }}</div>
                             <span class="org-role-badge badge-operator">Operator Layanan Operasional</span>
                         </div>
                         <div class="org-node operator" data-node="op-jamaludin">
-                            {!! orgAvatar($pegawai['op-jamaludin']) !!}
+                            {!! $orgAvatar($pegawai['op-jamaludin']) !!}
                             <div class="org-name">{{ $pegawai['op-jamaludin']['nama'] }}</div>
                             <div class="org-nip">NIP. {{ $pegawai['op-jamaludin']['nip'] }}</div>
                             <span class="org-role-badge badge-operator">Pengelola Umum Operasional</span>
@@ -640,9 +631,7 @@
         </div>{{-- /org-tree-wrap --}}
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-         STRUKTUR PKK
-         ══════════════════════════════════════════════════════════ -->
+    <!-- STRUKTUR PKK -->
     <div class="pkk-section">
         <div class="pkk-label">Organisasi Kemasyarakatan</div>
         <h2 class="pkk-title">Struktur Tim Penggerak PKK</h2>
@@ -724,7 +713,6 @@
         </div>
     </div>
 
-    <!-- ══ GALERI ══ -->
     @php
         $galeri = [
             ['thumb'=>'images/STRUKTUR-RT-RW-KEL-TERITIH.jpg','full'=>'images/STRUKTUR-RT-RW-TERITIH.jpg','name'=>'Struktur RT/RW Kelurahan Teritih','desc'=>'Daftar Ketua RT dan RW di seluruh wilayah Kelurahan Teritih','icon'=>'bi-people-fill','color'=>'#a855f7','bg'=>'#fdf4ff'],
@@ -762,7 +750,6 @@
 
 </div>
 
-<!-- ══ LIGHTBOX ══ -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox(event)" role="dialog" aria-modal="true" aria-label="Pratinjau gambar">
     <div class="lightbox-content" onclick="event.stopPropagation()">
         <button type="button" class="lightbox-close" onclick="closeLightbox()" aria-label="Tutup"><i class="bi bi-x-lg"></i></button>

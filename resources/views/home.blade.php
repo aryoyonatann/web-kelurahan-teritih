@@ -265,7 +265,6 @@
         </div>
 
         <div class="col-lg-4">
-
             <div class="kepala-card">
                 <div class="kepala-card-header">
                     <div class="kepala-card-header-icon"><i class="bi bi-person-badge-fill"></i></div>
@@ -377,11 +376,9 @@
         el.innerHTML = '<div class="jam-holiday"><span class="jam-holiday-icon"><i class="bi bi-calendar-x-fill"></i></span><span class="jam-holiday-text">Hari Libur Nasional: ' + name + '</span></div>';
     }
 
-    // Cek jam operasional (tanpa hari libur dulu)
     var isOpenByTime = (day >= 1 && day <= 4 && tot >= 480 && tot < 960)
                     || (day === 5 && tot >= 480 && tot < 930);
 
-    // Fetch API hari libur
     fetch('https://api-harilibur.vercel.app/api?year=' + year)
         .then(function(r){ return r.json(); })
         .then(function(data) {
@@ -389,7 +386,6 @@
             if (Array.isArray(data)) {
                 for (var i = 0; i < data.length; i++) {
                     var h = data[i];
-                    // Format API: holiday_date = "YYYY-MM-DD"
                     if (h.holiday_date === todayStr) {
                         holiday = h.holiday_name;
                         break;
@@ -404,7 +400,6 @@
             }
         })
         .catch(function() {
-            // Fallback jika API gagal: gunakan logika waktu saja
             setStatus(isOpenByTime, false);
         });
 })();

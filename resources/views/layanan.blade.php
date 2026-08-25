@@ -78,7 +78,6 @@
 <body>
 @include('partials.navbar')
 
-<!-- Hero -->
 <div class="layanan-hero">
     <div style="position:relative;z-index:2;max-width:560px">
         <div class="hero-badge"><i class="bi bi-shield-check-fill" style="font-size:10px"></i> Layanan Publik</div>
@@ -120,7 +119,7 @@
                     @foreach($semuaSurat as $surat)
                     @php
                         $warna = $surat->warna ?? '#1c64f2';
-                        $bg    = $warna . '18'; // ~10% opacity hex approximation using inline rgba below
+                        $bg    = $warna . '18';
                         $route = auth()->check() ? route('user.permohonan.form', $surat->slug) : route('login');
                     @endphp
                     <a href="{{ $route }}" class="surat-card">
@@ -173,7 +172,6 @@
                         <span class="jam-day" style="font-size:12px;font-weight:600">Status Sekarang</span>
                         <span id="jam-status-layanan"></span>
                     </div>
-                    {{-- TANGGAL & HARI LIBUR --}}
                     <div id="jam-date-layanan" class="jam-date"></div>
                     <div id="jam-holiday-layanan"></div>
                 </div>

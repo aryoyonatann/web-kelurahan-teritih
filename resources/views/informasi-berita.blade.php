@@ -83,7 +83,6 @@
 
 @include('partials.navbar')
 
-{{-- ══ HERO HEADER ══ --}}
 <div class="page-wrapper">
     <div class="berita-hero">
         <div style="position:relative;z-index:2;max-width:500px">
@@ -103,7 +102,6 @@
                 ->distinct()
                 ->pluck('kategori');
             $aktifKategori = request('kategori');
-            $searchQuery = request('q');
         @endphp
         <div class="search-filter-wrap">
             <div class="search-row">
@@ -129,14 +127,13 @@
         <div class="info-bar-count">Menampilkan <strong>{{ $totalBerita }}</strong> artikel</div>
     </div>
 
-    @if(!$beritaFeatured)
+    @if($beritaList->isEmpty())
     <div class="empty-state">
         <i class="bi bi-newspaper" style="font-size:40px;display:block;margin-bottom:12px;color:#e2e8f0"></i>
         <strong>Belum ada berita yang dipublikasikan.</strong>
     </div>
     @else
 
-    {{-- ══ GRID 3 KOLOM ══ --}}
     <div class="row g-3" id="beritaGrid">
         @foreach($beritaList as $b)
         <div class="col-md-4">

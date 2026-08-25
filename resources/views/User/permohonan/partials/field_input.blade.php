@@ -19,7 +19,6 @@
     $isIstri   = $group === 'istri';
     $isPasangan = $isSuami || $isIstri;
 
-    // Determine input name
     if ($isExtra) {
         $inputName = 'extra_' . $key;
     } elseif ($isPasangan) {

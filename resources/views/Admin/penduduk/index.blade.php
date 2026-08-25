@@ -430,7 +430,7 @@ table.warga-table tr:last-child td{border-bottom:none}
                                         @csrf @method('DELETE')
                                     </form>
                                     <button type="button"
-                                            onclick="bukaMModalHapus('{{ $w->id }}','{{ addslashes($w->nama) }}')"
+                                            onclick="bukaModalHapus('{{ $w->id }}','{{ addslashes($w->nama) }}')"
                                             style="background:none;border:none;color:#dc2626;font-size:12px;font-weight:600;cursor:pointer;padding:0;font-family:inherit">
                                         <i class="bi bi-trash-fill"></i> Hapus
                                     </button>
@@ -481,7 +481,7 @@ table.warga-table tr:last-child td{border-bottom:none}
 <script>
 /* ── Modal Konfirmasi Hapus Warga ── */
 var _hapusId = null;
-function bukaMModalHapus(id, nama) {
+function bukaModalHapus(id, nama) {
     _hapusId = id;
     document.getElementById('modalHapusNama').textContent = nama;
     document.getElementById('modalHapusWarga').classList.add('show');

@@ -440,7 +440,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
 
             <div style="margin-bottom:24px">
                 <h2 class="page-title">{{ $data->nama_surat }}</h2>
-                <p class="page-subtitle">Sesuaikan isi surat ini sesuka hati ??</p>
+                <p class="page-subtitle">Sesuaikan template dan field surat sesuai kebutuhan</p>
             </div>
 
             {{-- Step Indicator --}}
@@ -731,7 +731,7 @@ textarea.fi { resize: vertical; min-height: 90px; }
         <div class="modal-title" style="margin-bottom:6px">
             <i class="bi bi-type-bold" style="color:#8b5cf6"></i> Tambah Baris Khusus
         </div>
-        <div class="modal-desc">Tulis awalan kalimatnya — nanti warga yang melengkapi</div>
+        <div class="modal-desc">Tulis awalan kalimatnya ï¿½ nanti warga yang melengkapi</div>
         <div class="modal-field">
             <input id="cbModalTmpl" type="text" class="modal-input"
                    placeholder="Misal: Surat Keterangan ini dipergunakan untuk"

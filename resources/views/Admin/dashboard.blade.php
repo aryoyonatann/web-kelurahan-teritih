@@ -279,7 +279,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
 <div class="page-wrapper">
 
-    {{-- HERO BANNER --}}
     <div class="dash-hero mb-4">
         <div style="position:relative;z-index:1">
             <div class="dash-hero-title">Dashboard Admin</div>
@@ -293,7 +292,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-    {{-- STAT CARDS --}}
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">
             <div class="stat-card">
@@ -343,7 +341,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-    {{-- QUICK MENU --}}
     <div class="row g-2 g-md-3 mb-4">
         <div class="col-3">
             <a href="{{ route('kelola-akun.index') }}" class="quick-card">
@@ -375,12 +372,8 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-    {{-- ========================================================
-         ROW 1: Manajemen Berita (kiri) + Jam Operasional + Notif (kanan)
-    ========================================================= --}}
     <div class="row g-3 mb-3">
 
-        {{-- Manajemen Berita --}}
         <div class="col-12 col-xl-8">
             <div class="dash-card h-100">
                 <div class="dash-card-header">
@@ -429,10 +422,8 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             </div>
         </div>
 
-        {{-- Sidebar kanan: Notifikasi + Jam Operasional --}}
         <div class="col-12 col-xl-4 d-flex flex-column gap-3">
 
-            {{-- Pemberitahuan --}}
             <div class="dash-card">
                 <div class="dash-card-header">
                     <div class="dash-card-title">
@@ -450,7 +441,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                 <a href="{{ route('permohonan.index') }}" class="card-more-link">Lihat semua permohonan →</a>
             </div>
 
-            {{-- Jam Operasional --}}
             <div class="dash-card flex-grow-1">
                 <div class="dash-card-header">
                     <div class="dash-card-title"><i class="bi bi-clock-fill"></i> Jam Operasional</div>
@@ -476,9 +466,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-    {{-- ========================================================
-         ROW 2: Aktivitas Terbaru — FULL WIDTH
-    ========================================================= --}}
     <div class="row g-3">
         <div class="col-12">
             <div class="dash-card">
@@ -554,9 +541,8 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-</div>{{-- /page-wrapper --}}
+</div>
 
-{{-- MODAL PERMOHONAN PER BULAN --}}
 <div class="month-modal-overlay" id="monthModalOverlay">
     <div class="month-modal">
         <div class="month-modal-header">
@@ -710,10 +696,6 @@ setInterval(updateStatusKantor, 60000);
     btnClose.addEventListener('click', closeModal);
     overlay.addEventListener('click', e => { if (e.target===overlay) closeModal(); });
     document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
-
-    function escHtml(s) {
-        return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    }
 
     function statusBadge(status) {
         if (status==='disetujui') return '<span class="bdg bdg-approved">Disetujui</span>';

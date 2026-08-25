@@ -16,21 +16,18 @@
             max-width: 560px;
             margin: 0 auto;
         }
-        /* Header atas */
         .top-bar {
             text-align: center;
             margin-bottom: 8px;
             font-size: 12px;
             color: #94a3b8;
         }
-        /* Card utama */
         .card {
             background: white;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(0,0,0,.08);
         }
-        /* Header card */
         .card-header {
             background: linear-gradient(135deg, #0d1b3e 0%, #1c64f2 100%);
             padding: 32px 40px;
@@ -55,7 +52,6 @@
             font-size: 12px;
             color: rgba(255,255,255,.7);
         }
-        /* Body card */
         .card-body {
             padding: 36px 40px;
         }
@@ -67,7 +63,6 @@
             font-size: 14px; color: #64748b;
             line-height: 1.7; margin-bottom: 14px;
         }
-        /* Tombol */
         .btn-wrap { text-align: center; margin: 28px 0; }
         .btn {
             display: inline-block;
@@ -78,7 +73,6 @@
             border-radius: 10px;
             font-size: 15px; font-weight: 700;
         }
-        /* Info kadaluarsa */
         .info-box {
             background: #fffbeb;
             border: 1px solid #fde68a;
@@ -89,7 +83,6 @@
             margin-bottom: 20px;
             display: flex; gap: 8px; align-items: flex-start;
         }
-        /* Fallback URL */
         .url-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -110,7 +103,6 @@
             border: none; border-top: 1px solid #f1f5f9;
             margin: 24px 0;
         }
-        /* Footer */
         .card-footer {
             background: #f8fafc;
             border-top: 1px solid #f1f5f9;
@@ -133,14 +125,12 @@
 
     <div class="card">
 
-        <!-- Header -->
         <div class="card-header">
             <div class="header-icon">&#128274;</div>
             <h1>Reset Kata Sandi</h1>
             <p>Permintaan reset kata sandi akun Anda</p>
         </div>
 
-        <!-- Body -->
         <div class="card-body">
 
             <p class="greeting">Halo, {{ $notifiable->nama ?? 'Pengguna' }}!</p>
@@ -174,7 +164,6 @@
 
         </div>
 
-        <!-- Footer -->
         <div class="card-footer">
             <div class="footer-name">Kelurahan Teritih</div>
             <div class="footer-addr">Jl. Raya Teritih No.123, Kec. Walantaka, Kota Serang, Banten 42183</div>

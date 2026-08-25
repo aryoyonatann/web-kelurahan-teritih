@@ -107,7 +107,6 @@
             font-size: 11.5px; color: #ef4444; margin-top: 5px;
             display: flex; align-items: center; gap: 4px;
         }
-        /* Password strength */
         .pw-strength { margin-top: 8px; }
         .pw-bars { display: flex; gap: 4px; margin-bottom: 4px; }
         .pw-bar { flex: 1; height: 3px; border-radius: 2px; background: #e2e8f0; transition: background .2s; }
@@ -118,7 +117,6 @@
         .pw-label.weak   { color: #ef4444; }
         .pw-label.medium { color: #f59e0b; }
         .pw-label.strong { color: #10b981; }
-        /* Submit */
         .btn-submit {
             width: 100%; padding: 13px; border: none; border-radius: 10px;
             background: linear-gradient(135deg, #0d1b3e, #1c64f2);

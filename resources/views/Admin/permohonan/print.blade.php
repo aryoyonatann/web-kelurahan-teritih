@@ -1,9 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Surat – #{{ $permohonan->id_permohonan }}</title>    <style>
+    <title>Cetak Surat – #{{ $permohonan->id_permohonan }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9;font-size:14px;color:#334155}
     .panel-wrap{max-width:900px;margin:28px auto;padding:0 20px 60px}
@@ -60,6 +62,8 @@
     .bio tr td:nth-child(2){width:12px;padding:0 6px}
     .isi-surat{text-align:justify;margin-top:0;margin-bottom:18px;white-space:pre-wrap;word-break:break-word;font-size:12pt;text-indent:36px}
     .penutup{text-align:justify;margin-top:0;margin-bottom:8px;font-size:12pt;text-indent:36px}
+    .keterangan{text-align:justify;margin:6pt 0;font-size:12pt}
+    .keterangan.indented{text-indent:36px}
     .ttd-box{text-align:center;min-width:200px;font-size:12pt;margin-top:24pt}
     .ttd-kota{margin-bottom:2px}
     .ttd-ruang{height:70px}
@@ -207,6 +211,29 @@
             <div style="font-size:11px;color:#94a3b8;margin-top:4px">Gunakan **teks** untuk bold. Admin bisa edit sebelum cetak.</div>
         </div>
 
+        @php $sectionEntries = collect($fieldsConfig)->where('group','extra')->where('type','section')->values(); @endphp
+        @if($sectionEntries->isNotEmpty())
+        <hr class="divider">
+        <div class="section-sep">Teks Pemisah</div>
+        @foreach($sectionEntries as $se)
+        @php $seLabel = str_replace(array_keys($replacements), array_values($replacements), $se['label']); @endphp
+        <div class="form-group" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 16px">
+            <div style="font-size:12px;color:#374151;font-weight:600;margin-bottom:8px;line-height:1.5">{{ Str::limit($seLabel, 80) }}</div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:12px;color:#64748b">Posisi teks:</span>
+                <button type="button"
+                    id="btn_indent_{{ $se['key'] }}"
+                    onclick="toggleSectionIndent('{{ $se['key'] }}')"
+                    style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:1.5px solid #e2e8f0;background:white;font-size:12px;font-weight:600;color:#374151;cursor:pointer;font-family:inherit;transition:all .18s">
+                    <span id="icon_indent_{{ $se['key'] }}">⬜</span>
+                    <span id="label_indent_{{ $se['key'] }}">Tanpa Tab</span>
+                </button>
+                <span style="font-size:11px;color:#94a3b8">Klik untuk tambah/hapus indentasi paragraf</span>
+            </div>
+        </div>
+        @endforeach
+        @endif
+
         @php
             $editableExtras = collect($fieldsConfig)->where('group', 'extra')
                 ->where('type', '!=', 'section')
@@ -342,7 +369,7 @@
             <div class="k1">PEMERINTAH KOTA SERANG</div>
             <div class="k2">KECAMATAN WALANTAKA</div>
             <div class="k3">KELURAHAN TERITIH</div>
-            <div class="k4">Jl. Raya Teritih, Kecamatan Walantaka, Kota Serang, Banten 42183</div>
+            <div class="k4">Jln. Kalodran-Sidapurna Nomor 001 Kel. Teritih Kec. Walantaka</div>
         </div>
     </div>
 
@@ -409,7 +436,8 @@
     @foreach($extras as $ef)
         @if(($ef['type'] ?? '') === 'section')
             @if($extraTableOpened)</table>@php $extraTableOpened = false; @endphp @endif
-            <p style="margin:10pt 0 6pt;font-size:12pt">{{ $ef['label'] }}</p>
+            @php $sectionLabel = str_replace(array_keys($replacements), array_values($replacements), $ef['label']); @endphp
+            <p class="keterangan" id="pr_section_{{ $ef['key'] }}">{{ $sectionLabel }}</p>
         @elseif(($ef['print_style'] ?? '') === 'center_bold')
             {{-- dirender terpisah setelah pr_isi --}}
         @elseif($ef['on_print'] ?? false)
@@ -431,9 +459,14 @@
     {{-- Extra fields dengan print_style center_bold --}}
     @foreach(collect($fieldsConfig)->where('group','extra') as $ef)
         @if(($ef['print_style'] ?? '') === 'center_bold')
-            @php $cbVal = $dt[$ef['key']] ?? ''; @endphp
-            @php $cbPrefix = !empty($ef['template_text']) ? $ef['template_text'].' ' : ''; @endphp
-            <p style="text-align:center;font-weight:bold;font-style:italic;margin:18px 0 18px;font-size:12pt{{ $cbVal ? '' : ';display:none' }}" id="pr_cb_{{ $ef['key'] }}" data-prefix="{{ $ef['template_text'] ?? '' }}">{{ $cbVal ? $cbPrefix.$cbVal : '' }}</p>
+            @php
+                $cbVal    = $dt[$ef['key']] ?? '';
+                $cbRawPrefix = $ef['template_text'] ?? '';
+                // Replace placeholder {domisili}, {alamat}, dll di template_text
+                $cbPrefix = str_replace(array_keys($replacements), array_values($replacements), $cbRawPrefix);
+                $cbPrefix = $cbPrefix ? $cbPrefix . ' ' : '';
+            @endphp
+            <p style="text-align:center;font-weight:bold;font-style:italic;margin:18px 0 18px;font-size:12pt{{ $cbVal ? '' : ';display:none' }}" id="pr_cb_{{ $ef['key'] }}" data-prefix="{{ $cbPrefix }}">{{ $cbVal ? $cbPrefix.$cbVal : '' }}</p>
         @endif
     @endforeach
 
@@ -516,6 +549,30 @@ function toggleSaksi() {
     document.getElementById('saksi_wrap').style.display = show ? 'block' : 'none';
 }
 
+// Toggle indentasi teks pemisah (section)
+function toggleSectionIndent(key) {
+    const el    = document.getElementById('pr_section_' + key);
+    const btn   = document.getElementById('btn_indent_' + key);
+    const icon  = document.getElementById('icon_indent_' + key);
+    const label = document.getElementById('label_indent_' + key);
+    if (!el) return;
+
+    const isNowIndented = el.classList.toggle('indented');
+    if (isNowIndented) {
+        icon.textContent  = '✅';
+        label.textContent = 'Dengan Tab';
+        btn.style.borderColor = '#1c64f2';
+        btn.style.color       = '#1c64f2';
+        btn.style.background  = '#eff6ff';
+    } else {
+        icon.textContent  = '⬜';
+        label.textContent = 'Tanpa Tab';
+        btn.style.borderColor = '#e2e8f0';
+        btn.style.color       = '#374151';
+        btn.style.background  = 'white';
+    }
+}
+
 function tambahSaksi() {
     const list = document.getElementById('saksi_list');
     const num = list.querySelectorAll('.saksi-entry').length + 1;
@@ -586,9 +643,37 @@ function cetakSurat() {
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g,'<br>');
     document.getElementById('pr_isi_after_extra').innerHTML = parsed;
 
-    // Data tambahan (bisa diedit admin sebelum cetak, mendukung **bold**)
+    // Replace {domisili}, {alamat}, dll dengan data aktual pemohon
+    // Digunakan oleh parseBold() agar teks pemisah (center_bold) juga terisi otomatis
+    @php
+        $pemohonData = [
+            '{nama}'          => $nama,
+            '{nik}'           => $nik,
+            '{alamat}'        => $alamat,
+            '{domisili}'      => $alamat,
+            '{tempat_lahir}'  => $dt['tempat_lahir'] ?? '',
+            '{tanggal_lahir}' => isset($dt['tanggal_lahir']) && $dt['tanggal_lahir']
+                                    ? \Carbon\Carbon::parse($dt['tanggal_lahir'])->locale('id')->isoFormat('D MMMM Y')
+                                    : '',
+            '{jenis_kelamin}' => $jk,
+            '{agama}'         => $agama,
+            '{pekerjaan}'     => $pekerjaan,
+        ];
+        foreach (collect($fieldsConfig)->where('group','extra')->values() as $ef) {
+            $pemohonData['{' . $ef['key'] . '}'] = $dt[$ef['key']] ?? '';
+        }
+    @endphp
+    const pemohonData = @json($pemohonData);
+
+    function replacePlaceholders(str) {
+        for (const [ph, val] of Object.entries(pemohonData)) {
+            str = str.split(ph).join(val);
+        }
+        return str;
+    }
     function parseBold(str) {
-        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        return replacePlaceholders(str)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     }
     document.querySelectorAll('.pr-extra-input').forEach(function(inp) {

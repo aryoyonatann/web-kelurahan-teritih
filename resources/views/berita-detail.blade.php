@@ -98,14 +98,12 @@
 <div class="content-area">
     <div class="row g-4">
 
-        {{-- ARTIKEL UTAMA --}}
         <div class="col-lg-8">
 
             <a href="{{ route('berita') }}" class="btn-back">
                 <i class="bi bi-arrow-left"></i> Kembali ke Berita
             </a>
 
-            {{-- Hero Image --}}
             <div class="article-hero">
                 @if($berita->gambar)
                     <img src="{{ asset('storage/'.$berita->gambar) }}" alt="{{ $berita->judul }}">
@@ -114,7 +112,6 @@
                 @endif
             </div>
 
-            {{-- Meta --}}
             @if($berita->kategori)
                 <span class="article-cat">{{ $berita->kategori }}</span>
             @endif
@@ -132,19 +129,16 @@
                 <span><i class="bi bi-building"></i> Admin Kelurahan Teritih</span>
             </div>
 
-            {{-- Ringkasan (jika ada) --}}
             @if($berita->ringkasan)
             <div style="background:var(--blue-lt);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:24px;font-size:14px;font-weight:500;color:var(--navy);line-height:1.7">
                 {{ $berita->ringkasan }}
             </div>
             @endif
 
-            {{-- Isi Artikel --}}
             <div class="article-body">
                 {!! nl2br(e($berita->isi)) !!}
             </div>
 
-            {{-- Share Bar --}}
             <div class="share-bar">
                 <span class="share-label"><i class="bi bi-share me-2"></i>Bagikan Berita</span>
                 <div class="share-btns">
@@ -162,7 +156,6 @@
                 </div>
             </div>
 
-            {{-- Berita Terkait --}}
             @if($beritaLainnya->isNotEmpty())
             <div class="d-lg-none mt-2">
                 <div class="related-title"><i class="bi bi-newspaper" style="color:var(--blue)"></i> Berita Lainnya</div>
@@ -186,10 +179,8 @@
 
         </div>{{-- /col-lg-8 --}}
 
-        {{-- SIDEBAR --}}
         <div class="col-lg-4 d-none d-lg-block">
 
-            {{-- Berita Terkait --}}
             @if($beritaLainnya->isNotEmpty())
             <div class="sidebar-card">
                 <div class="sidebar-card-title">
@@ -219,7 +210,6 @@
             </div>
             @endif
 
-            {{-- Kembali ke Semua Berita --}}
             <div class="sidebar-card" style="text-align:center">
                 <a href="{{ route('berita') }}" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--blue);text-decoration:none">
                     <i class="bi bi-grid-3x3-gap"></i> Lihat Semua Berita
@@ -235,9 +225,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script>
-gsap.registerPlugin(ScrollTrigger);
 gsap.from('.page-header',{opacity:0,y:30,duration:.8,ease:'power3.out'});
 gsap.from('.article-hero',{opacity:0,scale:.97,duration:1,delay:.2,ease:'power2.out'});
 gsap.from('.article-title',{opacity:0,y:20,duration:.7,delay:.4,ease:'power2.out'});

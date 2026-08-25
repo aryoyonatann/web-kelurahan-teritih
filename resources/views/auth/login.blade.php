@@ -52,7 +52,6 @@
         flex-shrink: 0;
     }
 
-    /* Spacer kiri dan kanan agar links selalu di tengah */
     .login-nav-spacer {
         flex: 1;
     }
@@ -93,24 +92,6 @@
     .login-nav-links a:hover { background: rgba(255,255,255,.12); color: #ffffff; }
 
     .login-nav-cta { display: flex; align-items: center; gap: 10px; }
-
-    .btn-bantuan {
-        font-size: 14px; font-weight: 600;
-        color: rgba(255,255,255,.8); text-decoration: none;
-        background: none; border: none; cursor: pointer;
-        padding: 6px 4px; transition: color .18s;
-    }
-    .btn-bantuan:hover { color: #ffffff; }
-
-    .btn-daftar {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 8px 20px; border-radius: 8px;
-        font-size: 15px; font-weight: 700;
-        background: #1c64f2; color: white;
-        border: none; text-decoration: none;
-        transition: background .18s;
-    }
-    .btn-daftar:hover { background: #1a56db; color: white; }
 
     .page-body {
         flex: 1;

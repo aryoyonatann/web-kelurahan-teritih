@@ -108,7 +108,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             : '<span class="detail-empty">' . $empty . '</span>';
     @endphp
 
-    {{-- Profile Card --}}
     <div class="profile-card">
         <div class="profile-av">{{ $initials }}</div>
         <div class="flex-grow-1">
@@ -117,7 +116,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <div class="mt-2">
                 @if($status === 'aktif')
                     <span class="bdg bdg-aktif">Aktif</span>
-                @else($status === 'blokir')
+                @elseif($status === 'blokir')
                     <span class="bdg bdg-blokir">Blokir</span>
                 @endif
             </div>
@@ -127,7 +126,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </a>
     </div>
 
-    {{-- Data Pribadi --}}
     <div class="detail-card">
         <div class="detail-card-header">
             <i class="bi bi-person-fill"></i> Data Pribadi
@@ -160,7 +158,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-    {{-- Data Domisili --}}
     <div class="detail-card">
         <div class="detail-card-header">
             <i class="bi bi-geo-alt-fill"></i> Data Domisili
@@ -185,7 +182,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-    {{-- Data Akun --}}
     <div class="detail-card">
         <div class="detail-card-header">
             <i class="bi bi-shield-lock-fill"></i> Data Akun
@@ -212,7 +208,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         </div>
     </div>
 
-    {{-- Action Bar --}}
     <div class="action-bar">
         <form method="POST" action="{{ route('kelola-akun.toggle', $user->id_user) }}">
             @csrf @method('PATCH')
@@ -233,7 +228,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
 </div>
 
-{{-- Modal Hapus --}}
 <div class="modal-overlay" id="modalHapus">
     <div class="modal-box">
         <div class="modal-title" style="color:var(--red)">

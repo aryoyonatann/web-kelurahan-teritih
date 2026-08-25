@@ -41,7 +41,6 @@
         position: sticky; top: 0; z-index: 1000;
         box-shadow: 0 2px 12px rgba(0,0,0,.25); flex-shrink: 0;
     }
-    /* Spacer kiri dan kanan agar links selalu di tengah */
     .reg-nav-spacer { flex: 1; }
     .reg-nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 
@@ -64,13 +63,6 @@
     .reg-nav-links a { display: block; padding: 7px 16px; border-radius: 8px; font-size: 15px; font-weight: 500; color: rgba(255,255,255,.85); text-decoration: none; transition: all .18s; }
     .reg-nav-links a:hover { background: rgba(255,255,255,.12); color: #ffffff; }
     .reg-nav-cta { display: flex; align-items: center; gap: 10px; }
-    .btn-masuk {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 8px 20px; border-radius: 8px; font-size: 15px; font-weight: 700;
-        background: #1c64f2; color: white; border: none; text-decoration: none; transition: background .18s;
-    }
-    .btn-masuk:hover { background: #1a56db; color: white; }
-
     .page-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 36px 20px; }
 
     .reg-card {

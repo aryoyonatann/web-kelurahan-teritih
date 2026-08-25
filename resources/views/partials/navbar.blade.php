@@ -99,30 +99,29 @@
 }
 .mobile-drawer.open { transform: translateX(0); }
 
-/* HEADER BIRU — wajib ada !important agar tidak di-override */
+/* MOBILE DRAWER — header biru */
 .mobile-drawer .drawer-user-section {
-    padding: 20px 20px 16px !important;
-    background: linear-gradient(135deg, #0d1b3e, #1e3a5f) !important;
-    display: flex !important; align-items: center !important;
-    gap: 14px !important; flex-shrink: 0 !important;
+    padding: 20px 20px 16px;
+    background: linear-gradient(135deg, #0d1b3e, #1e3a5f);
+    display: flex; align-items: center;
+    gap: 14px; flex-shrink: 0;
 }
 .mobile-drawer .drawer-avatar {
-    width: 48px !important; height: 48px !important; border-radius: 50% !important;
-    background: rgba(255,255,255,.15) !important; border: 2px solid rgba(255,255,255,.3) !important;
-    display: flex !important; align-items: center !important; justify-content: center !important;
-    color: white !important; font-size: 18px !important; font-weight: 800 !important;
-    flex-shrink: 0 !important; overflow: hidden !important;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.3);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 18px; font-weight: 800;
+    flex-shrink: 0; overflow: hidden;
 }
 .mobile-drawer .drawer-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.mobile-drawer .drawer-user-name { font-size: 15px !important; font-weight: 700 !important; color: white !important; }
+.mobile-drawer .drawer-user-name { font-size: 15px; font-weight: 700; color: white; }
 .mobile-drawer .drawer-user-role {
-    font-size: 11px !important; color: rgba(255,255,255,.65) !important;
-    text-transform: uppercase !important; letter-spacing: .06em !important; margin-top: 2px !important;
+    font-size: 11px; color: rgba(255,255,255,.65);
+    text-transform: uppercase; letter-spacing: .06em; margin-top: 2px;
 }
 
 .drawer-nav-links { padding: 8px 0; flex: 1; }
 
-/* NAV LINK — default abu */
 .drawer-nav-link {
     display: flex; align-items: center; gap: 12px;
     padding: 15px 20px; font-size: 16px; font-weight: 500;
@@ -131,16 +130,15 @@
 }
 .drawer-nav-link i {
     font-size: 19px; width: 24px; text-align: center;
-    color: #64748b !important; transition: color .15s;
+    color: #64748b; transition: color .15s;
 }
 .drawer-nav-link:hover { background: #f8fafc; color: #1c64f2; border-left-color: #1c64f2; }
-.drawer-nav-link:hover i { color: #1c64f2 !important; }
+.drawer-nav-link:hover i { color: #1c64f2; }
 .drawer-nav-link.active { background: #eff6ff; color: #1c64f2; font-weight: 700; border-left-color: #1c64f2; }
-.drawer-nav-link.active i { color: #1c64f2 !important; }
+.drawer-nav-link.active i { color: #1c64f2; }
 
 .drawer-divider { height: 1px; background: #e2e8f0; margin: 4px 20px; }
 
-/* ACTION LINK */
 .drawer-action-link {
     display: flex; align-items: center; gap: 12px;
     padding: 15px 20px; font-size: 16px; font-weight: 500;
@@ -149,16 +147,15 @@
 }
 .drawer-action-link i {
     font-size: 19px; width: 24px; text-align: center;
-    color: #64748b !important; transition: color .15s;
+    color: #64748b; transition: color .15s;
 }
 .drawer-action-link:hover { background: #f8fafc; color: #0d1b3e; }
-.drawer-action-link:hover i { color: #0d1b3e !important; }
+.drawer-action-link:hover i { color: #0d1b3e; }
 .drawer-action-link.danger { color: #ef4444; }
-.drawer-action-link.danger i { color: #ef4444 !important; }
+.drawer-action-link.danger i { color: #ef4444; }
 .drawer-action-link.danger:hover { background: #fef2f2; color: #dc2626; }
-.drawer-action-link.danger:hover i { color: #dc2626 !important; }
+.drawer-action-link.danger:hover i { color: #dc2626; }
 
-/* GUEST LOGIN BUTTON */
 .drawer-guest-section { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
 .drawer-btn-masyarakat {
     display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -168,7 +165,6 @@
 }
 .drawer-btn-masyarakat:hover { background: #1a56db; color: white; }
 
-/* LOGOUT POPUP */
 .logout-overlay {
     position: fixed; inset: 0; z-index: 9999;
     background: rgba(13,27,62,.55); backdrop-filter: blur(4px);
@@ -286,7 +282,6 @@
 
 <div class="mobile-drawer" id="mobileDrawer">
 
-    {{-- HEADER BIRU: tampil untuk semua state (auth & guest) --}}
     @auth
         @php
             $user     = Auth::user();

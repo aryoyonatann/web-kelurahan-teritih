@@ -1,7 +1,4 @@
 <style>
-/* =====================================================
-   NAVBAR USER — authenticated masyarakat
-===================================================== */
 .main-nav {
     background: #0d1b3e;
     border-bottom: 1px solid #1e3a5f;
@@ -82,9 +79,6 @@
 .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* =====================================================
-   MOBILE DRAWER
-===================================================== */
 .mobile-drawer {
     position: fixed; top: 72px; left: 0; right: 0; bottom: 0;
     background: white; z-index: 999;
@@ -122,15 +116,13 @@
 }
 .drawer-nav-link i {
     font-size: 19px; width: 24px; text-align: center;
-    color: #64748b !important;   /* abu, override Bootstrap Icons */
+    color: #64748b;
     transition: color .15s;
 }
-/* HOVER */
 .drawer-nav-link:hover { background: #f8fafc; color: #1c64f2; border-left-color: #1c64f2; }
-.drawer-nav-link:hover i { color: #1c64f2 !important; }
-/* ACTIVE */
+.drawer-nav-link:hover i { color: #1c64f2; }
 .drawer-nav-link.active { background: #eff6ff; color: #1c64f2; font-weight: 700; border-left-color: #1c64f2; }
-.drawer-nav-link.active i { color: #1c64f2 !important; }
+.drawer-nav-link.active i { color: #1c64f2; }
 
 .drawer-divider { height: 1px; background: #e2e8f0; margin: 4px 20px; }
 
@@ -144,20 +136,16 @@
 }
 .drawer-action-link i {
     font-size: 19px; width: 24px; text-align: center;
-    color: #64748b !important;
+    color: #64748b;
     transition: color .15s;
 }
 .drawer-action-link:hover { background: #f8fafc; color: #0d1b3e; }
-.drawer-action-link:hover i { color: #0d1b3e !important; }
-/* DANGER */
+.drawer-action-link:hover i { color: #0d1b3e; }
 .drawer-action-link.danger { color: #ef4444; }
-.drawer-action-link.danger i { color: #ef4444 !important; }
+.drawer-action-link.danger i { color: #ef4444; }
 .drawer-action-link.danger:hover { background: #fef2f2; color: #dc2626; }
-.drawer-action-link.danger:hover i { color: #dc2626 !important; }
+.drawer-action-link.danger:hover i { color: #dc2626; }
 
-/* =====================================================
-   LOGOUT POPUP
-===================================================== */
 .logout-overlay {
     position: fixed; inset: 0; z-index: 9999;
     background: rgba(13, 27, 62, 0.55); backdrop-filter: blur(4px);

@@ -118,10 +118,6 @@ textarea.fi{resize:vertical;min-height:90px}
 .summary-key{width:140px;font-size:12px;font-weight:600;color:#64748b;flex-shrink:0}
 .summary-val{font-size:13px;color:#0f172a;flex:1}
 
-/* Hidden fields (tetap dikirim ke backend) */
-input[name=kode_surat],input[name=icon],input[name=warna],
-textarea[name=template_pembuka],textarea[name=template_isi],textarea[name=template_penutup]{display:none}
-
 @media(max-width:600px){.check-grid{grid-template-columns:1fr}.wizard-wrap{padding:16px}}
 </style>
 @endpush

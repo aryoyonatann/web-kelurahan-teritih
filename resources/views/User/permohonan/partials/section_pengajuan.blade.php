@@ -1,4 +1,3 @@
-<!-- PENGAJUAN UNTUK SIAPA -->
 <div class="card-section">
     <div class="card-section-head">
         <div class="card-section-head-icon" style="background:var(--blue-lt);color:var(--blue)"><i class="bi bi-person-check-fill"></i></div>

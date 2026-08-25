@@ -208,7 +208,6 @@
         <span class="breadcrumb-cur">Detail #{{ $data->id_permohonan }}</span>
     </div>
 
-    {{-- HERO --}}
     <div class="detail-hero">
         <div class="detail-hero-left">
             <div class="id-badge">ID #{{ $data->id_permohonan }}</div>
@@ -240,10 +239,8 @@
 
     <div class="detail-grid">
 
-        {{-- KIRI --}}
         <div>
 
-            {{-- DATA PERMOHONAN: biodata + extra fields sesuai fields_config --}}
             @php
                 $isPerwakilan = $data->isPerwakilan();
                 $allFields = collect($data->jenisSurat->fields_config ?? []);
@@ -365,7 +362,6 @@
                 </form>
             </div>
 
-            {{-- DOKUMEN PERSYARATAN --}}
             <div class="section-card">
                 <div class="section-head">
                     <div class="section-head-icon purple">
@@ -409,9 +405,8 @@
                 @endforelse
             </div>
 
-        </div>{{-- /kiri --}}
+        </div>
 
-        {{-- ═══ SIDEBAR ═══ --}}
         <div>
 
             {{-- AKSI --}}

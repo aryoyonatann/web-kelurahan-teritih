@@ -48,7 +48,6 @@
 
         @include('User.permohonan.partials.section_pengajuan')
 
-        {{-- DATA BIODATA DINAMIS --}}
         @if(!$isPasangan)
         <div class="card-section">
             <div class="card-section-head">
@@ -65,9 +64,7 @@
             </div>
         </div>
         @else
-        {{-- SURAT PASANGAN: Suami + Istri dalam 2 card berdampingan --}}
         <div class="row g-3 mb-2">
-            {{-- SUAMI --}}
             <div class="col-md-6">
                 <div class="card-section mb-0">
                     <div class="card-section-head">
@@ -84,7 +81,6 @@
                     </div>
                 </div>
             </div>
-            {{-- ISTRI --}}
             <div class="col-md-6">
                 <div class="card-section mb-0">
                     <div class="card-section-head">
@@ -103,7 +99,6 @@
             </div>
         </div>
         @endif
-        {{-- FIELD TAMBAHAN --}}
         @if($extraFields->count() > 0)
         <div class="card-section">
             <div class="card-section-head">
