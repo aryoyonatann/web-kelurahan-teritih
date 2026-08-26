@@ -102,6 +102,13 @@ textarea.fi{resize:vertical;min-height:90px}
 .field-item-label{flex:1;font-weight:600;color:#0f172a}
 .field-item-type{font-size:11px;color:#94a3b8;background:#f1f5f9;border-radius:5px;padding:2px 8px}
 .field-item-rm{width:26px;height:26px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.field-item-style-btn{width:26px;height:26px;border-radius:6px;border:1px solid #e2e8f0;background:white;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .15s}
+.field-item-style-btn:hover{border-color:#cbd5e1;color:#64748b}
+.field-item-style-btn.active{border-color:#16a34a;background:#dcfce7;color:#16a34a}
+
+/* Bold/underline toggle for the section label above bio data */
+.bio-section-style-row{display:flex;align-items:center;gap:6px;margin-top:8px}
+.bio-section-style-row .style-lbl{font-size:11px;color:#94a3b8;margin-right:2px}
 
 /* Navigation buttons */
 .wizard-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
@@ -251,6 +258,28 @@ textarea.fi{resize:vertical;min-height:90px}
                     </div>
                 </div>
                 <div class="wcard-body">
+                    <div class="mb-3">
+                        <label style="display:block;font-size:12px;font-weight:600;color:#334155;margin-bottom:6px">
+                            Judul di Atas Data Warga <span style="font-weight:400;color:#94a3b8">(opsional)</span>
+                        </label>
+                        <input type="text" name="bio_section_label" id="inp_bio_section" class="fi"
+                               value="{{ old('bio_section_label', '') }}"
+                               placeholder="Contoh: Data Yang Tercantum Dalam Kartu Penduduk e-( KTP )"
+                               oninput="renderPreview()">
+                        <input type="hidden" name="bio_section_style" id="inp_bio_section_style" value="{{ old('bio_section_style', 'bold_underline') }}">
+                        <div class="bio-section-style-row">
+                            <span class="style-lbl">Format teks:</span>
+                            <button type="button" class="field-item-style-btn active" id="btn_bio_bold" data-role="bold"
+                                    title="Tebal (Bold)" onclick="toggleBioSectionStyle('bold')">
+                                <i class="bi bi-type-bold"></i>
+                            </button>
+                            <button type="button" class="field-item-style-btn active" id="btn_bio_underline" data-role="underline"
+                                    title="Garis Bawah (Underline)" onclick="toggleBioSectionStyle('underline')">
+                                <i class="bi bi-type-underline"></i>
+                            </button>
+                        </div>
+                        <div class="hint">Muncul di atas tabel data warga saat surat dicetak (default tebal &amp; bergaris bawah, bisa diubah lewat tombol di atas). Kosongkan jika tidak perlu.</div>
+                    </div>
                     <div class="check-grid">
                         @foreach($standardFields as $sf)
                         <label class="check-item">
@@ -263,7 +292,6 @@ textarea.fi{resize:vertical;min-height:90px}
                         @endforeach
                     </div>
                     <div id="bioFieldsHidden"></div>
-                    <input type="hidden" name="bio_section_label" value="">
                 </div>
             </div>
 
@@ -398,6 +426,7 @@ textarea.fi{resize:vertical;min-height:90px}
                     <div class="sp-judul" id="pv_judul">SURAT KETERANGAN</div>
                     <div class="sp-nomor">Nomor: <span id="pv_nomor">470 / ___ / Kel.1010/SK/ VI /2026</span></div>
                     <p class="sp-pembuka">Yang bertanda tangan di bawah ini Kepala Kelurahan Teritih Kecamatan Walantaka Kota Serang Provinsi Banten, menerangkan dengan sebenarnya bahwa:</p>
+                    <p class="sp-section" id="pv_bio_section" style="display:none"></p>
                     <table class="sp-bio" id="pv_bio"></table>
                     <div id="pv_extra"></div>
                     <p class="sp-isi" id="pv_isi"></p>
@@ -531,6 +560,17 @@ function removeCenterBold(i, key) {
     removeField(i, key);
 }
 
+// Encode/decode bold+underline flags into the shared extra_print_style[] value
+function parseStyleFlags(val) {
+    return { bold: val === 'bold' || val === 'bold_underline', underline: val === 'underline' || val === 'bold_underline' };
+}
+function buildStyleValue(bold, underline) {
+    if (bold && underline) return 'bold_underline';
+    if (bold) return 'bold';
+    if (underline) return 'underline';
+    return '';
+}
+
 function renderField(key, label, type, req, onPrint, printStyle, templateText) {
     const i = extraCount++;
     const isCenterBold = printStyle === 'center_bold';
@@ -538,16 +578,32 @@ function renderField(key, label, type, req, onPrint, printStyle, templateText) {
     const typeLabel = {text:'Teks',textarea:'Teks Panjang',date:'Tanggal',section:'Pemisah'}[type] || 'Teks';
     const displayLabel = isCenterBold ? 'Bold Center' : typeLabel;
 
+    // Bold/underline flags (only meaningful for section separators)
+    const sectionStyle = isSection ? (printStyle || '') : '';
+    const flags = parseStyleFlags(sectionStyle);
+
     const item = document.createElement('div');
     item.className = 'field-item';
     item.id = 'fi_'+i;
     item.style.cssText = isSection ? 'background:#f0fdf4;border-color:#bbf7d0' : (isCenterBold ? 'background:#faf5ff;border-color:#e9d5ff' : '');
+
+    const styleBtns = isSection ? `
+        <button type="button" class="field-item-style-btn${flags.bold ? ' active' : ''}" data-role="bold"
+                title="Tebal (Bold)" onclick="toggleFieldStyle(${i},'bold')">
+            <i class="bi bi-type-bold"></i>
+        </button>
+        <button type="button" class="field-item-style-btn${flags.underline ? ' active' : ''}" data-role="underline"
+                title="Garis Bawah (Underline)" onclick="toggleFieldStyle(${i},'underline')">
+            <i class="bi bi-type-underline"></i>
+        </button>` : '';
+
     item.innerHTML = `
         <div class="field-item-icon" style="${isSection?'background:#dcfce7;color:#16a34a':(isCenterBold?'background:#f3e8ff;color:#8b5cf6':'')}">
             <i class="bi bi-${isSection?'text-left':(isCenterBold?'type-bold':'input-cursor-text')}"></i>
         </div>
-        <div class="field-item-label" style="${isSection?'color:#15803d;font-style:italic':(isCenterBold?'color:#6d28d9;font-weight:700':'')}">${label}</div>
+        <div class="field-item-label" style="${isSection?'color:#15803d;font-style:italic':(isCenterBold?'color:#6d28d9;font-weight:700':'')}${flags.bold?';font-weight:700':''}${flags.underline?';text-decoration:underline':''}">${label}</div>
         <span class="field-item-type" style="${isSection?'background:#dcfce7;color:#16a34a':(isCenterBold?'background:#f3e8ff;color:#8b5cf6':'')}">${displayLabel}</span>
+        ${styleBtns}
         <button type="button" class="field-item-rm" onclick="removeField(${i},'${key}')"><i class="bi bi-x-lg"></i></button>`;
     document.getElementById('addedFields').appendChild(item);
     if (isCenterBold) item.style.display = 'none'; // ditampilkan di centerBoldList step 3
@@ -558,12 +614,54 @@ function renderField(key, label, type, req, onPrint, printStyle, templateText) {
         <input type="hidden" name="extra_key[]"          value="${key}">
         <input type="hidden" name="extra_label[]"         value="${label}">
         <input type="hidden" name="extra_type[]"          value="${type}">
-        <input type="hidden" name="extra_print_style[]"   value="${printStyle || ''}">
+        <input type="hidden" name="extra_print_style[]"   value="${sectionStyle || printStyle || ''}">
         <input type="hidden" name="extra_template_text[]" value="${(templateText||'').replace(/"/g,'&quot;')}">
         <input type="hidden" name="extra_required[]"      value="${req ? '1' : '0'}">
         <input type="hidden" name="extra_on_print[]"      value="${onPrint ? '1' : '0'}">`;
     document.getElementById('extraFieldsHidden').appendChild(hidden);
-    pvAddField(i, key, label, isSection, isCenterBold, templateText || '');
+    pvAddField(i, key, label, isSection, isCenterBold, templateText || '', sectionStyle);
+}
+
+// Toggle bold/underline on a section-separator field item
+function toggleFieldStyle(i, role) {
+    const fh = document.getElementById('fh_'+i);
+    if (!fh) return;
+    const styleInput = fh.querySelector('input[name="extra_print_style[]"]');
+    const flags = parseStyleFlags(styleInput.value);
+    if (role === 'bold') flags.bold = !flags.bold;
+    if (role === 'underline') flags.underline = !flags.underline;
+    styleInput.value = buildStyleValue(flags.bold, flags.underline);
+
+    const item = document.getElementById('fi_'+i);
+    if (item) {
+        const boldBtn      = item.querySelector('.field-item-style-btn[data-role="bold"]');
+        const underlineBtn = item.querySelector('.field-item-style-btn[data-role="underline"]');
+        if (boldBtn)      boldBtn.classList.toggle('active', flags.bold);
+        if (underlineBtn) underlineBtn.classList.toggle('active', flags.underline);
+
+        const labelEl = item.querySelector('.field-item-label');
+        if (labelEl) {
+            labelEl.style.fontWeight     = flags.bold ? '700' : '';
+            labelEl.style.textDecoration = flags.underline ? 'underline' : '';
+        }
+    }
+
+    const pe = pvExtra.find(e => e.i === i);
+    if (pe) pe.style = styleInput.value;
+    renderPreview();
+}
+
+// Bold/underline toggle for "Judul di Atas Data Warga"
+function toggleBioSectionStyle(role) {
+    const input = document.getElementById('inp_bio_section_style');
+    const flags = parseStyleFlags(input.value);
+    if (role === 'bold') flags.bold = !flags.bold;
+    if (role === 'underline') flags.underline = !flags.underline;
+    input.value = buildStyleValue(flags.bold, flags.underline);
+
+    document.getElementById('btn_bio_bold').classList.toggle('active', flags.bold);
+    document.getElementById('btn_bio_underline').classList.toggle('active', flags.underline);
+    renderPreview();
 }
 
 function removeField(i, key) {
@@ -580,8 +678,9 @@ function removeField(i, key) {
 @php
     $ek = old('extra_key')[$idx] ?? '';
     $et = old('extra_type')[$idx] ?? 'text';
+    $eps = old('extra_print_style')[$idx] ?? '';
 @endphp
-renderField('{{ $ek }}', @json($lbl), '{{ $et }}', true, true);
+renderField('{{ $ek }}', @json($lbl), '{{ $et }}', true, true, {{ $eps ? "'".addslashes($eps)."'" : 'null' }});
 @endforeach
 // Jump to error step
 goStep({{ $errors->has('nama_surat') ? 1 : ($errors->has('bio_fields') ? 2 : 3) }});
@@ -615,6 +714,19 @@ function renderPreview() {
     });
     document.getElementById('pv_bio').innerHTML = bioHtml;
 
+    // Judul opsional di atas biodata
+    const bioSectionEl = document.getElementById('pv_bio_section');
+    const bioSectionVal = (document.getElementById('inp_bio_section')?.value || '').trim();
+    if (bioSectionVal) {
+        const bioFlags = parseStyleFlags(document.getElementById('inp_bio_section_style')?.value || '');
+        bioSectionEl.textContent = bioSectionVal;
+        bioSectionEl.style.fontWeight = bioFlags.bold ? '700' : '';
+        bioSectionEl.style.textDecoration = bioFlags.underline ? 'underline' : '';
+        bioSectionEl.style.display = '';
+    } else {
+        bioSectionEl.style.display = 'none';
+    }
+
     // Extra fields — tabel + section separator (tanpa center_bold)
     let extraHtml = '';
     let centerBoldHtml = '';
@@ -626,7 +738,9 @@ function renderPreview() {
                 centerBoldHtml += `<p style="text-align:center;font-weight:bold;font-style:italic;font-size:10pt;margin:6px 0">${display}</p>`;
             } else if (ef.isSection) {
                 if (tableOpen) { extraHtml += '</table>'; tableOpen = false; }
-                extraHtml += `<p class="sp-section">${ef.label}</p>`;
+                const sf = parseStyleFlags(ef.style || '');
+                const sCss = (sf.bold ? 'font-weight:700;' : '') + (sf.underline ? 'text-decoration:underline;' : '');
+                extraHtml += `<p class="sp-section" style="${sCss}">${ef.label}</p>`;
             } else {
                 if (!tableOpen) { extraHtml += '<table class="sp-bio">'; tableOpen = true; }
                 extraHtml += `<tr><td>${ef.label}</td><td>:</td><td class="sp-placeholder">[${ef.label}]</td></tr>`;
@@ -645,8 +759,8 @@ function renderPreview() {
 }
 
 // ── Preview sync — called after renderField/removeField ──
-function pvAddField(i, key, label, isSection, isCenterBold, templateText) {
-    pvExtra.push({ i, key, label, isSection: !!isSection, isCenterBold: !!isCenterBold, templateText: templateText||'' });
+function pvAddField(i, key, label, isSection, isCenterBold, templateText, style) {
+    pvExtra.push({ i, key, label, isSection: !!isSection, isCenterBold: !!isCenterBold, templateText: templateText||'', style: style||'' });
     renderPreview();
 }
 function pvRemoveField(key) {
@@ -679,6 +793,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('bioFieldsHidden').insertAdjacentHTML('beforeend',
             `<input type="hidden" name="bio_fields[]" value="${cb.value}">`);
     });
+    // Sync bold/underline buttons for "Judul di Atas Data Warga" with the current hidden value
+    const bioStyleFlags = parseStyleFlags(document.getElementById('inp_bio_section_style')?.value || '');
+    document.getElementById('btn_bio_bold')?.classList.toggle('active', bioStyleFlags.bold);
+    document.getElementById('btn_bio_underline')?.classList.toggle('active', bioStyleFlags.underline);
     document.getElementById('namaSurat')?.addEventListener('input', renderPreview);
     document.getElementById('inp_kode_klas')?.addEventListener('input', renderPreview);
     document.getElementById('kalimatIsi')?.addEventListener('input', renderPreview);

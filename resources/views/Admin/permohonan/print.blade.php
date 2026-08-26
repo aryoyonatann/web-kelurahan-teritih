@@ -70,6 +70,25 @@
     .ttd-nama{font-weight:bold;text-decoration:underline;margin-bottom:0;line-height:1.3}
     .ttd-nip{font-weight:bold;font-size:12pt;margin-top:1px;line-height:1.3}
     .keperluan-center{text-align:center;font-weight:bold;text-decoration:underline;margin:8px 0;font-size:12pt}
+    /* Mode padat: hanya aktif kalau surat terdeteksi >1 halaman, atau dipaksa manual oleh admin.
+       Tidak memengaruhi surat lain yang sudah pas 1 halaman. */
+    .surat.compact{font-size:11pt;line-height:1.3}
+    .surat.compact .kop{padding-bottom:5px}
+    .surat.compact .kop-teks .k1,.surat.compact .kop-teks .k2,.surat.compact .kop-teks .k3{font-size:17pt}
+    .surat.compact .kop-teks .k4{font-size:10pt;margin-top:1px}
+    .surat.compact .judul{margin:8px 0 2px;font-size:12.5pt}
+    .surat.compact .nomor{margin-bottom:8pt}
+    .surat.compact .pembuka{margin-bottom:8pt}
+    .surat.compact .bio{margin-bottom:8pt;line-height:1.25}
+    .surat.compact .isi-surat{margin-bottom:8pt}
+    .surat.compact .penutup{margin-bottom:6pt}
+    .surat.compact .keterangan{margin:4pt 0}
+    .surat.compact .ttd-box{margin-top:14pt}
+    .surat.compact .ttd-ruang{height:50px}
+    .surat.compact .keperluan-center{margin:5px 0}
+    /* Dipakai sesaat untuk mengukur tinggi surat sebelum diputuskan perlu compact atau tidak */
+    #suratCetak.measure-mode{display:block!important;position:absolute!important;top:-99999px;left:-99999px;visibility:hidden}
+    #suratCetak.measure-mode .surat{width:210mm;min-height:0;padding:10mm 18mm 10mm 22mm;font-family:'Times New Roman',Times,serif}
     </style>
 </head>
 <body>
@@ -350,7 +369,7 @@
             </div>
         </div>
 
-        <div class="btn-row">
+        <div class="btn-row" style="align-items:center">
             <button class="btn-cetak" onclick="cetakSurat()">🖨️ Cetak Surat</button>
             <a href="{{ route('permohonan.show', $permohonan->id_permohonan) }}" class="btn-back">← Kembali</a>
         </div>
@@ -391,7 +410,13 @@
     @foreach($bioConfig as $bf)
         @if(($bf['type'] ?? '') === 'section')
             @if($tableOpened)</table>@php $tableOpened = false; @endphp @endif
-            <p style="margin:16pt 0 8pt;font-weight:bold;text-decoration:underline;font-size:12pt">{{ $bf['label'] }}</p>
+            @php
+                $bioSecStyle = $bf['print_style'] ?? 'bold_underline';
+                $bioSecCss   = 'margin:16pt 0 8pt;font-size:12pt;';
+                if ($bioSecStyle === 'bold' || $bioSecStyle === 'bold_underline') $bioSecCss .= 'font-weight:bold;';
+                if ($bioSecStyle === 'underline' || $bioSecStyle === 'bold_underline') $bioSecCss .= 'text-decoration:underline;';
+            @endphp
+            <p style="{{ $bioSecCss }}">{{ $bf['label'] }}</p>
         @else
             @if(!$tableOpened)<table class="bio">@php $tableOpened = true; @endphp @endif
             @if($bf['key'] === 'nama')
@@ -436,8 +461,14 @@
     @foreach($extras as $ef)
         @if(($ef['type'] ?? '') === 'section')
             @if($extraTableOpened)</table>@php $extraTableOpened = false; @endphp @endif
-            @php $sectionLabel = str_replace(array_keys($replacements), array_values($replacements), $ef['label']); @endphp
-            <p class="keterangan" id="pr_section_{{ $ef['key'] }}">{{ $sectionLabel }}</p>
+            @php
+                $sectionLabel = str_replace(array_keys($replacements), array_values($replacements), $ef['label']);
+                $secStyle     = $ef['print_style'] ?? '';
+                $secCss       = '';
+                if ($secStyle === 'bold' || $secStyle === 'bold_underline') $secCss .= 'font-weight:bold;';
+                if ($secStyle === 'underline' || $secStyle === 'bold_underline') $secCss .= 'text-decoration:underline;';
+            @endphp
+            <p class="keterangan" id="pr_section_{{ $ef['key'] }}" style="{{ $secCss }}">{{ $sectionLabel }}</p>
         @elseif(($ef['print_style'] ?? '') === 'center_bold')
             {{-- dirender terpisah setelah pr_isi --}}
         @elseif($ef['on_print'] ?? false)
@@ -747,7 +778,24 @@ function cetakSurat() {
         body: JSON.stringify({ nomor_surat: nomor })
     });
 
+    // Deteksi otomatis: kalau surat melebihi 1 halaman A4, aktifkan mode padat (compact).
+    const suratEl = document.querySelector('#suratCetak .surat');
+    suratEl.classList.remove('compact');
+    if (willOverflowOnePage()) {
+        suratEl.classList.add('compact');
+    }
+
     window.print();
+}
+
+function willOverflowOnePage() {
+    const wrap = document.getElementById('suratCetak');
+    wrap.classList.add('measure-mode');
+    const suratEl = wrap.querySelector('.surat');
+    const heightPx = suratEl.scrollHeight; // box-sizing:border-box, sudah termasuk padding
+    wrap.classList.remove('measure-mode');
+    const A4_HEIGHT_PX = 297 * 96 / 25.4; // ≈ 1122.5px, tinggi A4 pada 96dpi
+    return heightPx > A4_HEIGHT_PX;
 }
 // ── Custom Alert Modal ──
 function showAlert(message, type = 'warning') {

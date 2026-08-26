@@ -159,6 +159,7 @@ class JenisSuratController extends Controller
         // Section label di atas biodata (opsional)
         $sectionLabel = trim($request->input('bio_section_label', ''));
         if ($sectionLabel) {
+            $sectionStyle = $request->input('bio_section_style', 'bold_underline');
             $fields[] = [
                 'key'         => 'section_ektp',
                 'label'       => $sectionLabel,
@@ -166,6 +167,7 @@ class JenisSuratController extends Controller
                 'print_label' => $sectionLabel,
                 'group'       => 'biodata',
                 'required'    => false,
+                'print_style' => $sectionStyle,
             ];
         }
 
