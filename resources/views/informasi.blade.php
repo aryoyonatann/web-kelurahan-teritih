@@ -506,7 +506,7 @@
             ['key'=>'umur4_dewasa','label'=>'Dewasa (19–55 Thn)','emoji'=>'👨‍💼','color'=>'#1c64f2'],
             ['key'=>'umur4_lansia','label'=>'Lansia (≥ 56 Thn)','emoji'=>'👴','color'=>'#10b981'],
         ];
-        $totalSample = $v('total_sample_ddk') ?: 15228;
+        $totalSample = $v('total_sample_ddk') ?: $v('total_penduduk') ?: 1;
         $kawinData = [
             ['key'=>'kawin_belum','label'=>'Belum Kawin','color'=>'#3b82f6'],
             ['key'=>'kawin_kawin','label'=>'Kawin','color'=>'#10b981'],
@@ -599,6 +599,7 @@
             ['key'=>'kerja_pemerintah','color'=>'#ec4899'],
             ['key'=>'kerja_pedagang_keliling','color'=>'#f97316'],
             ['key'=>'kerja_pedagang_kelontong','color'=>'#64748b'],
+            ['key'=>'kerja_lainnya','color'=>'#a855f7'],
         ];
         $maxKerja = max(1, ...array_map(fn($k) => $v($k['key']), $kerjaData));
         $totalKerja = array_sum(array_map(fn($k) => $v($k['key']), $kerjaData));

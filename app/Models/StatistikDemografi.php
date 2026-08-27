@@ -20,35 +20,38 @@ class StatistikDemografi extends Model
     }
 
     /**
-     * Gabungkan data statistik manual/import dengan hasil HITUNG OTOMATIS
-     * dari tabel `penduduk` (kalau sudah ada datanya). Kunci yang punya
-     * padanan di data penduduk akan DITIMPA nilainya (di memori saja,
-     * tidak disimpan ke DB) supaya grafik selalu mencerminkan data warga
-     * terkini. Kunci yang tidak berhubungan dengan data individual
-     * (RT/RW, fasilitas umum, data singkat, dll) tetap pakai nilai manual.
+     * Ambil statistik untuk halaman publik.
+     * Jika data warga sudah ada (syncSemuaStatistik sudah pernah dijalankan),
+     * baca langsung dari DB — TIDAK hitung ulang setiap page load.
+     * Fallback ke hitung-ulang hanya jika tabel statistik_demografi kosong
+     * atau belum pernah di-sync.
      */
     public static function withPendudukOverride()
     {
         $statistik = static::all()->keyBy('kunci');
-        $computed  = \App\Models\Penduduk::hitungStatistik();
 
-        foreach ($computed as $kunci => $val) {
-            $nilai     = is_array($val) ? $val['nilai'] : $val;
-            $nilaiTeks = is_array($val) ? $val['nilai_teks'] : null;
+        // Cek apakah data sudah pernah di-sync dari data warga
+        // (ditandai dengan adanya kunci 'total_penduduk' di DB)
+        $sudahSync = $statistik->has('total_penduduk') && $statistik['total_penduduk']->nilai > 0;
 
-            if ($statistik->has($kunci)) {
-                $statistik[$kunci]->nilai = $nilai;
-                if ($nilaiTeks !== null) {
-                    $statistik[$kunci]->nilai_teks = $nilaiTeks;
+        if (!$sudahSync) {
+            // Belum pernah sync — hitung on-the-fly dan merge (fallback)
+            $computed = \App\Models\Penduduk::hitungStatistik();
+            foreach ($computed as $kunci => $val) {
+                $nilai     = is_array($val) ? $val['nilai'] : $val;
+                $nilaiTeks = is_array($val) ? $val['nilai_teks'] : null;
+                if ($statistik->has($kunci)) {
+                    $statistik[$kunci]->nilai = $nilai;
+                    if ($nilaiTeks !== null) $statistik[$kunci]->nilai_teks = $nilaiTeks;
+                } else {
+                    $baru = new static([
+                        'kunci'      => $kunci,
+                        'label'      => str_replace('_', ' ', $kunci),
+                        'nilai'      => $nilai,
+                        'nilai_teks' => $nilaiTeks,
+                    ]);
+                    $statistik->put($kunci, $baru);
                 }
-            } else {
-                $baru = new static([
-                    'kunci'      => $kunci,
-                    'label'      => str_replace('_', ' ', $kunci),
-                    'nilai'      => $nilai,
-                    'nilai_teks' => $nilaiTeks,
-                ]);
-                $statistik->put($kunci, $baru);
             }
         }
 

@@ -61,10 +61,26 @@ class PermohonanController extends Controller
             ->findOrFail($id);
 
         $tahun = now()->year;
-        $nomorUrut = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
+
+        // OPSI B: ambil nomor urut tertinggi yang sudah tersimpan (termasuk input manual admin),
+        // lalu +1. Dengan ini kalau admin pernah loncat ke nomor 5, surat berikutnya dapat 6.
+        // Untuk ganti ke OPSI A (pure hitung jumlah baris), ganti blok ini dengan:
+        //   $nomorUrut = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
+        //       ->whereYear('tanggal_pengajuan', $tahun)
+        //       ->whereNotNull('nomor_surat')
+        //       ->count() + 1;
+        $nomorUrutTertinggi = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
             ->whereYear('tanggal_pengajuan', $tahun)
             ->whereNotNull('nomor_surat')
-            ->count() + 1;
+            ->get('nomor_surat')
+            ->map(function ($p) {
+                // Format nomor: "440 / 003 / Kel.1010/SKTM/ VIII /2026"
+                // Ambil bagian ke-2 (index 1) setelah split " / "
+                $parts = explode(' / ', $p->nomor_surat);
+                return isset($parts[1]) ? (int) trim($parts[1]) : 0;
+            })
+            ->max() ?? 0;
+        $nomorUrut = $nomorUrutTertinggi + 1;
 
         $bulanRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now()->month - 1];
 

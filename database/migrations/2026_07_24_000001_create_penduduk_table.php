@@ -24,11 +24,7 @@ return new class extends Migration
                 'SD/Sederajat', 'SMP/Sederajat', 'SMA/Sederajat',
                 'Diploma (D1-D3)', 'Sarjana (S1)', 'Pascasarjana (S2/S3)',
             ])->default('SMA/Sederajat');
-            $table->enum('pekerjaan', [
-                'Belum Bekerja', 'Pelajar', 'Ibu Rumah Tangga', 'Wiraswasta',
-                'Buruh Harian Lepas', 'Karyawan Swasta', 'Petani',
-                'Karyawan Pemerintah', 'Pedagang Keliling', 'Pedagang Kelontong',
-            ])->default('Wiraswasta');
+            $table->string('pekerjaan', 100)->default('Wiraswasta');
             $table->enum('hubungan_keluarga', ['Kepala Keluarga', 'Istri', 'Anak Kandung', 'Ibu'])->default('Anak Kandung');
             $table->string('rt', 10);
             $table->string('rw', 10);

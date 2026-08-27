@@ -10,7 +10,7 @@ class Penduduk extends Model
     protected $table = 'penduduk';
 
     protected $fillable = [
-        'nik', 'nama', 'jenis_kelamin', 'tanggal_lahir', 'agama',
+        'no_kk', 'nik', 'nama', 'jenis_kelamin', 'tanggal_lahir', 'agama',
         'status_kawin', 'pendidikan', 'pekerjaan', 'hubungan_keluarga',
         'rt', 'rw', 'alamat', 'tahun_data',
     ];
@@ -70,92 +70,162 @@ class Penduduk extends Model
     }
 
     /**
-     * Hitung seluruh statistik demografi dari data penduduk yang ada,
-     * dalam format ['kunci' => ['label' => ..., 'nilai' => ..., 'nilai_teks' => ...]]
-     * — siap dipakai untuk overwrite/merge ke koleksi StatistikDemografi.
-     * Mengembalikan array kosong kalau belum ada data penduduk sama sekali
-     * (supaya sistem fallback ke data manual/import lama).
+     * Hitung seluruh statistik demografi langsung via SQL aggregat —
+     * TIDAK load seluruh tabel ke memori PHP.
+     * Mengembalikan array kosong kalau belum ada data penduduk.
      */
     public static function hitungStatistik(): array
     {
-        $semua = static::all();
-        if ($semua->isEmpty()) return [];
+        if (static::count() === 0) return [];
         $hasil = [];
 
-        // Jenis kelamin
-        $hasil['jiwa_lakilaki']  = $semua->where('jenis_kelamin', 'L')->count();
-        $hasil['jiwa_perempuan'] = $semua->where('jenis_kelamin', 'P')->count();
-        $hasil['total_penduduk'] = $semua->count();
-        $hasil['jumlah_kk']      = $semua->where('hubungan_keluarga', 'Kepala Keluarga')->count();
-        $hasil['jumlah_rt']      = $semua->map(fn($p) => $p->rw . '-' . $p->rt)->filter()->unique()->count();
-        $hasil['jumlah_rw']      = $semua->pluck('rw')->filter()->unique()->count();
+        // ── Jenis kelamin & total ──────────────────────────────────
+        $perGender = static::selectRaw("jenis_kelamin, COUNT(*) as jml")
+            ->groupBy('jenis_kelamin')->pluck('jml', 'jenis_kelamin');
+        $hasil['jiwa_lakilaki']  = (int) ($perGender['L'] ?? 0);
+        $hasil['jiwa_perempuan'] = (int) ($perGender['P'] ?? 0);
+        $hasil['total_penduduk'] = $hasil['jiwa_lakilaki'] + $hasil['jiwa_perempuan'];
 
-        // Agama
+        // ── KK: hitung dari no_kk unik (jika ada), fallback ke Kepala Keluarga ──
+        $kkDariNoKk = static::whereNotNull('no_kk')->distinct()->count('no_kk');
+        $hasil['jumlah_kk'] = $kkDariNoKk > 0
+            ? $kkDariNoKk
+            : static::where('hubungan_keluarga', 'Kepala Keluarga')->count();
+
+        // ── RT & RW unik — pakai CONCAT di SQL, hindari filter '0' di PHP ──
+        $hasil['jumlah_rt'] = (int) static::selectRaw("COUNT(DISTINCT CONCAT(rw, '-', rt)) as jml")
+            ->whereNotNull('rt')->whereNotNull('rw')->where('rt', '!=', '')->where('rw', '!=', '')
+            ->value('jml');
+        $hasil['jumlah_rw'] = (int) static::whereNotNull('rw')->where('rw', '!=', '')
+            ->distinct()->count('rw');
+
+        // ── Agama ──────────────────────────────────────────────────
         $agamaMap = [
             'Islam' => 'jiwa_islam', 'Kristen Protestan' => 'jiwa_kristen',
             'Katolik' => 'jiwa_katolik', 'Hindu' => 'jiwa_hindu',
             'Buddha' => 'jiwa_buddha', 'Konghucu' => 'jiwa_konghucu',
             'Kepercayaan Lainnya' => 'jiwa_lainnya',
         ];
+        $perAgama = static::selectRaw("agama, COUNT(*) as jml")
+            ->groupBy('agama')->pluck('jml', 'agama');
         foreach ($agamaMap as $label => $kunci) {
-            $hasil[$kunci] = $semua->where('agama', $label)->count();
+            $hasil[$kunci] = (int) ($perAgama[$label] ?? 0);
         }
 
-        // Kelompok umur 5 tahunan (total + per gender)
+        // ── Kelompok umur 5 tahunan via SQL CASE ──────────────────
+        // Hitung umur di SQL: TIMESTAMPDIFF(YEAR, tanggal_lahir, CURDATE())
+        $umurSql = "TIMESTAMPDIFF(YEAR, tanggal_lahir, CURDATE())";
+        $caseUmur = '';
         foreach (self::KELOMPOK_UMUR as [$min, $max, $key]) {
-            $grup = $semua->filter(fn($p) => $p->kelompok_umur_key === $key);
-            $hasil["umur_{$key}"]   = $grup->count();
-            $hasil["umur_{$key}_l"] = $grup->where('jenis_kelamin', 'L')->count();
-            $hasil["umur_{$key}_p"] = $grup->where('jenis_kelamin', 'P')->count();
+            $maxCond = $max >= 999 ? '' : " AND {$umurSql} <= {$max}";
+            $caseUmur .= " WHEN {$umurSql} >= {$min}{$maxCond} THEN '{$key}'";
+        }
+        $rawUmur = static::selectRaw(
+            "CASE{$caseUmur} ELSE '75_plus' END as kelompok,
+             jenis_kelamin,
+             COUNT(*) as jml"
+        )->groupByRaw("kelompok, jenis_kelamin")->get();
+
+        // Inisialisasi semua kelompok ke 0 dulu
+        foreach (self::KELOMPOK_UMUR as [$min, $max, $key]) {
+            $hasil["umur_{$key}"]   = 0;
+            $hasil["umur_{$key}_l"] = 0;
+            $hasil["umur_{$key}_p"] = 0;
+        }
+        foreach ($rawUmur as $row) {
+            $k = $row->kelompok;
+            $hasil["umur_{$k}"]  = ($hasil["umur_{$k}"] ?? 0) + (int) $row->jml;
+            if ($row->jenis_kelamin === 'L') $hasil["umur_{$k}_l"] = (int) $row->jml;
+            if ($row->jenis_kelamin === 'P') $hasil["umur_{$k}_p"] = (int) $row->jml;
         }
 
-        // Kelompok umur 4 kategori, nilai_teks format "laki|perempuan"
-        foreach (['anak', 'remaja', 'dewasa', 'lansia'] as $k4) {
-            $grup = $semua->filter(fn($p) => $p->kelompok_umur_4_key === $k4);
+        // ── Kelompok umur 4 kategori via SQL CASE ─────────────────
+        $case4 = "CASE
+            WHEN {$umurSql} < 7   THEN 'anak'
+            WHEN {$umurSql} <= 18 THEN 'remaja'
+            WHEN {$umurSql} <= 55 THEN 'dewasa'
+            ELSE 'lansia'
+        END";
+        $rawUmur4 = static::selectRaw(
+            "{$case4} as kelompok4, jenis_kelamin, COUNT(*) as jml"
+        )->groupByRaw("kelompok4, jenis_kelamin")->get();
+
+        $umur4 = ['anak' => ['l'=>0,'p'=>0], 'remaja' => ['l'=>0,'p'=>0],
+                  'dewasa' => ['l'=>0,'p'=>0], 'lansia' => ['l'=>0,'p'=>0]];
+        foreach ($rawUmur4 as $row) {
+            $k = $row->kelompok4;
+            if ($row->jenis_kelamin === 'L') $umur4[$k]['l'] = (int) $row->jml;
+            if ($row->jenis_kelamin === 'P') $umur4[$k]['p'] = (int) $row->jml;
+        }
+        foreach ($umur4 as $k4 => $gnd) {
+            $total = $gnd['l'] + $gnd['p'];
             $hasil["umur4_{$k4}"] = [
-                'nilai'      => $grup->count(),
-                'nilai_teks' => $grup->where('jenis_kelamin', 'L')->count() . '|' . $grup->where('jenis_kelamin', 'P')->count(),
+                'nilai'      => $total,
+                'nilai_teks' => $gnd['l'] . '|' . $gnd['p'],
             ];
         }
 
-        // Status kawin, nilai_teks format "laki|perempuan"
-        $kawinMap = ['Belum Kawin' => 'kawin_belum', 'Kawin' => 'kawin_kawin', 'Janda/Duda' => 'kawin_janda_duda'];
+        // ── Total sample DDK (sum 4 kelompok umur) ────────────────
+        $totalDDK = array_sum(array_column(
+            array_intersect_key($hasil, array_flip(['umur4_anak','umur4_remaja','umur4_dewasa','umur4_lansia'])),
+            'nilai'
+        ));
+        $teksL = array_sum(array_map(
+            fn($k) => (int) explode('|', $hasil[$k]['nilai_teks'])[0],
+            ['umur4_anak','umur4_remaja','umur4_dewasa','umur4_lansia']
+        ));
+        $hasil['total_sample_ddk'] = [
+            'nilai'      => $totalDDK,
+            'nilai_teks' => $teksL . '|' . ($totalDDK - $teksL),
+        ];
+
+        // ── Status kawin ───────────────────────────────────────────
+        $kawinMap = ['Belum Kawin'=>'kawin_belum','Kawin'=>'kawin_kawin','Janda/Duda'=>'kawin_janda_duda'];
+        $rawKawin = static::selectRaw("status_kawin, jenis_kelamin, COUNT(*) as jml")
+            ->groupByRaw("status_kawin, jenis_kelamin")->get();
         foreach ($kawinMap as $label => $kunci) {
-            $grup = $semua->where('status_kawin', $label);
-            $hasil[$kunci] = [
-                'nilai'      => $grup->count(),
-                'nilai_teks' => $grup->where('jenis_kelamin', 'L')->count() . '|' . $grup->where('jenis_kelamin', 'P')->count(),
-            ];
+            $l = $rawKawin->where('status_kawin', $label)->where('jenis_kelamin', 'L')->sum('jml');
+            $p = $rawKawin->where('status_kawin', $label)->where('jenis_kelamin', 'P')->sum('jml');
+            $hasil[$kunci] = ['nilai' => $l + $p, 'nilai_teks' => "{$l}|{$p}"];
         }
 
-        // Pekerjaan
+        // ── Pekerjaan ──────────────────────────────────────────────
         $kerjaMap = [
-            'Pelajar' => 'kerja_pelajar', 'Ibu Rumah Tangga' => 'kerja_irt',
-            'Wiraswasta' => 'kerja_wiraswasta', 'Belum Bekerja' => 'kerja_belum',
-            'Buruh Harian Lepas' => 'kerja_buruh', 'Karyawan Swasta' => 'kerja_swasta',
-            'Petani' => 'kerja_petani', 'Karyawan Pemerintah' => 'kerja_pemerintah',
-            'Pedagang Keliling' => 'kerja_pedagang_keliling', 'Pedagang Kelontong' => 'kerja_pedagang_kelontong',
+            'Pelajar'=>'kerja_pelajar','Ibu Rumah Tangga'=>'kerja_irt',
+            'Wiraswasta'=>'kerja_wiraswasta','Belum Bekerja'=>'kerja_belum',
+            'Buruh Harian Lepas'=>'kerja_buruh','Karyawan Swasta'=>'kerja_swasta',
+            'Petani'=>'kerja_petani','Karyawan Pemerintah'=>'kerja_pemerintah',
+            'Pedagang Keliling'=>'kerja_pedagang_keliling','Pedagang Kelontong'=>'kerja_pedagang_kelontong',
         ];
+        $perKerja = static::selectRaw("pekerjaan, COUNT(*) as jml")
+            ->groupBy('pekerjaan')->pluck('jml', 'pekerjaan');
         foreach ($kerjaMap as $label => $kunci) {
-            $hasil[$kunci] = $semua->where('pekerjaan', $label)->count();
+            $hasil[$kunci] = (int) ($perKerja[$label] ?? 0);
         }
+        // Lainnya = semua yang tidak ada di daftar baku
+        $totalBaku = array_sum(array_map(fn($k) => $hasil[$k], array_values($kerjaMap)));
+        $hasil['kerja_lainnya'] = max(0, $hasil['total_penduduk'] - $totalBaku);
 
-        // Pendidikan
+        // ── Pendidikan ─────────────────────────────────────────────
         $pendMap = [
-            'Belum Sekolah (PAUD/TK)' => 'pend_belum_sekolah', 'SMA/Sederajat' => 'pend_sma',
-            'SD/Sederajat' => 'pend_sd', 'SMP/Sederajat' => 'pend_smp',
-            'Sarjana (S1)' => 'pend_s1', 'Sedang Sekolah (7-18 Thn)' => 'pend_sedang_sekolah',
-            'Diploma (D1-D3)' => 'pend_diploma', 'Pascasarjana (S2/S3)' => 'pend_s2',
-            'Tidak Tamat/Lainnya' => 'pend_tidak_tamat',
+            'Belum Sekolah (PAUD/TK)'=>'pend_belum_sekolah','SMA/Sederajat'=>'pend_sma',
+            'SD/Sederajat'=>'pend_sd','SMP/Sederajat'=>'pend_smp',
+            'Sarjana (S1)'=>'pend_s1','Sedang Sekolah (7-18 Thn)'=>'pend_sedang_sekolah',
+            'Diploma (D1-D3)'=>'pend_diploma','Pascasarjana (S2/S3)'=>'pend_s2',
+            'Tidak Tamat/Lainnya'=>'pend_tidak_tamat',
         ];
+        $perPend = static::selectRaw("pendidikan, COUNT(*) as jml")
+            ->groupBy('pendidikan')->pluck('jml', 'pendidikan');
         foreach ($pendMap as $label => $kunci) {
-            $hasil[$kunci] = $semua->where('pendidikan', $label)->count();
+            $hasil[$kunci] = (int) ($perPend[$label] ?? 0);
         }
 
-        // Hubungan keluarga
-        $hubMap = ['Anak Kandung' => 'hub_anak', 'Kepala Keluarga' => 'hub_kk', 'Istri' => 'hub_istri', 'Ibu' => 'hub_ibu'];
+        // ── Hubungan keluarga ──────────────────────────────────────
+        $hubMap = ['Anak Kandung'=>'hub_anak','Kepala Keluarga'=>'hub_kk','Istri'=>'hub_istri','Ibu'=>'hub_ibu'];
+        $perHub = static::selectRaw("hubungan_keluarga, COUNT(*) as jml")
+            ->groupBy('hubungan_keluarga')->pluck('jml', 'hubungan_keluarga');
         foreach ($hubMap as $label => $kunci) {
-            $hasil[$kunci] = $semua->where('hubungan_keluarga', $label)->count();
+            $hasil[$kunci] = (int) ($perHub[$label] ?? 0);
         }
 
         return $hasil;

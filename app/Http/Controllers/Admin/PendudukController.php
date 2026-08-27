@@ -25,6 +25,7 @@ class PendudukController extends Controller
         'Belum Bekerja', 'Pelajar', 'Ibu Rumah Tangga', 'Wiraswasta',
         'Buruh Harian Lepas', 'Karyawan Swasta', 'Petani',
         'Karyawan Pemerintah', 'Pedagang Keliling', 'Pedagang Kelontong',
+        'Lainnya',
     ];
 
     private array $pilihanHubungan = ['Kepala Keluarga', 'Istri', 'Anak Kandung', 'Ibu'];
@@ -32,15 +33,17 @@ class PendudukController extends Controller
     /** Ditampilkan sebagai bagian "Data Warga" di halaman Statistik Demografi */
     public function index(Request $request)
     {
-        $q = trim((string) $request->get('q', ''));
-        $rw = $request->get('rw', '');
+        $q    = trim((string) $request->get('q', ''));
+        $rw   = $request->get('rw', '');
+        $view = $request->get('view', 'list'); // 'list' atau 'kk'
 
         $query = Penduduk::query()->orderBy('nama');
 
         if ($q !== '') {
             $query->where(function ($w) use ($q) {
                 $w->where('nama', 'like', "%{$q}%")
-                  ->orWhere('nik', 'like', "%{$q}%");
+                  ->orWhere('nik', 'like', "%{$q}%")
+                  ->orWhere('no_kk', 'like', "%{$q}%");
             });
         }
 
@@ -48,14 +51,39 @@ class PendudukController extends Controller
             $query->where('rw', $rw);
         }
 
-        $warga    = $query->paginate(15)->withQueryString();
         $daftarRw = Penduduk::select('rw')->distinct()->orderBy('rw')->pluck('rw');
+
+        if ($view === 'kk') {
+            // Mode KK: ambil semua (tanpa paginasi), kelompokkan per no_kk
+            // Urutkan: KK dengan no_kk dulu, lalu yang null (diurutkan per RT/RW)
+            $semua = $query->orderByRaw('no_kk IS NULL ASC')->orderBy('no_kk')->orderBy('rw')->orderBy('rt')->orderBy('nama')->get();
+
+            // Kelompokkan: yang punya no_kk → group by no_kk
+            // yang no_kk null → tiap warga jadi "KK tersendiri" (belum didata KK-nya)
+            $grouped = $semua->groupBy(fn($p) => $p->no_kk ?? ('__null__' . $p->id));
+
+            return view('Admin.penduduk.index', [
+                'warga'    => null,
+                'grouped'  => $grouped,
+                'daftarRw' => $daftarRw,
+                'q'        => $q,
+                'rwFilter' => $rw,
+                'viewMode' => 'kk',
+                'totalWarga' => $semua->count(),
+            ]);
+        }
+
+        // Mode List (default): paginasi seperti biasa
+        $warga = $query->paginate(15)->withQueryString();
 
         return view('Admin.penduduk.index', [
             'warga'    => $warga,
+            'grouped'  => null,
             'daftarRw' => $daftarRw,
             'q'        => $q,
             'rwFilter' => $rw,
+            'viewMode' => 'list',
+            'totalWarga' => null,
         ]);
     }
 
@@ -70,12 +98,14 @@ class PendudukController extends Controller
             'pilihanHubungan'  => $this->pilihanHubungan,
             'daftarTahun'      => $this->daftarTahunInput(),
             'currentYear'      => (int) now()->format('Y'),
+            'pekerjaanCustom'  => false,
         ]);
     }
 
     public function store(Request $request)
     {
         $data = $this->validasi($request);
+        $data = $this->terapkanPekerjaanLainnya($data, $request);
         Penduduk::create($data);
         Penduduk::syncSemuaStatistik();
 
@@ -93,12 +123,17 @@ class PendudukController extends Controller
             'pilihanHubungan'  => $this->pilihanHubungan,
             'daftarTahun'      => $this->daftarTahunInput(),
             'currentYear'      => (int) now()->format('Y'),
+            // Kalau nilai pekerjaan tersimpan bukan dari daftar baku
+            // (hasil ketik manual "Lainnya" sebelumnya), tandai sebagai custom
+            // supaya form menampilkan select "Lainnya" + textnya terisi.
+            'pekerjaanCustom'  => $warga->pekerjaan && !in_array($warga->pekerjaan, $this->pilihanPekerjaan, true),
         ]);
     }
 
     public function update(Request $request, Penduduk $warga)
     {
         $data = $this->validasi($request, $warga->id);
+        $data = $this->terapkanPekerjaanLainnya($data, $request);
         $warga->update($data);
         Penduduk::syncSemuaStatistik();
 
@@ -167,7 +202,7 @@ class PendudukController extends Controller
         $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', $header[0]);
         $header    = array_map(fn($h) => strtolower(trim($h)), $header);
 
-        $kolomWajib = ['nama', 'jenis_kelamin', 'tanggal_lahir', 'agama', 'rt', 'rw'];
+        $kolomWajib = ['nama', 'nik', 'jenis_kelamin', 'tanggal_lahir', 'agama', 'rt', 'rw'];
         foreach ($kolomWajib as $k) {
             if (!in_array($k, $header)) {
                 return back()->with('import_errors', ["Kolom '{$k}' wajib ada di file. Gunakan template yang disediakan."]);
@@ -190,6 +225,7 @@ class PendudukController extends Controller
                     : $default;
 
             $nama  = $get('nama');
+            $nik   = $get('nik');
             $jk    = strtoupper((string) $get('jenis_kelamin', ''));
             $tgl   = $get('tanggal_lahir');
             $agama = $get('agama');
@@ -207,8 +243,13 @@ class PendudukController extends Controller
                 }
             }
 
-            if (!$nama || !in_array($jk, ['L', 'P']) || !$tgl || !$agama || !$rt || !$rw) {
-                $gagal[] = "Baris {$baris}: data wajib (nama/jenis_kelamin/tanggal_lahir/agama/rt/rw) tidak lengkap, dilewati.";
+            if (!$nama || !$nik || !in_array($jk, ['L', 'P']) || !$tgl || !$agama || !$rt || !$rw) {
+                $gagal[] = "Baris {$baris}: data wajib (nama/nik/jenis_kelamin/tanggal_lahir/agama/rt/rw) tidak lengkap, dilewati.";
+                continue;
+            }
+
+            if (!preg_match('/^\d{16}$/', $nik)) {
+                $gagal[] = "Baris {$baris}: NIK '{$nik}' harus 16 digit angka, dilewati.";
                 continue;
             }
 
@@ -217,9 +258,14 @@ class PendudukController extends Controller
                 continue;
             }
 
+            // Pekerjaan sekarang bebas teks — pakai apa adanya dari file kalau diisi,
+            // fallback ke "Wiraswasta" hanya kalau kolomnya kosong.
+            $pekerjaan = $get('pekerjaan') ?: 'Wiraswasta';
+
             try {
                 Penduduk::create([
-                    'nik'               => $get('nik') ?: null,
+                    'no_kk'             => $get('no_kk') ?: null,
+                    'nik'               => $nik,
                     'nama'              => $nama,
                     'jenis_kelamin'     => $jk,
                     'tanggal_lahir'     => $tgl,
@@ -228,8 +274,7 @@ class PendudukController extends Controller
                                             ? $get('status_kawin') : 'Belum Kawin',
                     'pendidikan'        => in_array($get('pendidikan'), $this->pilihanPendidikan)
                                             ? $get('pendidikan') : 'SMA/Sederajat',
-                    'pekerjaan'         => in_array($get('pekerjaan'), $this->pilihanPekerjaan)
-                                            ? $get('pekerjaan') : 'Wiraswasta',
+                    'pekerjaan'         => $pekerjaan,
                     'hubungan_keluarga' => in_array($get('hubungan_keluarga'), $this->pilihanHubungan)
                                             ? $get('hubungan_keluarga') : 'Anak Kandung',
                     'rt'                => $rt,
@@ -238,7 +283,17 @@ class PendudukController extends Controller
                 ]);
                 $berhasil++;
             } catch (\Throwable $e) {
-                $gagal[] = "Baris {$baris}: gagal disimpan (kemungkinan NIK duplikat).";
+                $msg = $e->getMessage();
+                // Deteksi penyebab umum agar pesan lebih informatif
+                if (str_contains($msg, 'Duplicate entry') || str_contains($msg, 'UNIQUE constraint')) {
+                    $gagal[] = "Baris {$baris}: NIK '{$nik}' sudah terdaftar di database (duplikat), dilewati.";
+                } elseif (str_contains($msg, 'Data too long')) {
+                    $gagal[] = "Baris {$baris}: salah satu data terlalu panjang, dilewati. ({$msg})";
+                } elseif (str_contains($msg, 'Data truncated')) {
+                    $gagal[] = "Baris {$baris}: nilai kolom tidak dikenali (mungkin enum/format salah), dilewati. ({$msg})";
+                } else {
+                    $gagal[] = "Baris {$baris}: gagal disimpan — {$msg}";
+                }
             }
         }
 
@@ -262,18 +317,19 @@ class PendudukController extends Controller
 
         // Header kolom
         $headers = [
-            'A1' => 'nama',
-            'B1' => 'nik',
-            'C1' => 'jenis_kelamin',
-            'D1' => 'tanggal_lahir',
-            'E1' => 'agama',
-            'F1' => 'status_kawin',
-            'G1' => 'pendidikan',
-            'H1' => 'pekerjaan',
-            'I1' => 'hubungan_keluarga',
-            'J1' => 'rt',
-            'K1' => 'rw',
-            'L1' => 'alamat',
+            'A1' => 'no_kk',
+            'B1' => 'nama',
+            'C1' => 'nik',
+            'D1' => 'jenis_kelamin',
+            'E1' => 'tanggal_lahir',
+            'F1' => 'agama',
+            'G1' => 'status_kawin',
+            'H1' => 'pendidikan',
+            'I1' => 'pekerjaan',
+            'J1' => 'hubungan_keluarga',
+            'K1' => 'rt',
+            'L1' => 'rw',
+            'M1' => 'alamat',
         ];
         foreach ($headers as $cell => $value) {
             $sheet->setCellValue($cell, $value);
@@ -288,24 +344,24 @@ class PendudukController extends Controller
             'borders'   => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                                              'color' => ['argb' => 'FFBFDBFE']]],
         ];
-        $sheet->getStyle('A1:L1')->applyFromArray($headerStyle);
+        $sheet->getStyle('A1:M1')->applyFromArray($headerStyle);
 
         // Baris contoh
         $sheet->fromArray([
-            'Contoh Nama Warga', '3672xxxxxxxxxxxx', 'L', '2000-05-17',
+            '3672xxxxxxxxxxxx', 'Contoh Nama Warga', '3672xxxxxxxxxxxx', 'L', '2000-05-17',
             'Islam', 'Belum Kawin', 'SMA/Sederajat', 'Wiraswasta',
             'Anak Kandung', '2', '3', 'Jl. Contoh No. 1',
         ], null, 'A2');
 
         // Style baris contoh — background kuning muda
-        $sheet->getStyle('A2:L2')->applyFromArray([
+        $sheet->getStyle('A2:M2')->applyFromArray([
             'fill'  => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'startColor' => ['argb' => 'FFFEF9C3']],
             'font'  => ['italic' => true, 'color' => ['argb' => 'FF92400E']],
         ]);
 
         // Auto-width kolom
-        foreach (range('A', 'L') as $col) {
+        foreach (range('A', 'M') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -323,14 +379,15 @@ class PendudukController extends Controller
                        'startColor' => ['argb' => 'FFF1F5F9']],
         ]);
         $info = [
+            ['no_kk',            '16 digit angka, opsional — warga satu KK pakai nomor yang sama'],
             ['jenis_kelamin',    'L atau P'],
             ['tanggal_lahir',    'Format: YYYY-MM-DD (contoh: 2000-05-17)'],
             ['agama',            implode(', ', $this->pilihanAgama)],
             ['status_kawin',     implode(', ', $this->pilihanKawin)],
             ['pendidikan',       implode(', ', $this->pilihanPendidikan)],
-            ['pekerjaan',        implode(', ', $this->pilihanPekerjaan)],
+            ['pekerjaan',        implode(', ', $this->pilihanPekerjaan) . ' — untuk "Lainnya" boleh diisi teks bebas'],
             ['hubungan_keluarga',implode(', ', $this->pilihanHubungan)],
-            ['nik',              'Opsional, 16 digit angka, unik'],
+            ['nik',              'Wajib, 16 digit angka, unik'],
             ['alamat',           'Opsional'],
         ];
         $row = 2;
@@ -363,25 +420,44 @@ class PendudukController extends Controller
     {
         return $request->validate([
             'nama'              => ['required', 'string', 'max:150'],
-            'nik'               => ['nullable', 'digits:16', 'unique:penduduk,nik' . ($ignoreId ? ",{$ignoreId}" : '')],
+            'no_kk'             => ['nullable', 'digits:16'],
+            'nik'               => ['required', 'digits:16', 'unique:penduduk,nik' . ($ignoreId ? ",{$ignoreId}" : '')],
             'jenis_kelamin'     => ['required', 'in:L,P'],
             'tanggal_lahir'     => ['required', 'date', 'before_or_equal:today'],
             'agama'             => ['required', 'in:' . implode(',', $this->pilihanAgama)],
             'status_kawin'      => ['required', 'in:' . implode(',', $this->pilihanKawin)],
             'pendidikan'        => ['required', 'in:' . implode(',', $this->pilihanPendidikan)],
             'pekerjaan'         => ['required', 'in:' . implode(',', $this->pilihanPekerjaan)],
+            'pekerjaan_lainnya' => ['required_if:pekerjaan,Lainnya', 'nullable', 'string', 'max:50'],
             'hubungan_keluarga' => ['required', 'in:' . implode(',', $this->pilihanHubungan)],
             'rt'                => ['required', 'string', 'max:10'],
             'rw'                => ['required', 'string', 'max:10'],
             'alamat'            => ['nullable', 'string', 'max:255'],
             'tahun_data'        => ['required', 'integer', 'min:2000', 'max:' . ((int) date('Y') + 1)],
         ], [
-            'nik.digits'      => 'NIK harus terdiri dari 16 digit angka.',
-            'nik.unique'      => 'NIK ini sudah terdaftar untuk warga lain.',
+            'nik.required'     => 'NIK wajib diisi.',
+            'nik.digits'       => 'NIK harus terdiri dari 16 digit angka.',
+            'nik.unique'       => 'NIK ini sudah terdaftar untuk warga lain.',
+            'no_kk.digits'     => 'No. KK harus terdiri dari 16 digit angka.',
+            'pekerjaan_lainnya.required_if' => 'Isi pekerjaan warga karena memilih "Lainnya".',
             'tahun_data.required' => 'Tahun data wajib dipilih.',
             'tahun_data.min'      => 'Tahun data tidak valid.',
             'tahun_data.max'      => 'Tahun data tidak boleh melebihi tahun depan.',
         ]);
+    }
+
+    /**
+     * Kalau pekerjaan dipilih "Lainnya", ganti nilainya dengan teks manual
+     * dari kolom pekerjaan_lainnya sebelum disimpan ke database.
+     */
+    private function terapkanPekerjaanLainnya(array $data, Request $request): array
+    {
+        if (($data['pekerjaan'] ?? null) === 'Lainnya') {
+            $data['pekerjaan'] = trim((string) $request->input('pekerjaan_lainnya'));
+        }
+        unset($data['pekerjaan_lainnya']);
+
+        return $data;
     }
 
     /**

@@ -188,11 +188,12 @@
         <div class="section-sep">Nomor & Tanggal Surat</div>
         <div class="form-grid">
             <div class="form-group">
-                <label class="form-label">Nomor Urut Surat <span class="req">*</span></label>
+                <label class="form-label">Nomor Urut Surat</label>
+                {{-- Nomor urut diisi otomatis, admin tetap bisa ubah manual jika perlu --}}
                 <input type="number" class="form-input" id="inp_nomor_urut" min="1"
-                    value="" style="max-width:120px" placeholder="Isi nomor urut" oninput="updateNomorPreview()">
-                <div style="font-size:11px;color:#94a3b8;margin-top:4px">
-                    Saran: <strong>{{ str_pad($nomorUrut, 3, '0', STR_PAD_LEFT) }}</strong> — Preview: <strong id="preview_nomor">-</strong>
+                    value="{{ $nomorUrut }}" style="max-width:120px" oninput="updateNomorPreview()">
+                <div style="font-size:11px;color:#059669;margin-top:4px">
+                    <strong>✓ Otomatis:</strong> nomor <strong>{{ str_pad($nomorUrut, 3, '0', STR_PAD_LEFT) }}</strong> — Preview: <strong id="preview_nomor">-</strong>
                 </div>
             </div>
             <div class="form-group">
@@ -573,6 +574,7 @@ function tambahTTD() {
 // Auto-fill saat halaman pertama kali dimuat
 document.addEventListener('DOMContentLoaded', function() {
     onJabatanChange(0);
+    updateNomorPreview(); // tampilkan preview nomor langsung
 });
 
 function toggleSaksi() {

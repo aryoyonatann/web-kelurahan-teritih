@@ -11,7 +11,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 .form-hero{background:linear-gradient(135deg,#0d1b3e 0%,#1c64f2 50%,#60a5fa 100%);padding:28px 32px}
 .form-hero h1{font-size:22px;font-weight:800;color:white;margin:0 0 4px}
 .form-hero p{font-size:13px;color:rgba(255,255,255,.75);margin:0}
-.form-content{padding:28px 32px;max-width:760px}
+.form-content{padding:28px 32px;max-width:100%}
 .alert-danger{padding:12px 16px;border-radius:10px;margin-bottom:20px;background:#fef2f2;border:1px solid #fca5a5;font-size:13px;color:#991b1b;font-weight:500}
 .card{background:white;border-radius:14px;border:1px solid #e2e8f0;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -62,9 +62,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                         <input type="text" name="nama" value="{{ old('nama', $warga->nama) }}" required>
                     </div>
                     <div class="field">
-                        <label>NIK (opsional)</label>
-                        <input type="text" name="nik" value="{{ old('nik', $warga->nik) }}" maxlength="16" placeholder="16 digit">
+                        <label>NIK <span style="color:#ef4444">*</span></label>
+                        <input type="text" name="nik" value="{{ old('nik', $warga->nik) }}" maxlength="16" placeholder="16 digit" required inputmode="numeric" pattern="\d{16}">
                     </div>
+                </div>
+
+                <div class="field">
+                    <label>No. Kartu Keluarga (KK) <span style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0">(opsional)</span></label>
+                    <input type="text" name="no_kk" value="{{ old('no_kk', $warga->no_kk) }}"
+                           maxlength="16" placeholder="16 digit nomor KK" inputmode="numeric" pattern="\d{16}">
+                    <small>Warga dalam satu keluarga menggunakan No. KK yang sama. Kosongkan jika belum diketahui.</small>
                 </div>
 
                 <div class="grid2">
@@ -112,11 +119,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                     </div>
                     <div class="field">
                         <label>Pekerjaan</label>
-                        <select name="pekerjaan" required>
+                        @php
+                            $pekerjaanTerpilih = old('pekerjaan', $pekerjaanCustom ? 'Lainnya' : $warga->pekerjaan);
+                        @endphp
+                        <select name="pekerjaan" id="pekerjaan-select" required>
                             @foreach($pilihanPekerjaan as $opt)
-                                <option value="{{ $opt }}" @selected(old('pekerjaan', $warga->pekerjaan) === $opt)>{{ $opt }}</option>
+                                <option value="{{ $opt }}" @selected($pekerjaanTerpilih === $opt)>{{ $opt }}</option>
                             @endforeach
                         </select>
+                        <div id="pekerjaan-lainnya-wrap" style="margin-top:8px;{{ $pekerjaanTerpilih === 'Lainnya' ? '' : 'display:none' }}">
+                            <input type="text" name="pekerjaan_lainnya"
+                                   value="{{ old('pekerjaan_lainnya', $pekerjaanCustom ? $warga->pekerjaan : '') }}"
+                                   maxlength="50" placeholder="Ketik pekerjaan warga">
+                        </div>
                     </div>
                 </div>
 
@@ -197,6 +212,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
     sel.addEventListener('change', updateTahunHint);
     updateTahunHint();
+})();
+
+(function () {
+    const pekerjaanSel  = document.getElementById('pekerjaan-select');
+    const lainnyaWrap   = document.getElementById('pekerjaan-lainnya-wrap');
+    const lainnyaInput  = lainnyaWrap ? lainnyaWrap.querySelector('input[name="pekerjaan_lainnya"]') : null;
+    if (!pekerjaanSel || !lainnyaWrap) return;
+
+    function toggleLainnya() {
+        const aktif = pekerjaanSel.value === 'Lainnya';
+        lainnyaWrap.style.display = aktif ? '' : 'none';
+        if (lainnyaInput) lainnyaInput.required = aktif;
+    }
+
+    pekerjaanSel.addEventListener('change', toggleLainnya);
+    toggleLainnya();
 })();
 </script>
 @endpush

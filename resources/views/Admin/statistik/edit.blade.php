@@ -472,6 +472,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                         'kerja_pemerintah' => 'Karyawan Pemerintah',
                         'kerja_pedagang_keliling' => 'Pedagang Keliling',
                         'kerja_pedagang_kelontong' => 'Pedagang Kelontong',
+                        'kerja_lainnya' => 'Lainnya',
                     ];
                 @endphp
                 <div class="agama-grid">
