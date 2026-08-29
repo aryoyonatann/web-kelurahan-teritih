@@ -157,7 +157,7 @@ class PermohonanUserController extends Controller
             if (in_array('tempat_tgl_lahir', $bioFields)){ $rules['tempat_lahir'] = 'required|string|max:100'; $rules['tanggal_lahir'] = 'required|date'; }
             if (in_array('jenis_kelamin', $bioFields))   $rules['jenis_kelamin']  = 'required|in:Laki-Laki,Perempuan';
             if (in_array('agama', $bioFields))           $rules['agama']          = 'required|string';
-            if (in_array('pekerjaan', $bioFields))       $rules['pekerjaan']      = 'required|string|max:100';
+            if (in_array('pekerjaan', $bioFields))       $rules['pekerjaan']      = 'required|string|max:50';
             if (in_array('umur', $bioFields))            $rules['umur']           = 'required|integer|min:0|max:150';
             if (in_array('alamat', $bioFields))          $rules['alamat_pemohon'] = 'required|string|max:500';
         } else {

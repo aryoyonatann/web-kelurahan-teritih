@@ -260,7 +260,8 @@ class PendudukController extends Controller
 
             // Pekerjaan sekarang bebas teks — pakai apa adanya dari file kalau diisi,
             // fallback ke "Wiraswasta" hanya kalau kolomnya kosong.
-            $pekerjaan = $get('pekerjaan') ?: 'Wiraswasta';
+            // Potong maksimal 50 karakter sesuai batas kolom VARCHAR(50).
+            $pekerjaan = mb_substr($get('pekerjaan') ?: 'Wiraswasta', 0, 50);
 
             try {
                 Penduduk::create([

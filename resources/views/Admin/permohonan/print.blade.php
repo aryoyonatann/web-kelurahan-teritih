@@ -149,7 +149,7 @@
     <div class="panel-body">
         <div class="info-box">
             <span style="font-size:16px">ℹ️</span>
-            <div>Isi kolom di bawah sebelum mencetak. <strong>Data ini tidak disimpan</strong> — hanya untuk tampilan cetak.</div>
+            <div>Isi kolom di bawah sebelum mencetak. <strong>Nomor surat akan disimpan</strong> — data lainnya hanya untuk tampilan cetak.</div>
         </div>
 
         {{-- PREVIEW DATA --}}
