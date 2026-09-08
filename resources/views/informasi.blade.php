@@ -85,33 +85,24 @@
     .pyr-tooltip .pdot{width:12px;height:12px;border-radius:3px;display:inline-block}
     @media(max-width:767px){.hbar-label{width:90px;font-size:12px}.chart-card{padding:20px 16px}.hbar-rank{display:none}}
 
-    /* ── PETA WILAYAH (gambar dengan lightbox) ── */
-    .peta-card{background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:box-shadow .25s}
+    /* ── PETA WILAYAH & FASILITAS ── */
+    .peta-card{background:white;border:1px solid var(--border);border-radius:16px;transition:box-shadow .25s}
     .peta-card:hover{box-shadow:0 8px 32px rgba(15,23,42,.08);border-color:#bfdbfe}
-    .peta-header{padding:18px 24px;display:flex;align-items:center;gap:12px;background:white;border-bottom:1px solid var(--border)}
+    .peta-header{padding:18px 24px;display:flex;align-items:center;gap:12px;background:white;border-bottom:1px solid var(--border);border-radius:16px 16px 0 0;flex-wrap:wrap}
     .peta-icon{width:38px;height:38px;border-radius:10px;background:#ecfdf5;color:#10b981;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
     .peta-info{flex:1;min-width:0}
     .peta-name{font-size:16px;font-weight:700;color:var(--navy);line-height:1.3}
     .peta-desc{font-size:12px;color:var(--muted);margin-top:2px}
-    .peta-hint{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;flex-shrink:0}
-    .peta-img-wrap{position:relative;cursor:zoom-in;overflow:hidden;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:240px}
-    .peta-img-wrap img{width:100%;height:auto;display:block;transition:transform .35s ease;max-width:100%}
-    .peta-img-wrap:hover img{transform:scale(1.015)}
-    .peta-img-overlay{position:absolute;inset:0;background:rgba(28,100,242,0);transition:background .25s;pointer-events:none}
-    .peta-img-wrap:hover .peta-img-overlay{background:rgba(28,100,242,.08)}
-    .peta-zoom-btn{position:absolute;top:14px;right:14px;background:rgba(15,23,42,.7);backdrop-filter:blur(8px);color:white;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .25s;pointer-events:none;font-family:inherit}
-    .peta-img-wrap:hover .peta-zoom-btn{opacity:1}
+
+    /* ── KARTU FASILITAS KLIK ── */
+    .fas-group-card{transition:box-shadow .2s, border-top-width .15s !important}
+    .fas-group-card:hover{transform:translateY(-1px)}
+    @keyframes fadeSlideDown {
+        from { opacity:0; transform:translateY(-6px); }
+        to   { opacity:1; transform:translateY(0); }
+    }
     .peta-empty{padding:60px 20px;text-align:center;color:var(--muted)}
     .peta-empty i{font-size:48px;color:#cbd5e1;display:block;margin-bottom:12px}
-
-    /* ── LIGHTBOX ── */
-    .lightbox{position:fixed;inset:0;background:rgba(8,15,30,.92);backdrop-filter:blur(8px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .25s}
-    .lightbox.show{display:flex;opacity:1}
-    .lightbox-content{position:relative;max-width:min(1400px,95vw);max-height:90vh;display:flex;flex-direction:column;align-items:center}
-    .lightbox-img{max-width:100%;max-height:82vh;width:auto;height:auto;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5);background:white}
-    .lightbox-caption{margin-top:16px;color:white;text-align:center;font-size:14px;font-weight:600;background:rgba(0,0,0,.4);padding:8px 20px;border-radius:20px;backdrop-filter:blur(4px)}
-    .lightbox-close{position:absolute;top:-50px;right:0;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;transition:all .18s;backdrop-filter:blur(8px)}
-    .lightbox-close:hover{background:rgba(255,255,255,.25);transform:scale(1.05)}
 
     .berita-header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:20px}
     .link-semua{font-size:14px;font-weight:600;color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:gap .18s}
@@ -149,9 +140,6 @@
         .big-stat-number{font-size:30px}.big-stat-icon{width:56px;height:56px;font-size:26px}
         .chart-area{flex-direction:column}
         .peta-header{padding:14px 16px}
-        .peta-hint{display:none}
-        .peta-zoom-btn{opacity:1;top:10px;right:10px;padding:6px 10px;font-size:11px}
-        .lightbox-close{top:-46px;width:38px;height:38px;font-size:20px}
     }
     </style>
 </head>
@@ -695,19 +683,38 @@
         ];
     @endphp
     <div class="sec-title mb-1"><i class="bi bi-building" style="color:#10b981"></i> Fasilitas Kelurahan</div>
-    <div class="sec-sub">Sarana dan prasarana umum di Kelurahan Teritih</div>
+    <div class="sec-sub">Sarana dan prasarana umum di Kelurahan Teritih — klik kartu untuk lihat daftar lokasi</div>
 
-    <div class="row g-3 mb-5">
+    @php $fasPerKat = collect($fasilitasLokasi ?? [])->groupBy('kategori'); @endphp
+
+    <div class="row g-3 mb-2">
         @foreach($fasGroups as $fg)
+        @php
+            $katKey  = strtolower($fg['title']); // ibadah / pendidikan / kesehatan / olahraga
+            $fasList = $fasPerKat[$katKey] ?? collect();
+            $fasCount = $fasList->count();
+        @endphp
         <div class="col-md-6 col-lg-3">
-            <div class="chart-card" style="padding:20px;height:100%;border-top:3px solid {{ $fg['color'] }}" onmouseenter="this.style.boxShadow='0 8px 24px {{ $fg['color'] }}15'" onmouseleave="this.style.boxShadow=''">
+            {{-- Kartu --}}
+            <div class="chart-card fas-group-card" id="card-{{ $katKey }}"
+                style="padding:20px;height:100%;border-top:3px solid {{ $fg['color'] }};cursor:{{ $fasCount > 0 ? 'pointer' : 'default' }}"
+                onclick="{{ $fasCount > 0 ? 'toggleFasDetail(\''.e($katKey).'\', \''.e($fg['color']).'\')' : '' }}"
+                onmouseenter="this.style.boxShadow='0 8px 24px {{ $fg['color'] }}22'"
+                onmouseleave="this.style.boxShadow=''">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-                    <div style="width:32px;height:32px;border-radius:8px;background:{{ $fg['bg'] }};display:flex;align-items:center;justify-content:center;color:{{ $fg['color'] }}"><i class="bi {{ $fg['icon'] }}"></i></div>
-                    <div style="font-size:13px;font-weight:700;color:{{ $fg['color'] }};text-transform:uppercase;letter-spacing:.04em">{{ $fg['title'] }}</div>
+                    <div style="width:32px;height:32px;border-radius:8px;background:{{ $fg['bg'] }};display:flex;align-items:center;justify-content:center;color:{{ $fg['color'] }}">
+                        <i class="bi {{ $fg['icon'] }}"></i>
+                    </div>
+                    <div style="font-size:13px;font-weight:700;color:{{ $fg['color'] }};text-transform:uppercase;letter-spacing:.04em;flex:1">{{ $fg['title'] }}</div>
+                    @if($fasCount > 0)
+                    <div id="chevron-{{ $katKey }}" style="color:{{ $fg['color'] }};font-size:13px;transition:transform .25s">
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    @endif
                 </div>
                 @foreach($fg['items'] as $fi)
                 @php
-                    $fval = $v($fi['key']);
+                    $fval   = $v($fi['key']);
                     $flabel = optional($s[$fi['key']] ?? null)->label ?? $fi['key'];
                 @endphp
                 <div style="display:flex;align-items:center;gap:10px;padding:8px 0;{{ !$loop->last ? 'border-bottom:1px solid #f1f5f9' : '' }}">
@@ -716,56 +723,121 @@
                     <span style="font-size:18px;font-weight:800;color:{{ $fg['color'] }}">{{ $fval }}</span>
                 </div>
                 @endforeach
+                @if($fasCount > 0)
+                <div style="margin-top:12px;padding-top:10px;border-top:1px dashed #e2e8f0;font-size:11px;color:{{ $fg['color'] }};font-weight:600;display:flex;align-items:center;gap:4px">
+                    <i class="bi bi-geo-alt-fill" style="font-size:10px"></i>
+                    {{ $fasCount }} lokasi terdaftar &nbsp;·&nbsp; Lihat detail
+                </div>
+                @endif
             </div>
         </div>
         @endforeach
     </div>
 
-    <div class="sec-title mb-1"><i class="bi bi-geo-alt-fill" style="color:var(--red)"></i> Peta Wilayah</div>
-    <div class="sec-sub">Pembagian lingkungan, batas wilayah, dan fasilitas umum Kelurahan Teritih.</div>
+    {{-- Panel expand daftar fasilitas per kategori --}}
+    @foreach($fasGroups as $fg)
+    @php
+        $katKey  = strtolower($fg['title']);
+        $fasList = $fasPerKat[$katKey] ?? collect();
+    @endphp
+    @if($fasList->count() > 0)
+    <div id="detail-{{ $katKey }}"
+         style="display:none;margin-bottom:16px;border-radius:14px;border:1.5px solid {{ $fg['color'] }}33;overflow:hidden;background:white;animation:fadeSlideDown .2s ease">
+        {{-- Header panel --}}
+        <div style="padding:14px 20px;background:{{ $fg['bg'] }};display:flex;align-items:center;gap:10px;border-bottom:1px solid {{ $fg['color'] }}22">
+            <div style="width:30px;height:30px;border-radius:8px;background:{{ $fg['color'] }}22;display:flex;align-items:center;justify-content:center;color:{{ $fg['color'] }}">
+                <i class="bi {{ $fg['icon'] }}"></i>
+            </div>
+            <div style="flex:1">
+                <div style="font-size:13px;font-weight:700;color:{{ $fg['color'] }}">{{ $fg['title'] }}</div>
+                <div style="font-size:11px;color:var(--muted)">{{ $fasList->count() }} lokasi terdaftar</div>
+            </div>
+            <button type="button" onclick="toggleFasDetail('{{ $katKey }}', '{{ $fg['color'] }}')"
+                style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px;font-size:13px">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        {{-- Daftar --}}
+        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
+            @foreach($fasList as $fas)
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fafafa;transition:all .15s"
+                 onmouseover="this.style.borderColor='{{ $fg['color'] }}44';this.style.background='white'"
+                 onmouseout="this.style.borderColor='var(--border)';this.style.background='#fafafa'">
+                <div style="width:36px;height:36px;border-radius:10px;background:{{ $fg['color'] }}15;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
+                    {{ $fg['items'][0]['icon'] ?? '📍' }}
+                </div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                        {{ $fas['nama'] ?? '-' }}
+                    </div>
+                    @if(!empty($fas['alamat']))
+                    <div style="font-size:11.5px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:3px">
+                        <i class="bi bi-geo-alt" style="font-size:10px"></i> {{ $fas['alamat'] }}
+                    </div>
+                    @endif
+                </div>
+                @if(!empty($fas['link_gmaps']))
+                <a href="{{ $fas['link_gmaps'] }}" target="_blank" rel="noopener"
+                   style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:#eff6ff;color:var(--blue);border:1.5px solid #bfdbfe;font-size:12px;font-weight:600;text-decoration:none;flex-shrink:0;transition:all .15s"
+                   onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+                    <i class="bi bi-map-fill"></i> Maps
+                </a>
+                @else
+                <span style="font-size:11px;color:#cbd5e1;font-style:italic;flex-shrink:0">Belum ada link</span>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+    @endforeach
 
-    @php $petaUrl = asset('images/PETA-TERITIH.png'); @endphp
+            <div class="sec-title mb-1"><i class="bi bi-geo-alt-fill" style="color:var(--red)"></i> Peta Wilayah</div>
+    <div class="sec-sub">Peta wilayah dan batas administratif Kelurahan Teritih.</div>
+
+    @php
+        $batas   = $batasWilayah ?? ['utara'=>'Kec. Kasemen','selatan'=>'Kel. Kepuren & Kalodran','barat'=>'Kec. Cipocokjaya','timur'=>'Kabupaten Serang'];
+        $petaUrl = asset('images/PETA-TERITIH.png');
+    @endphp
 
     <div class="peta-card mb-5">
         <div class="peta-header">
-            <div class="peta-icon"><i class="bi bi-map-fill"></i></div>
+            <div class="peta-icon" style="background:#fef3c7;color:#d97706"><i class="bi bi-image-fill"></i></div>
             <div class="peta-info">
                 <div class="peta-name">Peta Wilayah Kelurahan Teritih</div>
-                <div class="peta-desc">Pembagian lingkungan, batas wilayah, dan fasilitas umum</div>
+                <div class="peta-desc">Pembagian lingkungan dan batas wilayah &nbsp;·&nbsp; 4,33 km²</div>
             </div>
-            <div class="peta-hint"><i class="bi bi-zoom-in"></i> Klik gambar untuk perbesar</div>
+            <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;flex-shrink:0">
+                <i class="bi bi-zoom-in"></i> Klik untuk perbesar
+            </div>
         </div>
 
-        <div style="display:flex;gap:0;flex-wrap:wrap">
-            <div style="flex:0 0 auto;width:min(420px,100%);border-right:1px solid var(--border);cursor:zoom-in;overflow:hidden;position:relative;background:#f8fafc"
-                 onclick="openLightbox('{{ $petaUrl }}', 'Peta Wilayah Kelurahan Teritih')"
-                 title="Klik untuk perbesar">
-                <img src="{{ $petaUrl }}"
-                     alt="Peta Wilayah Kelurahan Teritih"
-                     loading="lazy"
-                     style="width:100%;height:100%;object-fit:contain;max-height:600px;display:block;transition:transform .35s ease"
-                     onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'"
+        <div style="display:flex;flex-wrap:wrap">
+            <div style="flex:0 0 auto;width:min(480px,100%);border-right:1px solid var(--border);cursor:zoom-in;overflow:hidden;position:relative;background:#f8fafc"
+                 onclick="openPetaLightbox()" title="Klik untuk perbesar">
+                <img src="{{ $petaUrl }}" alt="Peta Wilayah Kelurahan Teritih" loading="lazy"
+                     id="petaGambarImg"
+                     style="width:100%;height:100%;object-fit:contain;max-height:500px;display:block;transition:transform .3s"
+                     onmouseover="this.style.transform='scale(1.02)'"
+                     onmouseout="this.style.transform='scale(1)'"
                      onerror="this.closest('div').innerHTML='<div style=\'padding:60px 20px;text-align:center;color:#94a3b8\'><i class=\'bi bi-map\' style=\'font-size:48px;display:block;margin-bottom:12px\'></i>File peta belum tersedia</div>'">
-                <div style="position:absolute;bottom:12px;right:12px;background:rgba(15,23,42,.7);backdrop-filter:blur(8px);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;pointer-events:none">
+                <div style="position:absolute;bottom:12px;right:12px;background:rgba(15,23,42,.7);backdrop-filter:blur(8px);color:white;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;pointer-events:none">
                     <i class="bi bi-arrows-fullscreen"></i> Perbesar
-                </div>
-                <div style="position:absolute;bottom:12px;left:12px;background:rgba(15,23,42,.75);backdrop-filter:blur(8px);color:white;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;pointer-events:none">
-                    <i class="bi bi-map-fill" style="color:#60a5fa"></i> 4,33 km² &nbsp;·&nbsp; 433 Ha
                 </div>
             </div>
 
-            <div style="flex:1;min-width:220px;padding:24px 28px;display:flex;flex-direction:column;gap:20px">
+            <div style="flex:1;min-width:200px;padding:24px 28px;display:flex;flex-direction:column;gap:18px">
                 <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+                    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px">
                         <i class="bi bi-info-circle-fill" style="color:var(--blue)"></i> Informasi Wilayah
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:10px">
-                        @foreach([['bi-geo-alt','Kecamatan','Walantaka'],['bi-building','Kota/Kab','Kota Serang'],['bi-globe2','Provinsi','Banten'],['bi-mailbox2','Kode Pos','42183']] as [$icon,$label,$val])
-                        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)">
-                            <i class="bi {{ $icon }}" style="color:var(--blue);font-size:15px;width:18px;text-align:center;flex-shrink:0"></i>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                        @foreach([['bi-geo-alt','Kecamatan','Walantaka'],['bi-building','Kota/Kab','Kota Serang'],['bi-globe2','Provinsi','Banten'],['bi-mailbox2','Kode Pos','42183']] as [$ic,$lb,$vl])
+                        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg);border-radius:9px;border:1px solid var(--border)">
+                            <i class="bi {{ $ic }}" style="color:var(--blue);font-size:14px;width:16px;text-align:center;flex-shrink:0"></i>
                             <div>
-                                <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">{{ $label }}</div>
-                                <div style="font-size:13px;font-weight:700;color:var(--navy)">{{ $val }}</div>
+                                <div style="font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">{{ $lb }}</div>
+                                <div style="font-size:13px;font-weight:700;color:var(--navy)">{{ $vl }}</div>
                             </div>
                         </div>
                         @endforeach
@@ -773,14 +845,14 @@
                 </div>
 
                 <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+                    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px">
                         <i class="bi bi-layers-fill" style="color:#a855f7"></i> Batas Wilayah
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:8px">
-                        @foreach([['Utara','Kec. Kasemen'],['Selatan','Kelurahan Kepuren & Kalodran'],['Barat','Kec. Cipocokjaya'],['Timur','Kabupaten Serang']] as [$arah,$batas])
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
-                            <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ $arah }}</span>
-                            <span style="font-size:12px;font-weight:700;color:var(--navy)">{{ $batas }}</span>
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                        @foreach(['utara'=>'⬆️','selatan'=>'⬇️','barat'=>'⬅️','timur'=>'➡️'] as $arah => $ikon)
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+                            <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ $ikon }} {{ ucfirst($arah) }}</span>
+                            <span style="font-size:12px;font-weight:700;color:var(--navy)">{{ $batas[$arah] ?? '-' }}</span>
                         </div>
                         @endforeach
                     </div>
@@ -795,340 +867,87 @@
         </div>
     </div>
 
-</div>
-
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)" role="dialog" aria-modal="true" aria-label="Pratinjau peta">
-    <div class="lightbox-content" onclick="event.stopPropagation()">
-        <button type="button" class="lightbox-close" onclick="closeLightbox()" aria-label="Tutup">
-            <i class="bi bi-x-lg"></i>
-        </button>
-        <img src="" alt="" class="lightbox-img" id="lightboxImg">
-        <div class="lightbox-caption" id="lightboxCaption"></div>
+    {{-- Lightbox --}}
+    <div id="petaLightbox" onclick="closePetaLightbox()"
+         style="display:none;position:fixed;inset:0;background:rgba(8,15,30,.92);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;padding:20px">
+        <div onclick="event.stopPropagation()" style="position:relative;max-width:min(1400px,95vw);max-height:90vh">
+            <button onclick="closePetaLightbox()"
+                style="position:absolute;top:-48px;right:0;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <img id="petaLightboxImg" src="" alt="Peta Wilayah" style="max-width:100%;max-height:85vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+        </div>
     </div>
-</div>
 
 @include('partials.footer')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<div id="pyrTip" style="position:fixed;background:white;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:99999;box-shadow:0 6px 20px rgba(0,0,0,.12);font-family:'Plus Jakarta Sans',sans-serif;max-width:200px"></div>
 <script>
-// ── Lightbox untuk peta ──────────────────────────────────────────
-function openLightbox(src, caption) {
-    const box = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImg');
-    const cap = document.getElementById('lightboxCaption');
-    img.src = src; img.alt = caption; cap.textContent = caption;
-    box.classList.add('show');
+// ── TOGGLE DAFTAR FASILITAS PER KATEGORI ───────────────────────
+const openKat = {};
+
+function toggleFasDetail(kat, color) {
+    const panel   = document.getElementById('detail-' + kat);
+    const chevron = document.getElementById('chevron-' + kat);
+    const card    = document.getElementById('card-' + kat);
+    if (!panel) return;
+
+    const isOpen = openKat[kat];
+
+    if (isOpen) {
+        // Tutup
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+            panel.style.transition  = 'max-height .25s ease, opacity .2s ease';
+            panel.style.maxHeight   = '0';
+            panel.style.opacity     = '0';
+            panel.style.overflow    = 'hidden';
+        });
+        setTimeout(() => { panel.style.display = 'none'; panel.style.maxHeight = ''; panel.style.opacity = ''; }, 260);
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        if (card)    card.style.borderTopColor = color;
+        openKat[kat] = false;
+    } else {
+        // Buka — tutup yang lain dulu
+        Object.keys(openKat).forEach(function(k) {
+            if (openKat[k] && k !== kat) toggleFasDetail(k, '');
+        });
+
+        panel.style.display    = 'block';
+        panel.style.maxHeight  = '0';
+        panel.style.opacity    = '0';
+        panel.style.overflow   = 'hidden';
+        requestAnimationFrame(() => {
+            panel.style.transition = 'max-height .3s ease, opacity .25s ease';
+            panel.style.maxHeight  = panel.scrollHeight + 'px';
+            panel.style.opacity    = '1';
+        });
+        setTimeout(() => { panel.style.maxHeight = 'none'; panel.style.overflow = ''; }, 310);
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        if (card)    card.style.borderTopWidth = '3px';
+        openKat[kat] = true;
+
+        // Scroll ke panel
+        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+    }
+}
+
+// ── LIGHTBOX PETA ───────────────────────────────────────────────
+function openPetaLightbox() {
+    const lb  = document.getElementById('petaLightbox');
+    const img = document.getElementById('petaLightboxImg');
+    const src = document.getElementById('petaGambarImg')?.src;
+    if (src) img.src = src;
+    lb.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
-function closeLightbox() {
-    const box = document.getElementById('lightbox');
-    box.classList.remove('show');
+function closePetaLightbox() {
+    document.getElementById('petaLightbox').style.display = 'none';
     document.body.style.overflow = '';
-    setTimeout(() => { document.getElementById('lightboxImg').src = ''; }, 250);
 }
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && document.getElementById('lightbox').classList.contains('show')) closeLightbox();
-});
-
-// ── Line Chart Hover ──────────────────────────────────────────────
-(function(){
-    const tip       = document.getElementById('lineTip');
-    if (!tip) return;
-    const container = tip.parentElement;
-    const svg       = container.querySelector('svg');
-    const dots      = document.querySelectorAll('.line-dot');
-
-    // Sembunyikan dots default, tampilkan saat hover SVG
-    svg.addEventListener('mouseenter', () => dots.forEach(d => d.style.opacity = '1'));
-    svg.addEventListener('mouseleave', () => {
-        dots.forEach(d => { d.style.opacity = '0'; d.setAttribute('r','4'); d.setAttribute('stroke-width','2'); });
-        tip.style.opacity = '0';
-    });
-
-    dots.forEach(dot => {
-        dot.addEventListener('mouseenter', function () {
-            document.getElementById('lineTipYear').textContent = this.dataset.year;
-            document.getElementById('lineTipVal').textContent  = this.dataset.val;
-            this.setAttribute('r', '7');
-            this.setAttribute('stroke-width', '3');
-
-            // Posisi tooltip: hitung dari posisi dot di SVG relatif ke container
-            const svgRect       = svg.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            const cx            = parseFloat(this.getAttribute('cx'));
-            const cy            = parseFloat(this.getAttribute('cy'));
-
-            // Konversi koordinat SVG viewBox ke pixel aktual
-            const scaleX = svgRect.width  / 700;   // viewBox width = 700
-            const scaleY = svgRect.height / 170;   // viewBox height = 170
-            const dotX   = (svgRect.left - containerRect.left) + cx * scaleX;
-            const dotY   = (svgRect.top  - containerRect.top)  + cy * scaleY;
-
-            // Ukuran tooltip estimasi
-            const tipW = 80;
-            const tipH = 44;
-            const gap  = 10;
-
-            // Default: tooltip di atas dot, center-aligned
-            let x = dotX - tipW / 2;
-            let y = dotY - tipH - gap;
-
-            // Jika keluar kanan — geser ke kiri
-            if (x + tipW > containerRect.width - 8) {
-                x = containerRect.width - tipW - 8;
-            }
-            // Jika keluar kiri
-            if (x < 8) x = 8;
-            // Jika keluar atas — tampilkan di bawah dot
-            if (y < 4) y = dotY + gap;
-
-            tip.style.left    = x + 'px';
-            tip.style.top     = y + 'px';
-            tip.style.opacity = '1';
-        });
-
-        dot.addEventListener('mouseleave', function () {
-            tip.style.opacity = '0';
-            this.setAttribute('r', '4');
-            this.setAttribute('stroke-width', '2');
-        });
-    });
-})();
-
-// ── Piramida Tooltip (smooth) ─────────────────────────────────────
-(function(){
-    const tip=document.getElementById('pyrTip');
-    if(!tip)return;
-    const allBars=document.querySelectorAll('.pyr-bar');
-    document.querySelectorAll('.pyr-bar').forEach(bar=>{
-        bar.addEventListener('mouseenter',function(){
-            const label=this.dataset.label;
-            const laki=parseInt(this.dataset.laki||0);
-            const prmp=parseInt(this.dataset.perempuan||0);
-            const fill=this.getAttribute('fill')||'';
-            const isLaki=fill.includes('60a5fa');
-            const gender=isLaki?'Laki-Laki':'Perempuan';
-            const val=isLaki?laki:prmp;
-            tip.innerHTML=`<div style="font-weight:700;color:#0d1b3e;margin-bottom:4px">${label} Tahun</div><div style="font-size:13px">${gender}: <strong>${val.toLocaleString('id-ID')}</strong> jiwa</div>`;
-            tip.style.opacity='1';
-            allBars.forEach(b=>{b.style.opacity=b===this?'1':'0.3';});
-        });
-        bar.addEventListener('mousemove',function(e){
-            tip.style.left=(e.clientX+12)+'px';
-            tip.style.top=(e.clientY+12)+'px';
-        });
-        bar.addEventListener('mouseleave',function(){
-            tip.style.opacity='0';
-            allBars.forEach(b=>{b.style.opacity='0.85';});
-        });
-    });
-})();
-
-// ── Donut Chart Agama ────────────────────────────────────────────
-(function(){
-    const data=[
-        @foreach($agamaList as $ag)
-        {value:{{$ag['jiwa']}},color:'{{$ag['color']}}',label:'{{addslashes($ag['label'])}}',jiwa:'{{number_format($ag['jiwa'])}}',pct:'{{$pa($ag['jiwa'])}}'},
-        @endforeach
-    ];
-    const cx=120,cy=120,r=88,strokeW=34,circ=2*Math.PI*r;
-    const total=data.reduce((s,d)=>s+d.value,0);
-    const svg=document.getElementById('donutChart'),tip=document.getElementById('donutTooltip'),ctr=document.getElementById('donutCenter');
-    const totalFmt='{{number_format($totalAgama)}}';
-    if(total===0){svg.innerHTML=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="${strokeW}"/>`;return;}
-    let html=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f1f5f9" stroke-width="${strokeW}"/>`,off=0;
-    data.forEach((d,i)=>{
-        const dash=(d.value/total)*circ,gap=circ-dash,rot=(off/total)*360-90;
-        html+=`<circle id="arc${i}" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${strokeW}" stroke-dasharray="${dash.toFixed(3)} ${gap.toFixed(3)}" stroke-linecap="butt" transform="rotate(${rot.toFixed(3)},${cx},${cy})" style="cursor:pointer;transition:stroke-width .15s,opacity .15s"/>`;
-        off+=d.value;
-    });
-    html+=`<circle cx="${cx}" cy="${cy}" r="${r-strokeW/2-3}" fill="white"/>`;
-    svg.innerHTML=html;
-    const resetAll=()=>{data.forEach((_,i)=>{const el=svg.querySelector('#arc'+i);if(el){el.style.opacity='1';el.style.strokeWidth=strokeW+'px';}});ctr.innerHTML=`<div class="donut-total">${totalFmt}</div><div class="donut-label">Total<br>Jiwa</div>`;if(tip)tip.style.opacity='0';};
-    const activateIdx=(i)=>{const d=data[i];data.forEach((_,j)=>{const el=svg.querySelector('#arc'+j);if(el){el.style.opacity=j===i?'1':'0.3';el.style.strokeWidth=(j===i?strokeW+7:strokeW)+'px';}});ctr.innerHTML=`<div style="font-size:20px;font-weight:800;color:${d.color};line-height:1">${d.jiwa}</div><div style="font-size:13px;font-weight:700;color:${d.color}">${d.pct}%</div><div style="font-size:10px;color:#64748b;font-weight:600;max-width:80px;text-align:center;line-height:1.3;margin-top:2px">${d.label}</div>`;if(tip){tip.innerHTML=`<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${d.color};margin-right:6px;vertical-align:middle"></span>${d.label}: ${d.jiwa} jiwa (${d.pct}%)`;tip.style.opacity='1';}};
-    data.forEach((d,i)=>{const el=svg.querySelector('#arc'+i);if(!el)return;el.addEventListener('mouseenter',()=>activateIdx(i));el.addEventListener('mouseleave',resetAll);el.addEventListener('click',()=>activateIdx(i));el.addEventListener('touchstart',(e)=>{e.preventDefault();activateIdx(i);},{passive:false});});
-    document.querySelectorAll('.legend-row').forEach((row,i)=>{row.addEventListener('mouseenter',()=>{row.style.background='#f1f5f9';activateIdx(i);});row.addEventListener('mouseleave',()=>{row.style.background='';resetAll();});row.addEventListener('click',()=>activateIdx(i));});
-})();
-
-// ── GSAP Animations ──────────────────────────────────────────────
-gsap.registerPlugin(ScrollTrigger);
-
-// Konfigurasi global ScrollTrigger agar lebih smooth
-ScrollTrigger.config({ limitCallbacks: true, ignoreMobileResize: true });
-
-// Helper onScroll yang lebih aman — pakai requestAnimationFrame agar tidak blocking
-function onScroll(trigger, fn) {
-    if (!trigger) return;
-    ScrollTrigger.create({
-        trigger: trigger,
-        start: 'top 88%',
-        once: true,
-        onEnter: () => requestAnimationFrame(fn)
-    });
-}
-
-// Tunggu sampai semua resource load (font, gambar) baru jalankan semua animasi
-// Ini mencegah layout shift yang menyebabkan ScrollTrigger salah hitung posisi
-window.addEventListener('load', function () {
-
-    // Refresh ScrollTrigger setelah layout stabil
-    ScrollTrigger.refresh();
-
-    // ── Hero (langsung, tanpa scroll) ──────────────────────────
-    gsap.from('.info-hero', { opacity: 0, y: 30, duration: 1.2, ease: 'power3.out', clearProps: 'all' });
-    gsap.from('.hero-badge',  { opacity: 0, y: 15, duration: 0.8, delay: 0.3, ease: 'back.out(1.5)', clearProps: 'all' });
-    gsap.from('.hero-title',  { opacity: 0, y: 20, duration: 1.0, delay: 0.4, ease: 'power3.out', clearProps: 'all' });
-    gsap.from('.hero-desc',   { opacity: 0, y: 15, duration: 0.9, delay: 0.6, ease: 'power2.out', clearProps: 'all' });
-    gsap.from('.hero-emblem', { opacity: 0, scale: 0.6, duration: 1.2, delay: 0.5, ease: 'back.out(1.7)', clearProps: 'all' });
-
-    // ── Line chart draw ─────────────────────────────────────────
-    (function () {
-        const el = document.querySelector('#lineChart path[stroke="#22d3ee"]');
-        if (!el || !el.getTotalLength) return;
-        const len = el.getTotalLength();
-        gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
-        const clipRect = document.getElementById('areaClipRect');
-        gsap.to(el, { strokeDashoffset: 0, duration: 3.5, ease: 'power2.inOut', delay: 0.6 });
-        if (clipRect) gsap.to(clipRect, { attr: { width: 700 }, duration: 3.5, ease: 'power2.inOut', delay: 0.6 });
-        // Tampilkan dots setelah line selesai
-        setTimeout(() => {
-            document.querySelectorAll('.line-dot').forEach((d, i) => {
-                gsap.to(d, { opacity: 1, duration: 0.4, delay: i * 0.12, ease: 'power2.out' });
-            });
-        }, 3800);
-    })();
-
-    // ── Stat cards (KK/RT/RW) ─────────────────────────────────
-    (function () {
-        const cards = document.querySelectorAll('.big-stat-card');
-        if (!cards.length) return;
-        gsap.set(cards, { opacity: 0, y: 25, force3D: true });
-        onScroll(cards[0], () => gsap.to(cards, { opacity: 1, y: 0, duration: 1.0, stagger: 0.2, ease: 'power2.out', clearProps: 'transform' }));
-    })();
-
-    // ── Gender cards ───────────────────────────────────────────
-    (function () {
-        const cards = document.querySelectorAll('.gender-side-card');
-        if (!cards.length) return;
-        gsap.set(cards, { opacity: 0, y: 30, force3D: true });
-        onScroll('.demo-card', () => gsap.to(cards, { opacity: 1, y: 0, duration: 1.1, stagger: 0.2, ease: 'power2.out', clearProps: 'transform' }));
-    })();
-
-    // ── Piramida bars ─────────────────────────────────────────
-    (function () {
-        const bars = document.querySelectorAll('.pyr-bar');
-        if (!bars.length) return;
-        const origData = [];
-        bars.forEach(bar => {
-            origData.push({ w: bar.getAttribute('width'), x: bar.getAttribute('x') });
-            const fill = bar.getAttribute('fill') || '';
-            if (fill.includes('60a5fa')) {
-                bar.setAttribute('x', parseFloat(bar.getAttribute('x')) + parseFloat(bar.getAttribute('width')));
-            }
-            bar.setAttribute('width', '0');
-        });
-        onScroll('#pyrSvg', () => {
-            bars.forEach((bar, i) => {
-                gsap.to(bar, { attr: { width: origData[i].w, x: origData[i].x }, duration: 1.8, delay: i * 0.04, ease: 'power2.out' });
-            });
-        });
-    })();
-
-    // ── Donut chart ────────────────────────────────────────────
-    (function () {
-        const el = document.getElementById('donutChart');
-        if (!el) return;
-        gsap.set(el, { scale: 0.7, opacity: 0, transformOrigin: 'center center', force3D: true });
-        onScroll(el, () => gsap.to(el, { scale: 1, opacity: 1, duration: 1.4, ease: 'back.out(1.4)', clearProps: 'transform' }));
-    })();
-
-    // ── Agama legend cards ─────────────────────────────────────
-    (function () {
-        const rows = document.querySelectorAll('.legend-row');
-        if (!rows.length) return;
-        gsap.set(rows, { opacity: 0, x: 20, force3D: true });
-        onScroll(rows[0], () => gsap.to(rows, { opacity: 1, x: 0, duration: 0.8, stagger: 0.08, ease: 'power2.out', clearProps: 'transform' }));
-    })();
-
-    // ── Horizontal bars (semua .chart-card) ───────────────────
-    document.querySelectorAll('.chart-card').forEach(card => {
-        const bars = card.querySelectorAll('.hbar-fill');
-        if (!bars.length) return;
-        const widths = [];
-        bars.forEach(bar => {
-            widths.push(bar.style.width);
-            bar.style.width = '0';
-            bar.style.transition = 'none';
-        });
-        onScroll(card, () => {
-            bars.forEach((bar, i) => {
-                gsap.to(bar, { width: widths[i], duration: 1.8, delay: i * 0.09, ease: 'power2.out' });
-            });
-        });
-    });
-
-    // ── Counter count-up ───────────────────────────────────────
-    document.querySelectorAll('.big-stat-number,.gs-num').forEach(el => {
-        const target = parseInt(el.textContent.replace(/\D/g, '')) || 0;
-        if (!target) return;
-        const originalText = el.textContent;
-        el.textContent = '0';
-        onScroll(el, () => {
-            const obj = { val: 0 };
-            gsap.to(obj, {
-                val: target, duration: 2.5, ease: 'power2.out',
-                onUpdate: () => { el.textContent = Math.round(obj.val).toLocaleString('id-ID'); },
-                onComplete: () => { el.textContent = originalText; }
-            });
-        });
-    });
-
-    // ── Section titles ─────────────────────────────────────────
-    document.querySelectorAll('.sec-title').forEach(t => {
-        gsap.set(t, { opacity: 0, x: -20, force3D: true });
-        onScroll(t, () => gsap.to(t, { opacity: 1, x: 0, duration: 0.9, ease: 'power2.out', clearProps: 'transform' }));
-    });
-    document.querySelectorAll('.sec-sub').forEach(t => {
-        gsap.set(t, { opacity: 0, x: -12, force3D: true });
-        onScroll(t, () => gsap.to(t, { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out', clearProps: 'transform' }));
-    });
-
-    // ── Fasilitas cards ────────────────────────────────────────
-    (function () {
-        const cards = document.querySelectorAll('.col-md-6.col-lg-3 .chart-card');
-        if (!cards.length) return;
-        gsap.set(cards, { opacity: 0, y: 25, force3D: true });
-        onScroll(cards[0], () => gsap.to(cards, { opacity: 1, y: 0, duration: 1.0, stagger: 0.15, ease: 'power2.out', clearProps: 'transform' }));
-    })();
-
-    // ── Peta ───────────────────────────────────────────────────
-    (function () {
-        const el = document.querySelector('.peta-card');
-        if (!el) return;
-        gsap.set(el, { opacity: 0, y: 25, force3D: true });
-        onScroll(el, () => gsap.to(el, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', clearProps: 'transform' }));
-    })();
-
-    // ── Berita cards ───────────────────────────────────────────
-    (function () {
-        const grid = document.getElementById('beritaGrid');
-        if (!grid) return;
-        const cards = grid.querySelectorAll('.berita-overlay-card');
-        if (!cards.length) return;
-        gsap.set(cards, { opacity: 0, y: 35, force3D: true });
-        onScroll(grid, () => gsap.to(cards, { opacity: 1, y: 0, duration: 1.1, stagger: 0.18, ease: 'power3.out', clearProps: 'transform' }));
-    })();
-
-}); // end window.load
-
-// Scroll to hash on load
-window.addEventListener('load', () => {
-    if (window.location.hash) {
-        const el = document.querySelector(window.location.hash);
-        if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 400);
-    }
+    if (e.key === 'Escape') closePetaLightbox();
 });
 </script>
 </body>

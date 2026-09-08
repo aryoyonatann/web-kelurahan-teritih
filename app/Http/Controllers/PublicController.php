@@ -26,8 +26,18 @@ class PublicController extends Controller
 
     public function demografi()
     {
-        $statistik = \App\Models\StatistikDemografi::withPendudukOverride();
-        return view('informasi', compact('statistik'));
+        $statistik       = \App\Models\StatistikDemografi::withPendudukOverride();
+        $fasilitasLokasi = \App\Http\Controllers\Admin\PengaturanController::getFasilitasLokasi();
+        $fasKategori     = \App\Http\Controllers\Admin\PengaturanController::getFasKategori();
+        $batasWilayah    = \App\Http\Controllers\Admin\PengaturanController::getBatasWilayah();
+
+        return response()
+            ->view('informasi', compact(
+                'statistik', 'fasilitasLokasi', 'fasKategori', 'batasWilayah'
+            ))
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     public function berita(Request $request)

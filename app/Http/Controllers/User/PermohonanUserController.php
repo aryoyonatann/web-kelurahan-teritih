@@ -9,6 +9,7 @@ use App\Models\Persyaratan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class PermohonanUserController extends Controller
 {
@@ -135,6 +136,38 @@ class PermohonanUserController extends Controller
         return redirect()
             ->route('user.permohonan.index')
             ->with('success', 'Permohonan berhasil dihapus.');
+    }
+
+    /**
+     * API endpoint untuk notifikasi user — dipanggil AJAX polling dari navbar.
+     * Mengembalikan daftar permohonan milik user yang statusnya 'siap_diambil'.
+     */
+    public function notifikasiStatus()
+    {
+        $userId = Auth::id();
+
+        $siapDiambil = PermohonanSurat::with(['jenisSurat', 'approval'])
+            ->where('id_user', $userId)
+            ->whereHas('approval', fn($q) => $q->where('status', \App\Models\Approval::STATUS_SIAP_DIAMBIL))
+            ->latest('tanggal_pengajuan')
+            ->get();
+
+        $notifs = $siapDiambil->map(function ($p) {
+            return [
+                'id'      => $p->id_permohonan,
+                'surat'   => $p->jenisSurat->nama_surat ?? 'Surat',
+                'message' => 'Surat Anda sudah siap diambil di kantor kelurahan!',
+                'time'    => optional($p->approval)->tanggal_siap_diambil
+                    ? \Carbon\Carbon::parse($p->approval->tanggal_siap_diambil)->diffForHumans()
+                    : '-',
+                'url'     => route('user.permohonan.show', $p->id_permohonan),
+            ];
+        });
+
+        return response()->json([
+            'count' => $notifs->count(),
+            'items' => $notifs->values(),
+        ]);
     }
 
     private function storeSuratTemplate(Request $request, JenisSurat $jenisSurat)

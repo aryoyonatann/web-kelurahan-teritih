@@ -71,7 +71,10 @@
     .pill-pending  { background:var(--warning-light);color:#92400e; } .pill-pending .pill-dot  { background:var(--warning);animation:pulse-warn 1.5s infinite; }
     .pill-approved { background:var(--success-light);color:#064e3b; } .pill-approved .pill-dot { background:var(--success); }
     .pill-rejected { background:var(--danger-light); color:#7f1d1d; } .pill-rejected .pill-dot { background:var(--danger); }
-    @keyframes pulse-warn { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+    .pill-siap     { background:#fff7ed;color:#9a3412; } .pill-siap .pill-dot { background:#f97316;animation:pulse-orange 1.5s infinite; }
+    .pill-selesai  { background:#f0fdf4;color:#14532d; } .pill-selesai .pill-dot { background:#16a34a; }
+    @keyframes pulse-warn   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+    @keyframes pulse-orange { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 
     .btn-print-main {
         display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:var(--radius-sm);
@@ -155,6 +158,8 @@
     .btn-approve-full { background:var(--success-light);color:#047857; } .btn-approve-full:hover { background:#a7f3d0; }
     .btn-reject-full  { background:var(--danger-light); color:#b91c1c; } .btn-reject-full:hover  { background:#fecaca; }
     .btn-print-full   { background:var(--purple-light); color:var(--purple);text-decoration:none;display:flex; } .btn-print-full:hover { background:#ddd6fe; }
+    .btn-siap-full    { background:#fff7ed;color:#c2410c;border:1.5px solid #fed7aa; } .btn-siap-full:hover { background:#ffedd5; }
+    .btn-selesai-full { background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0; } .btn-selesai-full:hover { background:#dcfce7; }
     .action-done { text-align:center;padding:16px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px dashed var(--gray-200); }
     .action-done p { font-size:12px;color:var(--gray-400);margin:0 0 6px; }
 
@@ -169,6 +174,8 @@
     .tl-dot.pending  { background:var(--warning-light);color:var(--warning); }
     .tl-dot.approved { background:var(--success-light);color:var(--success); }
     .tl-dot.rejected { background:var(--danger-light); color:var(--danger); }
+    .tl-dot.orange   { background:#fff7ed;color:#ea580c; }
+    .tl-dot.selesai  { background:#f0fdf4;color:#16a34a; }
     .tl-body p     { font-size:13px;font-weight:700;color:var(--gray-800);margin:0 0 3px; }
     .tl-body small { font-size:11px;color:var(--gray-400);font-family:'DM Mono',monospace; }
 
@@ -220,11 +227,15 @@
                 <span class="pill pill-approved"><span class="pill-dot"></span> Disetujui</span>
             @elseif($status === 'ditolak')
                 <span class="pill pill-rejected"><span class="pill-dot"></span> Ditolak</span>
+            @elseif($status === 'siap_diambil')
+                <span class="pill pill-siap"><span class="pill-dot"></span> Siap Diambil</span>
+            @elseif($status === 'selesai')
+                <span class="pill pill-selesai"><span class="pill-dot"></span> Selesai</span>
             @else
                 <span class="pill pill-pending"><span class="pill-dot"></span> Menunggu Proses</span>
             @endif
 
-            @if($status === 'disetujui')
+            @if(in_array($status, ['disetujui', 'siap_diambil', 'selesai']))
             <a href="{{ route('permohonan.print', $data->id_permohonan) }}" target="_blank" class="btn-print-main">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6 9 6 2 18 2 18 9"/>
@@ -434,17 +445,59 @@
                     </button>
                 </form>
 
-                @else
-                <div class="action-done">
-                    <p>Permohonan ini sudah diproses</p>
-                    @if($status === 'disetujui')
-                        <span class="pill pill-approved" style="display:inline-flex"><span class="pill-dot"></span> Disetujui</span>
-                    @else
-                        <span class="pill pill-rejected" style="display:inline-flex"><span class="pill-dot"></span> Ditolak</span>
-                    @endif
+                @elseif($status === 'disetujui')
+                <div class="action-done" style="margin-bottom:12px">
+                    <p>Permohonan disetujui — tandai siap diambil setelah surat dicetak</p>
+                    <span class="pill pill-approved" style="display:inline-flex"><span class="pill-dot"></span> Disetujui</span>
                 </div>
+                <a href="{{ route('permohonan.print', $data->id_permohonan) }}" target="_blank" class="btn-full btn-print-full" style="margin-bottom:10px">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 6 2 18 2 18 9"/>
+                        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+                        <rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                    Cetak / Print Surat Resmi
+                </a>
+                <form action="{{ route('permohonan.siapDiambil', $data->id_permohonan) }}" method="POST" id="form-siap-show">
+                    @csrf @method('PUT')
+                    <button type="button" class="btn-full btn-siap-full"
+                        onclick="showConfirm('Tandai surat ini <strong>Siap Diambil</strong>?<br><small style=\'color:#64748b\'>Warga akan mendapat notifikasi untuk datang ke kelurahan.</small>', () => document.getElementById('form-siap-show').submit(), {confirmText:'Ya, Siap Diambil', type:'info'})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                        </svg>
+                        Tandai Siap Diambil
+                    </button>
+                </form>
 
-                @if($status === 'disetujui')
+                @elseif($status === 'siap_diambil')
+                <div class="action-done" style="margin-bottom:12px;background:#fff7ed;border-color:#fed7aa">
+                    <p style="color:#9a3412">Surat sudah siap — tunggu warga mengambil</p>
+                    <span class="pill pill-siap" style="display:inline-flex"><span class="pill-dot"></span> Siap Diambil</span>
+                </div>
+                <a href="{{ route('permohonan.print', $data->id_permohonan) }}" target="_blank" class="btn-full btn-print-full" style="margin-bottom:10px">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 6 2 18 2 18 9"/>
+                        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+                        <rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                    Cetak / Print Surat
+                </a>
+                <form action="{{ route('permohonan.selesai', $data->id_permohonan) }}" method="POST" id="form-selesai-show">
+                    @csrf @method('PUT')
+                    <button type="button" class="btn-full btn-selesai-full"
+                        onclick="showConfirm('Konfirmasi surat sudah diambil oleh <strong>{{ addslashes($nama) }}</strong>?', () => document.getElementById('form-selesai-show').submit(), {confirmText:'Ya, Sudah Diambil', type:'success'})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Konfirmasi Sudah Diambil
+                    </button>
+                </form>
+
+                @elseif($status === 'selesai')
+                <div class="action-done" style="background:#f0fdf4;border-color:#bbf7d0">
+                    <p style="color:#166534">Permohonan selesai — surat sudah diambil</p>
+                    <span class="pill pill-selesai" style="display:inline-flex"><span class="pill-dot"></span> Selesai</span>
+                </div>
                 <div style="margin-top:12px">
                     <a href="{{ route('permohonan.print', $data->id_permohonan) }}" target="_blank" class="btn-full btn-print-full" style="margin-bottom:0">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -452,10 +505,16 @@
                             <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
                             <rect x="6" y="14" width="12" height="8"/>
                         </svg>
-                        Cetak / Print Surat Resmi
+                        Cetak / Print Surat
                     </a>
                 </div>
-                @endif
+
+                @else
+                {{-- ditolak --}}
+                <div class="action-done">
+                    <p>Permohonan ini telah ditolak</p>
+                    <span class="pill pill-rejected" style="display:inline-flex"><span class="pill-dot"></span> Ditolak</span>
+                </div>
                 @endif
             </div>
 
@@ -508,18 +567,44 @@
                         </li>
                         @if($data->approval)
                         <li class="tl-item">
-                            <div class="tl-dot {{ $data->approval->status === 'disetujui' ? 'approved' : 'rejected' }}">
-                                @if($data->approval->status === 'disetujui')
+                            <div class="tl-dot {{ in_array($data->approval->status, ['disetujui','siap_diambil','selesai']) ? 'approved' : 'rejected' }}">
+                                @if(in_array($data->approval->status, ['disetujui','siap_diambil','selesai']))
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                                 @else
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                 @endif
                             </div>
                             <div class="tl-body">
-                                <p>{{ $data->approval->status === 'disetujui' ? 'Permohonan Disetujui ✅' : 'Permohonan Ditolak ❌' }}</p>
+                                <p>{{ in_array($data->approval->status, ['disetujui','siap_diambil','selesai']) ? 'Permohonan Disetujui ✅' : 'Permohonan Ditolak ❌' }}</p>
                                 <small>{{ \Carbon\Carbon::parse($data->approval->tanggal_approval)->format('d M Y, H:i') }} WIB</small>
                             </div>
                         </li>
+                        @if(in_array($data->approval->status, ['siap_diambil', 'selesai']))
+                        <li class="tl-item">
+                            <div class="tl-dot orange">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                </svg>
+                            </div>
+                            <div class="tl-body">
+                                <p>Surat Siap Diambil 📦</p>
+                                <small>{{ $data->approval->tanggal_siap_diambil ? \Carbon\Carbon::parse($data->approval->tanggal_siap_diambil)->format('d M Y, H:i').' WIB' : '-' }}</small>
+                            </div>
+                        </li>
+                        @endif
+                        @if($data->approval->status === 'selesai')
+                        <li class="tl-item">
+                            <div class="tl-dot selesai">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="tl-body">
+                                <p>Surat Sudah Diambil ✅</p>
+                                <small>{{ $data->approval->tanggal_selesai ? \Carbon\Carbon::parse($data->approval->tanggal_selesai)->format('d M Y, H:i').' WIB' : '-' }}</small>
+                            </div>
+                        </li>
+                        @endif
                         @else
                         <li class="tl-item">
                             <div class="tl-dot pending">

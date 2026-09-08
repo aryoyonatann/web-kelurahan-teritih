@@ -58,7 +58,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
                 <div class="grid2">
                     <div class="field">
-                        <label>Nama Lengkap</label>
+                        <label>Nama Lengkap <span style="color:#ef4444">*</span></label>
                         <input type="text" name="nama" value="{{ old('nama', $warga->nama) }}" required>
                     </div>
                     <div class="field">
@@ -76,14 +76,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
                 <div class="grid2">
                     <div class="field">
-                        <label>Jenis Kelamin</label>
+                        <label>Jenis Kelamin <span style="color:#ef4444">*</span></label>
                         <select name="jenis_kelamin" required>
                             <option value="L" @selected(old('jenis_kelamin', $warga->jenis_kelamin) === 'L')>Laki-laki</option>
                             <option value="P" @selected(old('jenis_kelamin', $warga->jenis_kelamin) === 'P')>Perempuan</option>
                         </select>
                     </div>
                     <div class="field">
-                        <label>Tanggal Lahir</label>
+                        <label>Tanggal Lahir <span style="color:#ef4444">*</span></label>
                         <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', optional($warga->tanggal_lahir)->format('Y-m-d')) }}" required>
                         <small>Umur & kelompok umur dihitung otomatis dari tanggal ini.</small>
                     </div>
@@ -91,7 +91,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
                 <div class="grid2">
                     <div class="field">
-                        <label>Agama</label>
+                        <label>Agama <span style="color:#ef4444">*</span></label>
                         <select name="agama" required>
                             @foreach($pilihanAgama as $opt)
                                 <option value="{{ $opt }}" @selected(old('agama', $warga->agama) === $opt)>{{ $opt }}</option>
@@ -99,7 +99,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                         </select>
                     </div>
                     <div class="field">
-                        <label>Status Perkawinan</label>
+                        <label>Status Perkawinan <span style="color:#ef4444">*</span></label>
                         <select name="status_kawin" required>
                             @foreach($pilihanKawin as $opt)
                                 <option value="{{ $opt }}" @selected(old('status_kawin', $warga->status_kawin) === $opt)>{{ $opt }}</option>
@@ -110,7 +110,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
                 <div class="grid2">
                     <div class="field">
-                        <label>Pendidikan Terakhir</label>
+                        <label>Pendidikan Terakhir <span style="color:#ef4444">*</span></label>
                         <select name="pendidikan" required>
                             @foreach($pilihanPendidikan as $opt)
                                 <option value="{{ $opt }}" @selected(old('pendidikan', $warga->pendidikan) === $opt)>{{ $opt }}</option>
@@ -118,7 +118,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                         </select>
                     </div>
                     <div class="field">
-                        <label>Pekerjaan</label>
+                        <label>Pekerjaan <span style="color:#ef4444">*</span></label>
                         @php
                             $pekerjaanTerpilih = old('pekerjaan', $pekerjaanCustom ? 'Lainnya' : $warga->pekerjaan);
                         @endphp
@@ -137,18 +137,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
                 <div class="grid2">
                     <div class="field">
-                        <label>RT</label>
+                        <label>RT <span style="color:#ef4444">*</span></label>
                         <input type="text" name="rt" value="{{ old('rt', $warga->rt) }}" required placeholder="Misal: 2">
                     </div>
                     <div class="field">
-                        <label>RW</label>
+                        <label>RW <span style="color:#ef4444">*</span></label>
                         <input type="text" name="rw" value="{{ old('rw', $warga->rw) }}" required placeholder="Misal: 3">
                     </div>
                 </div>
 
                 <div class="grid2">
                     <div class="field">
-                        <label>Hubungan dalam Keluarga</label>
+                        <label>Hubungan dalam Keluarga <span style="color:#ef4444">*</span></label>
                         <select name="hubungan_keluarga" required>
                             @foreach($pilihanHubungan as $opt)
                                 <option value="{{ $opt }}" @selected(old('hubungan_keluarga', $warga->hubungan_keluarga) === $opt)>{{ $opt }}</option>

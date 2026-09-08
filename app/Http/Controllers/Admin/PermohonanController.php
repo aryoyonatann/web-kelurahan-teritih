@@ -33,7 +33,7 @@ class PermohonanController extends Controller
             ['id_permohonan' => $id],
             [
                 'id_admin'         => auth('admin')->id() ?? 1,
-                'status'           => 'disetujui',
+                'status'           => Approval::STATUS_DISETUJUI,
                 'tanggal_approval' => now(),
             ]
         );
@@ -41,18 +41,59 @@ class PermohonanController extends Controller
         return redirect()->back()->with('success', 'Permohonan berhasil disetujui.');
     }
 
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
         Approval::updateOrCreate(
             ['id_permohonan' => $id],
             [
                 'id_admin'         => auth('admin')->id() ?? 1,
-                'status'           => 'ditolak',
+                'status'           => Approval::STATUS_DITOLAK,
                 'tanggal_approval' => now(),
+                'catatan'          => $request->input('catatan'),
             ]
         );
 
         return redirect()->back()->with('success', 'Permohonan berhasil ditolak.');
+    }
+
+    /**
+     * Admin menandai surat sudah dicetak/ditandatangani dan siap diambil warga.
+     * Hanya bisa dilakukan dari status 'disetujui'.
+     */
+    public function siapDiambil($id)
+    {
+        $approval = Approval::where('id_permohonan', $id)->firstOrFail();
+
+        if ($approval->status !== Approval::STATUS_DISETUJUI) {
+            return redirect()->back()->with('error', 'Hanya permohonan berstatus "Disetujui" yang bisa ditandai siap diambil.');
+        }
+
+        $approval->update([
+            'status'               => Approval::STATUS_SIAP_DIAMBIL,
+            'tanggal_siap_diambil' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Permohonan ditandai Siap Diambil. Warga akan mendapat notifikasi.');
+    }
+
+    /**
+     * Admin menandai surat sudah diambil warga (selesai).
+     * Hanya bisa dilakukan dari status 'siap_diambil'.
+     */
+    public function selesai($id)
+    {
+        $approval = Approval::where('id_permohonan', $id)->firstOrFail();
+
+        if ($approval->status !== Approval::STATUS_SIAP_DIAMBIL) {
+            return redirect()->back()->with('error', 'Hanya permohonan berstatus "Siap Diambil" yang bisa ditandai selesai.');
+        }
+
+        $approval->update([
+            'status'           => Approval::STATUS_SELESAI,
+            'tanggal_selesai'  => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Permohonan selesai. Surat telah diambil warga.');
     }
 
     public function print($id)
@@ -62,20 +103,11 @@ class PermohonanController extends Controller
 
         $tahun = now()->year;
 
-        // OPSI B: ambil nomor urut tertinggi yang sudah tersimpan (termasuk input manual admin),
-        // lalu +1. Dengan ini kalau admin pernah loncat ke nomor 5, surat berikutnya dapat 6.
-        // Untuk ganti ke OPSI A (pure hitung jumlah baris), ganti blok ini dengan:
-        //   $nomorUrut = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
-        //       ->whereYear('tanggal_pengajuan', $tahun)
-        //       ->whereNotNull('nomor_surat')
-        //       ->count() + 1;
         $nomorUrutTertinggi = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
             ->whereYear('tanggal_pengajuan', $tahun)
             ->whereNotNull('nomor_surat')
             ->get('nomor_surat')
             ->map(function ($p) {
-                // Format nomor: "440 / 003 / Kel.1010/SKTM/ VIII /2026"
-                // Ambil bagian ke-2 (index 1) setelah split " / "
                 $parts = explode(' / ', $p->nomor_surat);
                 return isset($parts[1]) ? (int) trim($parts[1]) : 0;
             })
@@ -84,7 +116,6 @@ class PermohonanController extends Controller
 
         $bulanRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now()->month - 1];
 
-        // Ambil data pegawai dari pengaturan untuk auto-fill TTD
         $nodeKeys = ['lurah','sekretaris','kasi-pemum','pelaksana','op-sanusi','op-hawari','kasi-pmk','op-hasan','kasi-trantibum','op-afif','op-jamaludin'];
         $pegawaiData = [];
         foreach ($nodeKeys as $key) {
@@ -93,7 +124,6 @@ class PermohonanController extends Controller
                 'nip'  => Pengaturan::getValue('pegawai_'.$key.'_nip',  ''),
             ];
         }
-        // Nama & jabatan lurah (dari profil kepala kelurahan)
         $namaLurah  = Pengaturan::getValue('nama_lurah', 'Jupran, SE, MM');
         $jabatLurah = Pengaturan::getValue('jabat_lurah', 'Kepala Kelurahan Teritih');
 

@@ -74,13 +74,18 @@ Route::prefix('admin')->group(function () {
         Route::resource('jenis-surat', JenisSuratController::class);
 
         // Permohonan Admin
-        Route::get( 'permohonan',                 [PermohonanController::class, 'index'])           ->name('permohonan.index');
-        Route::get( 'permohonan/{id}',            [PermohonanController::class, 'show'])            ->name('permohonan.show');
-        Route::put( 'permohonan/{id}/approve',    [PermohonanController::class, 'approve'])         ->name('permohonan.approve');
-        Route::put( 'permohonan/{id}/reject',     [PermohonanController::class, 'reject'])          ->name('permohonan.reject');
-        Route::put( 'permohonan/{id}/update-data',[PermohonanController::class, 'updateData'])      ->name('permohonan.updateData');
-        Route::put( 'permohonan/{id}/keterangan', [PermohonanController::class, 'updateKeterangan'])->name('permohonan.keterangan');
-        Route::get( 'permohonan/{id}/print',      [PermohonanController::class, 'print'])           ->name('permohonan.print');
+        Route::get( 'permohonan',                     [PermohonanController::class, 'index'])           ->name('permohonan.index');
+        Route::get( 'permohonan/{id}',                [PermohonanController::class, 'show'])            ->name('permohonan.show');
+        Route::put( 'permohonan/{id}/approve',        [PermohonanController::class, 'approve'])         ->name('permohonan.approve');
+        Route::put( 'permohonan/{id}/reject',         [PermohonanController::class, 'reject'])          ->name('permohonan.reject');
+        Route::put( 'permohonan/{id}/siap-diambil',   [PermohonanController::class, 'siapDiambil'])     ->name('permohonan.siapDiambil');
+        Route::put( 'permohonan/{id}/selesai',        [PermohonanController::class, 'selesai'])         ->name('permohonan.selesai');
+        Route::put( 'permohonan/{id}/update-data',    [PermohonanController::class, 'updateData'])      ->name('permohonan.updateData');
+        Route::put( 'permohonan/{id}/keterangan',     [PermohonanController::class, 'updateKeterangan'])->name('permohonan.keterangan');
+        Route::get( 'permohonan/{id}/print',          [PermohonanController::class, 'print'])           ->name('permohonan.print');
+
+        // Notifikasi User (API - dipanggil dari navbar user via JS polling)
+        Route::get( 'user-notifikasi',                [NotifikasiController::class, 'userNotif'])       ->name('user.notifikasi');
 
         Route::resource('berita-admin', BeritaController::class)->except(['show']);
 
@@ -97,8 +102,9 @@ Route::prefix('admin')->group(function () {
         Route::get('master-data', fn() => view('Admin.master-data.index'))->name('admin.master-data');
 
         // Pengaturan
-        Route::get( 'pengaturan', [PengaturanController::class, 'edit'])  ->name('admin.pengaturan.edit');
-        Route::put( 'pengaturan', [PengaturanController::class, 'update'])->name('admin.pengaturan.update');
+        Route::get( 'pengaturan',             [PengaturanController::class, 'edit'])         ->name('admin.pengaturan.edit');
+        Route::put( 'pengaturan',             [PengaturanController::class, 'update'])       ->name('admin.pengaturan.update');
+        Route::post('pengaturan/resolve-gmaps',[PengaturanController::class,'resolveGmaps']) ->name('admin.pengaturan.resolve-gmaps');
     });
 });
 
@@ -106,6 +112,9 @@ Route::prefix('admin')->group(function () {
 // USER AREA — wajib login
 // =========================================================
 Route::middleware('auth')->group(function () {
+
+    // Notifikasi user — dipanggil AJAX dari navbar (harus di luar prefix admin)
+    Route::get('/user/notifikasi-status', [\App\Http\Controllers\User\PermohonanUserController::class, 'notifikasiStatus'])->name('user.notifikasi.status');
 
     Route::prefix('user')->name('user.')->group(function () {
 

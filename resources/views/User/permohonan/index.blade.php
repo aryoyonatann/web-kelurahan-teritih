@@ -20,7 +20,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .alert{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:9px;margin-bottom:20px;font-size:13px}
 .alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
 .alert-error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+/* Banner siap diambil */
+.banner-siap{background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1.5px solid #fed7aa;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:14px;box-shadow:0 2px 8px rgba(249,115,22,.1)}
+.banner-siap-ico{width:44px;height:44px;border-radius:11px;background:#f97316;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;color:white}
+.banner-siap-body{flex:1}
+.banner-siap-title{font-size:14px;font-weight:800;color:#9a3412;margin-bottom:4px}
+.banner-siap-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px}
+.banner-siap-list li{font-size:13px;color:#c2410c;display:flex;align-items:center;gap:8px}
+.banner-siap-list a{color:#9a3412;font-weight:700;text-decoration:underline}
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
 .stat-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:12px}
 .stat-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
 .stat-icon svg{width:18px;height:18px}
@@ -55,6 +63,9 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
 .pill-pending{background:#fef9c3;color:#854d0e}.pill-pending::before{background:#ca8a04}
 .pill-disetujui{background:#dcfce7;color:#14532d}.pill-disetujui::before{background:#16a34a}
 .pill-ditolak{background:#fee2e2;color:#7f1d1d}.pill-ditolak::before{background:var(--red)}
+.pill-siap_diambil{background:#fff7ed;color:#9a3412}.pill-siap_diambil::before{background:#f97316;animation:pulse-orange 1.5s infinite}
+.pill-selesai{background:#f0fdf4;color:#14532d}.pill-selesai::before{background:#16a34a}
+@keyframes pulse-orange{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
 .action-group{display:flex;align-items:center;gap:6px}
 .btn-sm{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;text-decoration:none;white-space:nowrap;font-family:inherit}
 .btn-sm svg{width:12px;height:12px}
@@ -65,7 +76,8 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
 .empty-icon svg{width:28px;height:28px;color:#9ca3af}
 .empty-state h3{font-size:16px;font-weight:700;color:var(--slate);margin-bottom:6px}
 .empty-state p{font-size:13px;color:#9ca3af;margin-bottom:20px}
-@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}.page-top{flex-direction:column;align-items:flex-start}}
+@media(max-width:900px){.stats-row{grid-template-columns:repeat(3,1fr)}.page-top{flex-direction:column;align-items:flex-start}}
+@media(max-width:600px){.stats-row{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -119,6 +131,15 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
             </div>
             <div class="stat-info"><small>Disetujui</small><strong>{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'disetujui')->count() }}</strong></div>
         </div>
+        <div class="stat-card" style="border:1.5px solid #fed7aa;position:relative;overflow:hidden">
+            <div class="stat-icon" style="background:#fff7ed;color:#f97316">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+            </div>
+            <div class="stat-info"><small>Siap Diambil</small><strong style="color:#c2410c">{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'siap_diambil')->count() }}</strong></div>
+            @if($data->filter(fn($d) => $d->approval && $d->approval->status === 'siap_diambil')->count() > 0)
+            <div style="position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:#f97316;animation:pulse-orange 1.5s infinite"></div>
+            @endif
+        </div>
         <div class="stat-card">
             <div class="stat-icon red">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -126,6 +147,26 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
             <div class="stat-info"><small>Ditolak</small><strong>{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'ditolak')->count() }}</strong></div>
         </div>
     </div>
+
+    {{-- Banner notifikasi siap diambil --}}
+    @php $siapDiambilList = $data->filter(fn($d) => $d->approval && $d->approval->status === 'siap_diambil'); @endphp
+    @if($siapDiambilList->count() > 0)
+    <div class="banner-siap">
+        <div class="banner-siap-ico">📦</div>
+        <div class="banner-siap-body">
+            <div class="banner-siap-title">🎉 Surat Anda Siap Diambil!</div>
+            <ul class="banner-siap-list">
+                @foreach($siapDiambilList as $sd)
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span><strong>{{ $sd->jenisSurat->nama_surat ?? 'Surat' }}</strong> — silakan datang ke kantor kelurahan untuk mengambil surat.
+                    <a href="{{ route('user.permohonan.show', $sd->id_permohonan) }}">Lihat Detail →</a></span>
+                </li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+    @endif
 
     <div class="table-card">
         @if($data->isEmpty())
@@ -169,9 +210,18 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
                     <td style="max-width:220px;color:var(--muted)">{{ Str::limit($d->keperluan, 55) }}</td>
                     <td class="td-date">{{ \Carbon\Carbon::parse($d->tanggal_pengajuan)->format('d M Y') }}</td>
                     <td>
+                        @if($status === 'siap_diambil')
+                        <span class="pill pill-siap_diambil" style="position:relative">
+                            📦 Siap Diambil
+                            <span style="position:absolute;-top:3px;-right:3px;width:7px;height:7px;border-radius:50%;background:#f97316;top:-3px;right:-3px;animation:pulse-orange 1.5s infinite;display:block"></span>
+                        </span>
+                        @elseif($status === 'selesai')
+                        <span class="pill pill-selesai">✅ Selesai</span>
+                        @else
                         <span class="pill pill-{{ $status }}">
                             {{ $status === 'disetujui' ? 'Disetujui' : ($status === 'ditolak' ? 'Ditolak' : 'Pending') }}
                         </span>
+                        @endif
                     </td>
                     <td>
                         <div class="action-group">

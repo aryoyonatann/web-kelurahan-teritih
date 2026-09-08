@@ -533,42 +533,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
             </div>
         </div>
 
-        {{-- ⑦ FASILITAS KELURAHAN                      --}}
-        {{-- ══════════════════════════════════════════ --}}
-        <div class="group-card">
-            <div class="group-header">
-                <div class="group-icon" style="background:#ecfdf5;color:#10b981"><i class="bi bi-building"></i></div>
-                <div class="group-title">Fasilitas Kelurahan</div>
-            </div>
-            <div class="group-body">
-                @php
-                    $fasKeys = [
-                        'fas_masjid' => 'Masjid',
-                        'fas_musholla' => 'Musholla',
-                        'fas_tpq' => 'TPQ/Madrasah',
-                        'fas_paud' => 'PAUD/TK',
-                        'fas_sd' => 'SD/MI',
-                        'fas_smp' => 'SMP/MTs',
-                        'fas_sma' => 'SMA/SMK/MA',
-                        'fas_posyandu' => 'Posyandu',
-                        'fas_puskesmas' => 'Puskesmas/Klinik',
-                        'fas_lapangan' => 'Lapangan Olahraga',
-                    ];
-                @endphp
-                <div class="agama-grid">
-                    @foreach($fasKeys as $kunci => $labelF)
-                    @php $sf = $statistik[$kunci] ?? null; @endphp
-                    <div class="stat-row">
-                        <div class="stat-row-label">{{ $labelF }}</div>
-                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelF }}">
-                        <input type="number" name="statistik[{{ $kunci }}][nilai]" class="stat-input" value="{{ $sf->nilai ?? 0 }}" min="0">
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
-        {{-- ══════════════════════════════════════════ --}}
         {{-- ⑧ PENDIDIKAN                               --}}
         {{-- ══════════════════════════════════════════ --}}
         <div class="group-card">
@@ -605,6 +569,231 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 </div>
             </div>
         </div>
+
+        {{-- ══════════════════════════════════════════ --}}
+        {{-- ⑦ FASILITAS KELURAHAN — angka + daftar lokasi --}}
+        {{-- ══════════════════════════════════════════════ --}}
+        @php
+            $fasKeys = [
+                'fas_masjid'    => ['label'=>'Masjid',            'kat'=>'ibadah'],
+                'fas_musholla'  => ['label'=>'Musholla',          'kat'=>'ibadah'],
+                'fas_tpq'       => ['label'=>'TPQ/Madrasah',      'kat'=>'ibadah'],
+                'fas_paud'      => ['label'=>'PAUD/TK',           'kat'=>'pendidikan'],
+                'fas_sd'        => ['label'=>'SD/MI',             'kat'=>'pendidikan'],
+                'fas_smp'       => ['label'=>'SMP/MTs',           'kat'=>'pendidikan'],
+                'fas_sma'       => ['label'=>'SMA/SMK/MA',        'kat'=>'pendidikan'],
+                'fas_posyandu'  => ['label'=>'Posyandu',          'kat'=>'kesehatan'],
+                'fas_puskesmas' => ['label'=>'Puskesmas/Klinik',  'kat'=>'kesehatan'],
+                'fas_lapangan'  => ['label'=>'Lapangan Olahraga', 'kat'=>'olahraga'],
+            ];
+            // Hitung jumlah per sub-kategori dari daftar lokasi
+            $fasPerSubKat = collect($fasilitasLokasi ?? [])->groupBy('sub_kategori');
+            $fasPerKat    = collect($fasilitasLokasi ?? [])->groupBy('kategori');
+            // Map sub-kategori global
+            $subKatMapStatic = [
+                'fas_masjid'    => ['kat'=>'ibadah',     'label'=>'Masjid'],
+                'fas_musholla'  => ['kat'=>'ibadah',     'label'=>'Musholla/Langgar'],
+                'fas_tpq'       => ['kat'=>'ibadah',     'label'=>'TPQ/Madrasah'],
+                'fas_paud'      => ['kat'=>'pendidikan', 'label'=>'PAUD/TK'],
+                'fas_sd'        => ['kat'=>'pendidikan', 'label'=>'SD/MI'],
+                'fas_smp'       => ['kat'=>'pendidikan', 'label'=>'SMP/MTs'],
+                'fas_sma'       => ['kat'=>'pendidikan', 'label'=>'SMA/SMK/MA'],
+                'fas_posyandu'  => ['kat'=>'kesehatan',  'label'=>'Posyandu'],
+                'fas_puskesmas' => ['kat'=>'kesehatan',  'label'=>'Puskesmas/Klinik'],
+                'fas_lapangan'  => ['kat'=>'olahraga',   'label'=>'Lapangan Olahraga'],
+            ];
+        @endphp
+
+        <div class="group-card" id="cardFasilitas">
+            <div class="group-header">
+                <div class="group-icon" style="background:#ecfdf5;color:#10b981"><i class="bi bi-building-fill"></i></div>
+                <div class="group-title">Fasilitas Kelurahan</div>
+                <span style="margin-left:auto;font-size:11px;color:#64748b">
+                    {{ count($fasilitasLokasi ?? []) }} lokasi terdaftar
+                </span>
+            </div>
+            <div class="group-body">
+
+                {{-- Info cara pakai --}}
+                <div class="info-box" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534">
+                    <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px"></i>
+                    <div>
+                        <strong>Cara pakai:</strong> Input angka di bawah bisa diubah bebas — gunakan untuk fasilitas yang belum diinput di daftar lokasi (misal musholla kecil yang belum punya link GMaps).
+                        Klik <strong>"Sinkron dari Daftar"</strong> untuk otomatis isi angka dari jumlah lokasi yang sudah diinput.
+                    </div>
+                </div>
+
+                {{-- Tombol sinkron --}}
+                <div style="display:flex;justify-content:flex-end">
+                    <button type="button" onclick="sinkronAngka()"
+                        style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#166534;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s"
+                        onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">
+                        <i class="bi bi-arrow-repeat"></i> Sinkron dari Daftar
+                    </button>
+                </div>
+
+                {{-- Input angka per jenis fasilitas --}}
+                <div class="agama-grid">
+                    @foreach($fasKeys as $kunci => $fasInfo)
+                    @php
+                        $sf       = $statistik[$kunci] ?? null;
+                        $labelF   = $fasInfo['label'];
+                        $katF     = $fasInfo['kat'];
+                        $jumlahKat = ($fasPerSubKat->get($kunci) ?? collect())->count();
+                    @endphp
+                    <div class="stat-row" style="position:relative">
+                        <div class="stat-row-label" style="display:flex;align-items:center;gap:6px">
+                            {{ $labelF }}
+                            @if($jumlahKat > 0)
+                            <span style="font-size:10px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:12px;padding:1px 7px;font-weight:700">
+                                {{ $jumlahKat }} lokasi
+                            </span>
+                            @endif
+                        </div>
+                        <input type="hidden" name="statistik[{{ $kunci }}][label]" value="{{ $labelF }}">
+                        <input type="number"
+                            name="statistik[{{ $kunci }}][nilai]"
+                            id="fas_input_{{ $kunci }}"
+                            data-kat="{{ $katF }}"
+                            data-jml="{{ $jumlahKat }}"
+                            class="stat-input fas-angka-input"
+                            value="{{ $sf->nilai ?? 0 }}"
+                            min="0">
+                    </div>
+                    @endforeach
+                </div>
+
+                {{-- Divider --}}
+                <div style="border-top:2px dashed #e2e8f0;margin:8px 0 4px;padding-top:20px">
+                    <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px;display:flex;align-items:center;gap:8px">
+                        <i class="bi bi-geo-alt-fill" style="color:#10b981"></i>
+                        Daftar Lokasi Fasilitas
+                        <span style="font-size:11px;font-weight:400;color:#94a3b8">— nama, alamat, dan link Google Maps tiap fasilitas</span>
+                    </div>
+                    <div style="font-size:12px;color:#64748b;margin-bottom:16px">
+                        Fasilitas yang belum ada di Google Maps cukup isi nama dan alamat saja, link GMaps dikosongkan.
+                    </div>                    {{-- Info sub-kategori --}}
+                    <div style="padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;font-size:12px;color:#92400e;margin-bottom:16px">
+                        <strong>💡 Sub-kategori penting:</strong> Pilih sub-kategori agar fasilitas masuk ke kolom angka yang tepat (misal SD/MI → angka SD/MI). Fasilitas tanpa sub-kategori tidak dihitung saat sinkron.
+                    </div>
+
+                    {{-- Tombol tambah --}}
+                    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+                        <button type="button" onclick="tambahFasilitas()"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1c64f2;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s">
+                            <i class="bi bi-plus-lg"></i> Tambah Fasilitas
+                        </button>
+                    </div>
+
+                    {{-- List --}}
+                    <div id="fasilitasList" style="display:flex;flex-direction:column;gap:8px">
+                        @forelse($fasilitasLokasi ?? [] as $idx => $fas)
+                        @php
+                            $kFas   = $fas['kategori'] ?? 'ibadah';
+                            $kData  = ($fasKategori ?? [])[$kFas] ?? ['label'=>$kFas,'icon'=>'📍','color'=>'#64748b'];
+                            $subKat = $fas['sub_kategori'] ?? '';
+                            $subKatOptions = [];
+                            foreach ($subKatMapStatic as $key => $info) {
+                                if ($info['kat'] === $kFas) $subKatOptions[] = ['key'=>$key,'label'=>$info['label']];
+                            }
+                        @endphp
+                        <div class="fas-item" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:11px;padding:14px;transition:border-color .15s"
+                             onmouseover="this.style.borderColor='#bfdbfe'" onmouseout="this.style.borderColor='#e2e8f0'">
+                            <div style="display:grid;grid-template-columns:1fr 160px;gap:10px;margin-bottom:10px">
+                                <div>
+                                    <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Nama Fasilitas <span style="color:#ef4444">*</span></label>
+                                    <input type="text" name="fasilitas[{{ $idx }}][nama]" value="{{ $fas['nama'] ?? '' }}" class="stat-input" style="font-size:12.5px" placeholder="Nama fasilitas" required>
+                                </div>
+                                <div>
+                                    <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Kategori <span style="color:#ef4444">*</span></label>
+                                    <select name="fasilitas[{{ $idx }}][kategori]" class="stat-input fas-kat-select" style="font-size:12.5px" onchange="updateSubKat(this)">
+                                        @foreach($fasKategori ?? [] as $kKey => $kD)
+                                        <option value="{{ $kKey }}" {{ $kFas===$kKey?'selected':'' }}>{{ $kD['icon'] }} {{ $kD['label'] }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="margin-bottom:10px">
+                                <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Sub-kategori <span style="color:#ef4444">*</span> <span style="font-size:10px;font-weight:400;color:#94a3b8">— jenis spesifik fasilitas ini</span></label>
+                                <select name="fasilitas[{{ $idx }}][sub_kategori]" class="stat-input fas-subkat-select" style="font-size:12.5px">
+                                    <option value="">— Pilih sub-kategori —</option>
+                                    @foreach($subKatOptions as $sk)
+                                    <option value="{{ $sk['key'] }}" {{ $subKat===$sk['key']?'selected':'' }}>{{ $sk['label'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div style="margin-bottom:10px">
+                                <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Alamat Lengkap <span style="font-size:10px;font-weight:400;color:#94a3b8">(opsional)</span></label>
+                                <input type="text" name="fasilitas[{{ $idx }}][alamat]" value="{{ $fas['alamat'] ?? '' }}" class="stat-input" style="font-size:12.5px" placeholder="Contoh: Kp. Sidapurna RT 01/02 Kel. Teritih">
+                            </div>
+                            <div>
+                                <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Link Google Maps <span style="font-size:10px;font-weight:400;color:#94a3b8">(opsional)</span></label>
+                                <div style="display:flex;gap:8px;align-items:center">
+                                    <input type="text" name="fasilitas[{{ $idx }}][link_gmaps]" value="{{ $fas['link_gmaps'] ?? '' }}" class="stat-input fas-gmaps-input" style="font-size:12px;flex:1" placeholder="https://maps.google.com/..." oninput="updateCekBtn(this)">
+                                    <a href="{{ $fas['link_gmaps'] ?? '#' }}" target="_blank" rel="noopener" class="fas-cek-btn"
+                                        style="display:inline-flex;align-items:center;gap:5px;padding:9px 13px;border-radius:8px;border:1.5px solid {{ !empty($fas['link_gmaps']) ? '#bbf7d0' : '#e2e8f0' }};background:{{ !empty($fas['link_gmaps']) ? '#f0fdf4' : '#f8fafc' }};color:{{ !empty($fas['link_gmaps']) ? '#16a34a' : '#94a3b8' }};font-size:12px;font-weight:600;text-decoration:none;flex-shrink:0;transition:all .15s;pointer-events:{{ !empty($fas['link_gmaps']) ? 'auto' : 'none' }}">
+                                        <i class="bi bi-map-fill"></i> Cek
+                                    </a>
+                                    <button type="button" onclick="hapusFasilitas(this)" style="width:38px;height:38px;border-radius:8px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0"><i class="bi bi-trash3"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div id="emptyFas" style="text-align:center;padding:32px;color:#94a3b8;font-size:13px;border:1.5px dashed #e2e8f0;border-radius:11px">
+                            <i class="bi bi-building" style="font-size:32px;display:block;margin-bottom:10px;color:#cbd5e1"></i>
+                            Belum ada fasilitas. Klik "+ Tambah Fasilitas" untuk mulai.
+                        </div>
+                        @endforelse
+                    </div>                </div>
+            </div>
+        </div>
+
+        {{-- Template row baru --}}
+        <template id="fasTemplate">
+            <div class="fas-item" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:11px;padding:14px;transition:border-color .15s"
+                 onmouseover="this.style.borderColor='#bfdbfe'" onmouseout="this.style.borderColor='#e2e8f0'">
+                <div style="display:grid;grid-template-columns:1fr 160px;gap:10px;margin-bottom:10px">
+                    <div>
+                        <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Nama Fasilitas <span style="color:#ef4444">*</span></label>
+                        <input type="text" name="__NAMA__" class="stat-input" style="font-size:12.5px" placeholder="Nama fasilitas" required>
+                    </div>
+                    <div>
+                        <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Kategori <span style="color:#ef4444">*</span></label>
+                        <select name="__KAT__" class="stat-input fas-kat-select" style="font-size:12.5px" onchange="updateSubKat(this)">
+                            @foreach($fasKategori ?? [] as $kKey => $kD)
+                            <option value="{{ $kKey }}">{{ $kD['icon'] }} {{ $kD['label'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-bottom:10px">
+                    <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Sub-kategori <span style="color:#ef4444">*</span> <span style="font-size:10px;font-weight:400;color:#94a3b8">— jenis spesifik fasilitas ini</span></label>
+                    <select name="__SUB__" class="stat-input fas-subkat-select" style="font-size:12.5px">
+                        <option value="">— Pilih sub-kategori —</option>
+                        @foreach($subKatMapStatic as $key => $info)
+                        @if($info['kat'] === 'ibadah')
+                        <option value="{{ $key }}">{{ $info['label'] }}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                </div>
+                <div style="margin-bottom:10px">
+                    <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Alamat Lengkap <span style="font-size:10px;font-weight:400;color:#94a3b8">(opsional)</span></label>
+                    <input type="text" name="__ALAMAT__" class="stat-input" style="font-size:12.5px" placeholder="Contoh: Kp. Sidapurna RT 01/02 Kel. Teritih">
+                </div>
+                <div>
+                    <label style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-bottom:4px">Link Google Maps <span style="font-size:10px;font-weight:400;color:#94a3b8">(opsional)</span></label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <input type="text" name="__LINK__" class="stat-input fas-gmaps-input" style="font-size:12px;flex:1" placeholder="https://maps.google.com/..." oninput="updateCekBtn(this)">
+                        <a href="#" target="_blank" rel="noopener" class="fas-cek-btn"
+                            style="display:inline-flex;align-items:center;gap:5px;padding:9px 13px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#94a3b8;font-size:12px;font-weight:600;text-decoration:none;flex-shrink:0;pointer-events:none;transition:all .15s">
+                            <i class="bi bi-map-fill"></i> Cek
+                        </a>
+                        <button type="button" onclick="hapusFasilitas(this)" style="width:38px;height:38px;border-radius:8px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0"><i class="bi bi-trash3"></i></button>
+                    </div>
+                </div>
+            </div>
+        </template>
 
         {{-- ══════════════════════════════════════════ --}}
         {{-- ⑩ UPDATE TERAKHIR                          --}}
@@ -671,7 +860,133 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
 @push('scripts')
 <script>
-// Hitung persentase agama live
+// ── UPDATE TOMBOL CEK GMAPS DINAMIS ────────────────────────────
+function updateCekBtn(input) {
+    const val  = input.value.trim();
+    const btn  = input.closest('div').querySelector('.fas-cek-btn');
+    if (!btn) return;
+    const isGmaps = val.includes('google.com/maps') ||
+                    val.includes('maps.app.goo.gl') ||
+                    val.includes('goo.gl/maps');
+    const hasVal  = val.length > 5;
+
+    if (hasVal && isGmaps) {
+        btn.href             = val;
+        btn.style.border     = '1.5px solid #bbf7d0';
+        btn.style.background = '#f0fdf4';
+        btn.style.color      = '#16a34a';
+        btn.style.pointerEvents = 'auto';
+    } else if (hasVal) {
+        btn.href             = val;
+        btn.style.border     = '1.5px solid #fde68a';
+        btn.style.background = '#fffbeb';
+        btn.style.color      = '#92400e';
+        btn.style.pointerEvents = 'auto';
+    } else {
+        btn.href             = '#';
+        btn.style.border     = '1.5px solid #e2e8f0';
+        btn.style.background = '#f8fafc';
+        btn.style.color      = '#94a3b8';
+        btn.style.pointerEvents = 'none';
+    }
+}
+
+// Init tombol Cek untuk item yang sudah ada saat halaman load
+document.querySelectorAll('.fas-gmaps-input').forEach(function(inp) {
+    updateCekBtn(inp);
+});
+// ── FASILITAS: Sinkron angka dari daftar lokasi ────────────────
+// subKat data dari PHP untuk JS
+const subKatData = @json($subKatMapStatic);
+
+function sinkronAngka() {
+    // Hitung per sub-kategori dari item daftar
+    const subCount = {};
+    document.querySelectorAll('#fasilitasList .fas-item').forEach(function(item) {
+        const sub = item.querySelector('.fas-subkat-select')?.value || '';
+        if (sub) subCount[sub] = (subCount[sub] || 0) + 1;
+    });
+
+    // Update tiap input angka sesuai key-nya (fas_masjid, fas_sd, dll)
+    document.querySelectorAll('.fas-angka-input').forEach(function(inp) {
+        const key = inp.id.replace('fas_input_', '');
+        if (subCount[key] !== undefined) {
+            inp.value = subCount[key];
+            inp.style.borderColor = '#22c55e';
+            inp.style.background  = '#f0fdf4';
+            setTimeout(() => { inp.style.borderColor = ''; inp.style.background = ''; }, 1200);
+        }
+    });
+
+    const btn = document.querySelector('[onclick="sinkronAngka()"]');
+    if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check-lg"></i> Tersinkron!';
+        btn.style.background = '#dcfce7';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#f0fdf4'; }, 1800);
+    }
+}
+
+// ── Sub-kategori: update opsi saat kategori berubah ────────────
+function updateSubKat(katSelect) {
+    const kat    = katSelect.value;
+    const row    = katSelect.closest('.fas-item');
+    const subSel = row?.querySelector('.fas-subkat-select');
+    if (!subSel) return;
+
+    const curVal = subSel.value;
+    subSel.innerHTML = '<option value="">— Pilih sub-kategori —</option>';
+    Object.entries(subKatData).forEach(function([key, info]) {
+        if (info.kat === kat) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = info.label;
+            if (key === curVal) opt.selected = true;
+            subSel.appendChild(opt);
+        }
+    });
+}
+
+// ── FASILITAS: Tambah & Hapus baris ────────────────────────────
+let fasIdx = {{ count($fasilitasLokasi ?? []) }};
+
+function tambahFasilitas() {
+    document.getElementById('emptyFas')?.remove();
+    const tmpl  = document.getElementById('fasTemplate');
+    const clone = tmpl.content.cloneNode(true);
+    const div   = clone.querySelector('.fas-item');
+
+    div.querySelectorAll('[name]').forEach(function(el) {
+        el.name = el.name
+            .replace('__NAMA__',   'fasilitas[' + fasIdx + '][nama]')
+            .replace('__KAT__',    'fasilitas[' + fasIdx + '][kategori]')
+            .replace('__SUB__',    'fasilitas[' + fasIdx + '][sub_kategori]')
+            .replace('__ALAMAT__', 'fasilitas[' + fasIdx + '][alamat]')
+            .replace('__LINK__',   'fasilitas[' + fasIdx + '][link_gmaps]');
+    });
+    fasIdx++;
+
+    document.getElementById('fasilitasList').appendChild(div);
+    div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    div.querySelector('input[type=text]')?.focus();
+
+    // Init tombol Cek untuk baris baru
+    div.querySelectorAll('.fas-gmaps-input').forEach(function(inp) {
+        updateCekBtn(inp);
+    });
+}
+
+function hapusFasilitas(btn) {
+    btn.closest('.fas-item').remove();
+    if (!document.querySelector('#fasilitasList .fas-item')) {
+        document.getElementById('fasilitasList').innerHTML =
+            '<div id="emptyFas" style="text-align:center;padding:32px;color:#94a3b8;font-size:13px;border:1.5px dashed #e2e8f0;border-radius:11px">' +
+            '<i class="bi bi-building" style="font-size:32px;display:block;margin-bottom:10px;color:#cbd5e1"></i>' +
+            'Belum ada fasilitas.</div>';
+    }
+}
+
+// ── Hitung persentase agama live ───────────────────────────────
 function hitungAgama() {
     const keys = ['jiwa_islam','jiwa_kristen','jiwa_katolik','jiwa_hindu','jiwa_buddha','jiwa_konghucu','jiwa_lainnya'];
     const tot  = keys.reduce((s,k) => s + (parseFloat(document.getElementById('input_'+k)?.value)||0), 0);
@@ -715,6 +1030,17 @@ function hitungKawin(key) {
     document.getElementById('kawin_nilai_' + key).value = l + p;
     document.getElementById('kawin_teks_' + key).value = l + '|' + p;
 }
+// Submit form → intercept untuk tampilkan loading state
+document.querySelector('form')?.addEventListener('submit', function() {
+    const btn = this.querySelector('.btn-simpan');
+    if (btn) {
+        btn.innerHTML = '<i class="bi bi-arrow-repeat" style="animation:spin .7s linear infinite;display:inline-block"></i> Menyimpan...';
+        btn.disabled = true;
+    }
+});
+const spinStyle = document.createElement('style');
+spinStyle.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(spinStyle);
 
 </script>
 @endpush

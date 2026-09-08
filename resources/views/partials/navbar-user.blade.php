@@ -221,6 +221,24 @@
         <li><a href="{{ route('berita') }}"    class="{{ request()->routeIs('berita') ? 'active' : '' }}">Berita &amp; Pengumuman</a></li>
     </ul>
 
+    {{-- Bell Notifikasi User --}}
+    <div style="position:relative" id="userNotifWrap">
+        <button id="btnUserNotif" type="button" style="width:40px;height:40px;border-radius:10px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;transition:all .18s;margin-right:4px" title="Notifikasi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:18px;height:18px"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span id="userNotifBadge" style="display:none;position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#f97316;border:2px solid #0d1b3e;animation:notifPulse 1.5s infinite"></span>
+        </button>
+        <div id="userNotifDropdown" style="display:none;position:fixed;top:80px;right:16px;width:340px;background:white;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:2000;overflow:hidden">
+            <div style="padding:14px 18px 10px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:13px;font-weight:800;color:#0f172a">📬 Notifikasi Surat</span>
+                <span id="userNotifCount" style="display:none;font-size:11px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;border-radius:20px;padding:2px 8px;font-weight:700"></span>
+            </div>
+            <div id="userNotifList" style="max-height:300px;overflow-y:auto"></div>
+            <div style="padding:10px 18px;border-top:1px solid #f1f5f9;text-align:center">
+                <a href="{{ route('user.permohonan.index') }}" style="font-size:12px;font-weight:700;color:#1c64f2;text-decoration:none">Lihat Semua Permohonan →</a>
+            </div>
+        </div>
+    </div>
+
     <div class="user-chip" id="userChipNav">
         <div class="user-avatar">
             @if($user->foto ?? null)
@@ -295,6 +313,13 @@
 
 <form id="logoutForm" method="POST" action="{{ route('logout') }}" style="display:none">@csrf</form>
 
+<style>
+@keyframes notifPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: .6; }
+}
+</style>
+
 <script>
 (function() {
     const chip = document.getElementById('userChipNav');
@@ -314,5 +339,79 @@
     window.doLogout = function() { document.getElementById('logoutForm').submit(); }
     document.getElementById('logoutOverlay').addEventListener('click', function(e) { if (e.target===this) hideLogoutConfirm(); });
     document.addEventListener('keydown', function(e) { if (e.key==='Escape') hideLogoutConfirm(); });
+
+    // ── USER NOTIFIKASI BELL ──
+    const NOTIF_POLL_MS = 60000; // poll setiap 60 detik
+    const btnNotif      = document.getElementById('btnUserNotif');
+    const badge         = document.getElementById('userNotifBadge');
+    const dropdown      = document.getElementById('userNotifDropdown');
+    const listEl        = document.getElementById('userNotifList');
+    const countEl       = document.getElementById('userNotifCount');
+    let notifOpen       = false;
+    let lastCount       = 0;
+
+    function escH(s) {
+        return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    function renderNotifList(items) {
+        if (!items || items.length === 0) {
+            listEl.innerHTML = '<div style="padding:28px;text-align:center;color:#94a3b8;font-size:13px">'
+                + '<div style="font-size:32px;margin-bottom:8px">🔔</div>'
+                + '<div style="font-weight:600">Tidak ada notifikasi</div>'
+                + '<div style="font-size:12px;margin-top:4px">Tidak ada surat yang siap diambil</div></div>';
+            return;
+        }
+        listEl.innerHTML = items.map(function(n) {
+            return '<a href="' + escH(n.url) + '" style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #f8fafc;text-decoration:none;transition:background .12s" onmouseover="this.style.background=\'#fff7ed\'" onmouseout="this.style.background=\'\'">'
+                + '<div style="width:38px;height:38px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📦</div>'
+                + '<div style="flex:1;min-width:0">'
+                + '<div style="font-size:13px;font-weight:700;color:#9a3412;margin-bottom:2px">Siap Diambil!</div>'
+                + '<div style="font-size:12px;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escH(n.surat) + '</div>'
+                + '<div style="font-size:11px;color:#94a3b8;margin-top:3px">' + escH(n.time) + '</div>'
+                + '</div>'
+                + '<div style="width:8px;height:8px;border-radius:50%;background:#f97316;flex-shrink:0;margin-top:4px;animation:notifPulse 1.5s infinite"></div>'
+                + '</a>';
+        }).join('');
+    }
+
+    function fetchUserNotif() {
+        fetch('{{ route("user.notifikasi.status") }}', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var count = data.count || 0;
+            if (count > 0) {
+                badge.style.display = 'block';
+                countEl.style.display = 'inline';
+                countEl.textContent = count + ' surat';
+            } else {
+                badge.style.display = 'none';
+                countEl.style.display = 'none';
+            }
+            lastCount = count;
+            if (notifOpen) renderNotifList(data.items || []);
+        })
+        .catch(function() {});
+    }
+
+    if (btnNotif) {
+        btnNotif.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notifOpen = !notifOpen;
+            dropdown.style.display = notifOpen ? 'block' : 'none';
+            if (notifOpen) fetchUserNotif();
+        });
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('userNotifWrap').contains(e.target)) {
+                notifOpen = false;
+                dropdown.style.display = 'none';
+            }
+        });
+        fetchUserNotif();
+        setInterval(fetchUserNotif, NOTIF_POLL_MS);
+    }
+    // ── END NOTIFIKASI ──
 })();
 </script>

@@ -31,6 +31,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .hero-top.pending  {background:linear-gradient(135deg,#1e3a8a 0%,#1c64f2 55%,#3b82f6 100%)}
 .hero-top.disetujui{background:linear-gradient(135deg,#064e3b 0%,#059669 55%,#34d399 100%)}
 .hero-top.ditolak  {background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 55%,#f87171 100%)}
+.hero-top.siap_diambil{background:linear-gradient(135deg,#7c2d12 0%,#ea580c 55%,#fb923c 100%)}
+.hero-top.selesai  {background:linear-gradient(135deg,#14532d 0%,#16a34a 55%,#4ade80 100%)}
 .hero-top::before{content:'';position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;border:48px solid rgba(255,255,255,.06);pointer-events:none}
 .hero-top::after{content:'';position:absolute;right:80px;bottom:-40px;width:140px;height:140px;border-radius:50%;border:28px solid rgba(255,255,255,.04);pointer-events:none}
 .hero-inner{position:relative;z-index:1;display:flex;align-items:flex-start;gap:20px;margin-bottom:20px}
@@ -101,9 +103,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .tl-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;z-index:1;position:relative;margin-bottom:10px;border:3px solid white;box-shadow:0 0 0 2px var(--border)}
 .tl-blue  {background:var(--blue-lt);color:var(--blue);box-shadow:0 0 0 2px #bfdbfe}
 .tl-green {background:#ecfdf5;color:var(--green);box-shadow:0 0 0 2px #a7f3d0}
-.tl-orange{background:#fffbeb;color:var(--orange);box-shadow:0 0 0 2px #fde68a}
+.tl-orange{background:#fff7ed;color:var(--orange);box-shadow:0 0 0 2px #fde68a}
 .tl-red   {background:#fef2f2;color:var(--red);box-shadow:0 0 0 2px #fecaca}
 .tl-gray  {background:#f3f4f6;color:#9ca3af;box-shadow:0 0 0 2px #e5e7eb}
+.tl-siap  {background:#fff7ed;color:#ea580c;box-shadow:0 0 0 2px #fed7aa}
+.tl-selesai{background:#ecfdf5;color:#059669;box-shadow:0 0 0 2px #6ee7b7}
 .tl-title{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:3px}
 .tl-time {font-size:11px;color:var(--muted)}
 
@@ -114,6 +118,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sb-icon.pending  {background:var(--blue-lt);color:var(--blue)}
 .sb-icon.disetujui{background:#ecfdf5;color:var(--green)}
 .sb-icon.ditolak  {background:#fef2f2;color:var(--red)}
+.sb-icon.siap_diambil{background:#fff7ed;color:#ea580c}
+.sb-icon.selesai  {background:#ecfdf5;color:var(--green)}
 .sb-label{font-size:11px;color:var(--muted);margin-bottom:2px}
 .sb-val{font-size:16px;font-weight:800}
 .sb-val.pending  {color:var(--blue)}
@@ -151,6 +157,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* CATATAN PENOLAKAN */
 .tolak-box{background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:16px 20px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start}
 .tolak-box i{color:var(--red);font-size:18px;flex-shrink:0;margin-top:1px}
+
+/* BANNER SIAP DIAMBIL */
+.siap-box{background:linear-gradient(135deg,#fff7ed,#ffedd5);border:2px solid #fed7aa;border-radius:14px;padding:20px 24px;margin-bottom:18px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 4px 16px rgba(249,115,22,.12)}
+.siap-box-ico{width:52px;height:52px;border-radius:14px;background:#f97316;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;flex-shrink:0}
+.siap-box-body .siap-title{font-size:16px;font-weight:800;color:#9a3412;margin-bottom:4px}
+.siap-box-body .siap-desc{font-size:13px;color:#c2410c;line-height:1.6}
+
+/* BANNER SELESAI */
+.selesai-box{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #bbf7d0;border-radius:14px;padding:20px 24px;margin-bottom:18px;display:flex;gap:14px;align-items:center}
+.selesai-box-ico{font-size:36px;flex-shrink:0}
+.selesai-box-body .selesai-title{font-size:15px;font-weight:800;color:#14532d;margin-bottom:2px}
+.selesai-box-body .selesai-desc{font-size:13px;color:#166534}
 </style>
 </head>
 <body>
@@ -203,6 +221,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
                 <div class="hero-ico">
                     @if($status==='disetujui') <i class="bi bi-check-circle-fill"></i>
                     @elseif($status==='ditolak') <i class="bi bi-x-circle-fill"></i>
+                    @elseif($status==='siap_diambil') <i class="bi bi-bag-check-fill"></i>
+                    @elseif($status==='selesai') <i class="bi bi-patch-check-fill"></i>
                     @else <i class="bi bi-hourglass-split"></i>
                     @endif
                 </div>
@@ -214,9 +234,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
                         Diajukan {{ \Carbon\Carbon::parse($permohonan->tanggal_pengajuan)->isoFormat('D MMMM Y, HH:mm') }} WIB
                     </div>
                     <div class="hero-pill">
-                        <span class="dot {{ $status === 'pending' ? 'pulse' : '' }}"></span>
+                        <span class="dot {{ in_array($status, ['pending','siap_diambil']) ? 'pulse' : '' }}"></span>
                         @if($status==='disetujui') Permohonan Disetujui
                         @elseif($status==='ditolak') Permohonan Ditolak
+                        @elseif($status==='siap_diambil') 📦 Surat Siap Diambil!
+                        @elseif($status==='selesai') ✅ Selesai — Surat Sudah Diambil
                         @else Menunggu Proses Admin
                         @endif
                     </div>
@@ -241,7 +263,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
             </div>
             <div class="hs">
                 <div class="hs-label">Status</div>
-                <div class="hs-val">{{ $status === 'disetujui' ? 'Disetujui ✅' : ($status === 'ditolak' ? 'Ditolak ❌' : 'Pending ⏳') }}</div>
+                <div class="hs-val">
+                    @if($status==='disetujui') Disetujui ✅
+                    @elseif($status==='ditolak') Ditolak ❌
+                    @elseif($status==='siap_diambil') Siap Diambil 📦
+                    @elseif($status==='selesai') Selesai ✅
+                    @else Pending ⏳
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -252,6 +281,36 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <div>
             <div style="font-size:13px;font-weight:700;color:#991b1b;margin-bottom:4px">Alasan Penolakan:</div>
             <div style="font-size:13px;color:#7f1d1d">{{ $permohonan->approval->catatan }}</div>
+        </div>
+    </div>
+    @endif
+
+    @if($status === 'siap_diambil')
+    <div class="siap-box">
+        <div class="siap-box-ico">📦</div>
+        <div class="siap-box-body">
+            <div class="siap-title">Surat Anda Sudah Siap Diambil!</div>
+            <div class="siap-desc">
+                Surat <strong>{{ $permohonan->jenisSurat->nama_surat ?? '' }}</strong> atas nama <strong>{{ $permohonan->nama_pemohon }}</strong> telah selesai diproses dan siap diambil.<br>
+                Silakan datang ke <strong>Kantor Kelurahan Teritih</strong> pada jam kerja (Senin–Jumat, 08.00–16.00 WIB) dengan membawa KTP asli.
+                @if($permohonan->approval->tanggal_siap_diambil)
+                <br><small style="opacity:.75">Disiapkan sejak {{ \Carbon\Carbon::parse($permohonan->approval->tanggal_siap_diambil)->isoFormat('D MMMM Y, HH:mm') }} WIB</small>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if($status === 'selesai')
+    <div class="selesai-box">
+        <div class="selesai-box-ico">🎉</div>
+        <div class="selesai-box-body">
+            <div class="selesai-title">Permohonan Selesai</div>
+            <div class="selesai-desc">Surat telah diambil.
+                @if($permohonan->approval->tanggal_selesai)
+                Diselesaikan pada {{ \Carbon\Carbon::parse($permohonan->approval->tanggal_selesai)->isoFormat('D MMMM Y') }}.
+                @endif
+            </div>
         </div>
     </div>
     @endif
@@ -373,45 +432,64 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         @endforelse
     </div>
 
-    <div class="sec">
+        <div class="sec">
         <div class="sec-head">
             <div class="sec-icon" style="background:#fffbeb;color:var(--orange)"><i class="bi bi-clock-history"></i></div>
-            <div class="sec-title">Riwayat & Progres Permohonan</div>
+            <div class="sec-title">Riwayat &amp; Progres Permohonan</div>
         </div>
-        <div class="tl-wrap">
+        <div class="tl-wrap" style="grid-template-columns:repeat(4,1fr)">
+            {{-- Step 1: Dikirim --}}
             <div class="tl-item">
                 <div class="tl-dot tl-blue"><i class="bi bi-send-fill"></i></div>
                 <div class="tl-title">Permohonan Dikirim</div>
                 <div class="tl-time">{{ \Carbon\Carbon::parse($permohonan->tanggal_pengajuan)->isoFormat('D MMM Y, HH:mm') }} WIB</div>
             </div>
+            {{-- Step 2: Diverifikasi --}}
             <div class="tl-item">
                 @if($status === 'pending')
                 <div class="tl-dot tl-orange"><i class="bi bi-hourglass-split"></i></div>
                 <div class="tl-title">Sedang Diverifikasi</div>
-                <div class="tl-time">Estimasi 1–2 hari kerja</div>
-                @elseif($status === 'disetujui')
+                <div class="tl-time">Estimasi 1-2 hari kerja</div>
+                @elseif(in_array($status, ['disetujui','siap_diambil','selesai']))
                 <div class="tl-dot tl-green"><i class="bi bi-check-lg"></i></div>
                 <div class="tl-title">Diverifikasi Admin</div>
                 <div class="tl-time">{{ $permohonan->approval->tanggal_approval ? \Carbon\Carbon::parse($permohonan->approval->tanggal_approval)->isoFormat('D MMM Y') : 'Selesai' }}</div>
                 @elseif($status === 'ditolak')
                 <div class="tl-dot tl-red"><i class="bi bi-x-lg"></i></div>
-                <div class="tl-title">Diverifikasi Admin</div>
-                <div class="tl-time">{{ $permohonan->approval->tanggal_approval ? \Carbon\Carbon::parse($permohonan->approval->tanggal_approval)->isoFormat('D MMM Y') : 'Selesai' }}</div>
+                <div class="tl-title">Ditolak Admin</div>
+                <div class="tl-time">{{ $permohonan->approval->tanggal_approval ? \Carbon\Carbon::parse($permohonan->approval->tanggal_approval)->isoFormat('D MMM Y') : '-' }}</div>
                 @endif
             </div>
+            {{-- Step 3: Siap Diambil --}}
             <div class="tl-item">
-                @if($status === 'disetujui')
-                <div class="tl-dot tl-green"><i class="bi bi-check-circle-fill"></i></div>
-                <div class="tl-title">Permohonan Disetujui ✅</div>
-                <div class="tl-time">Surat siap diambil di kantor kelurahan</div>
-                @elseif($status === 'ditolak')
-                <div class="tl-dot tl-red"><i class="bi bi-x-circle-fill"></i></div>
-                <div class="tl-title">Permohonan Ditolak</div>
-                <div class="tl-time">Lihat alasan penolakan di atas</div>
+                @if(in_array($status, ['siap_diambil','selesai']))
+                <div class="tl-dot tl-siap"><i class="bi bi-bag-check-fill"></i></div>
+                <div class="tl-title">Siap Diambil</div>
+                <div class="tl-time">{{ $permohonan->approval->tanggal_siap_diambil ? \Carbon\Carbon::parse($permohonan->approval->tanggal_siap_diambil)->isoFormat('D MMM Y') : '-' }}</div>
+                @elseif($status === 'disetujui')
+                <div class="tl-dot tl-orange"><i class="bi bi-hourglass-split"></i></div>
+                <div class="tl-title">Menunggu Disiapkan</div>
+                <div class="tl-time">Surat sedang dicetak</div>
                 @else
                 <div class="tl-dot tl-gray"><i class="bi bi-circle"></i></div>
-                <div class="tl-title" style="color:var(--muted)">Menunggu Keputusan</div>
-                <div class="tl-time">Belum diproses</div>
+                <div class="tl-title" style="color:var(--muted)">Menunggu</div>
+                <div class="tl-time">-</div>
+                @endif
+            </div>
+            {{-- Step 4: Selesai --}}
+            <div class="tl-item">
+                @if($status === 'selesai')
+                <div class="tl-dot tl-selesai"><i class="bi bi-patch-check-fill"></i></div>
+                <div class="tl-title">Sudah Diambil</div>
+                <div class="tl-time">{{ $permohonan->approval->tanggal_selesai ? \Carbon\Carbon::parse($permohonan->approval->tanggal_selesai)->isoFormat('D MMM Y') : '-' }}</div>
+                @elseif($status === 'siap_diambil')
+                <div class="tl-dot tl-orange"><i class="bi bi-arrow-down-circle"></i></div>
+                <div class="tl-title">Ambil Sekarang!</div>
+                <div class="tl-time">Segera ke kelurahan</div>
+                @else
+                <div class="tl-dot tl-gray"><i class="bi bi-circle"></i></div>
+                <div class="tl-title" style="color:var(--muted)">Selesai</div>
+                <div class="tl-time">-</div>
                 @endif
             </div>
         </div>

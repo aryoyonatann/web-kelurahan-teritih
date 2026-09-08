@@ -1,8 +1,9 @@
-@extends('Admin.layouts.app')
+﻿@extends('Admin.layouts.app')
 
 @section('title', 'Pengaturan Kelurahan')
 
-@push('styles')<style>
+@push('styles')
+<style>
 .back-bar{display:flex;align-items:center;gap:8px;padding:14px 32px;background:white;border-bottom:1px solid #e2e8f0;font-size:13px}
 .back-btn{display:inline-flex;align-items:center;gap:6px;color:#64748b;text-decoration:none;font-weight:600;padding:5px 10px;border-radius:7px;transition:all .15s}
 .back-btn:hover{background:#f1f5f9;color:#1c64f2}
@@ -48,7 +49,6 @@
 .foto-thumb{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2.5px solid #e2e8f0;flex-shrink:0}
 .foto-thumb-placeholder{width:64px;height:64px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:24px;flex-shrink:0}
 .btn-pilih-foto{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1c64f2;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
-.btn-pilih-foto:hover{background:#eff6ff}
 
 /* Pegawai item */
 .pegawai-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start}
@@ -68,6 +68,15 @@ input[type=file].hidden-file{display:none}
 
 .alert-success{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;margin-bottom:20px;background:#ecfdf5;border:1px solid #6ee7b7;font-size:13px;color:#065f46;font-weight:500}
 .alert-error{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#ef4444}
+
+/* Fasilitas list */
+.fas-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;transition:border-color .15s}
+.fas-item:hover{border-color:#bfdbfe}
+.fas-item + .fas-item{margin-top:10px}
+
+
+
+.step-num{width:22px;height:22px;border-radius:6px;background:#eff6ff;color:#1c64f2;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 </style>
 @endpush
 
@@ -83,7 +92,7 @@ input[type=file].hidden-file{display:none}
 <div class="pg-hero">
     <div class="pg-hero-text">
         <h1>Pengaturan Kelurahan</h1>
-        <p>Kelola foto, profil kepala kelurahan, dan data pegawai struktur organisasi.</p>
+        <p>Kelola foto, profil kepala kelurahan, data pegawai, dan fasilitas kelurahan.</p>
     </div>
     <div class="pg-hero-icon"><i class="bi bi-gear-fill"></i></div>
 </div>
@@ -110,7 +119,7 @@ input[type=file].hidden-file{display:none}
             </div>
             <div class="sidebar-info">
                 <div class="sidebar-info-item"><i class="bi bi-geo-alt-fill"></i><div>Kel. Teritih, Kec. Walantaka <span>Kota Serang</span></div></div>
-                <div class="sidebar-info-item"><i class="bi bi-clock-fill"></i><div>Jam Operasional <span>Senin–Kamis 07.30–16.00 | Jumat 07.30–16.30</span></div></div>
+                <div class="sidebar-info-item"><i class="bi bi-clock-fill"></i><div>Jam Operasional <span>Senin–Kamis 07.30–16.00</span></div></div>
                 <div class="sidebar-info-item"><i class="bi bi-instagram"></i><div>@kelurahanteritih</div></div>
             </div>
         </div>
@@ -125,17 +134,13 @@ input[type=file].hidden-file{display:none}
             <div class="alert-error"><strong>Terjadi kesalahan:</strong><ul style="margin:6px 0 0;padding-left:18px">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
         @endif
 
-        {{-- Profil Lurah --}}
+        {{-- ── Profil Lurah ── --}}
         <div class="form-card">
             <div class="form-card-header">
                 <div class="form-card-header-icon" style="background:#eff6ff;color:#1c64f2"><i class="bi bi-person-badge-fill"></i></div>
-                <div>
-                    <h3>Profil Kepala Kelurahan</h3>
-                    <p>Informasi yang tampil di halaman Beranda</p>
-                </div>
+                <div><h3>Profil Kepala Kelurahan</h3><p>Informasi yang tampil di halaman Beranda</p></div>
             </div>
             <div class="form-card-body">
-                {{-- Foto --}}
                 <div class="mb-4">
                     <label class="form-label">Foto Kepala Kelurahan</label>
                     <div class="foto-upload-area" onclick="document.getElementById('fotoInput').click()" style="cursor:pointer">
@@ -153,23 +158,26 @@ input[type=file].hidden-file{display:none}
                         <input type="file" id="fotoInput" name="foto_lurah" accept="image/*" class="hidden-file">
                     </div>
                 </div>
-
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                     <div>
                         <label class="form-label">Nama Lengkap</label>
-                        <input type="text" name="nama_lurah" value="{{ old('nama_lurah', $namaLurah) }}" class="form-control" placeholder="Nama lengkap beserta gelar" oninput="document.getElementById('sidebarNama').textContent=this.value||'Nama Lurah'">
+                        <input type="text" name="nama_lurah" value="{{ old('nama_lurah', $namaLurah) }}" class="form-control"
+                            placeholder="Nama lengkap beserta gelar"
+                            oninput="document.getElementById('sidebarNama').textContent=this.value||'Nama Lurah'">
                         @error('nama_lurah')<div class="form-error">{{ $message }}</div>@enderror
                     </div>
                     <div>
                         <label class="form-label">Jabatan</label>
-                        <input type="text" name="jabat_lurah" value="{{ old('jabat_lurah', $jabatLurah) }}" class="form-control" placeholder="Contoh: Kepala Kelurahan Teritih" oninput="document.getElementById('sidebarJabatan').textContent=this.value||'Jabatan'">
+                        <input type="text" name="jabat_lurah" value="{{ old('jabat_lurah', $jabatLurah) }}" class="form-control"
+                            placeholder="Contoh: Kepala Kelurahan Teritih"
+                            oninput="document.getElementById('sidebarJabatan').textContent=this.value||'Jabatan'">
                         @error('jabat_lurah')<div class="form-error">{{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Pegawai --}}
+        {{-- ── Pegawai ── --}}
         @php
         $nodeLabels = [
             'lurah'          => 'Kepala Kelurahan',
@@ -185,14 +193,10 @@ input[type=file].hidden-file{display:none}
             'op-jamaludin'   => 'Pengelola Umum (Jamaludin)',
         ];
         @endphp
-
         <div class="form-card">
             <div class="form-card-header">
                 <div class="form-card-header-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-diagram-3-fill"></i></div>
-                <div>
-                    <h3>Data Pegawai Struktur Organisasi</h3>
-                    <p>Nama, NIP, dan foto masing-masing pegawai</p>
-                </div>
+                <div><h3>Data Pegawai Struktur Organisasi</h3><p>Nama, NIP, dan foto masing-masing pegawai</p></div>
             </div>
             <div class="form-card-body">
                 @foreach($nodeKeys as $key)
@@ -208,16 +212,12 @@ input[type=file].hidden-file{display:none}
                     <div>
                         <div class="pegawai-role">{{ $label }}</div>
                         <div class="pegawai-inputs">
-                            <div>
-                                <input type="text" name="pegawai[{{ $key }}][nama]"
-                                    value="{{ old('pegawai.'.$key.'.nama', $p['nama']) }}"
-                                    class="form-control" placeholder="Nama lengkap" style="font-size:12.5px">
-                            </div>
-                            <div>
-                                <input type="text" name="pegawai[{{ $key }}][nip]"
-                                    value="{{ old('pegawai.'.$key.'.nip', $p['nip']) }}"
-                                    class="form-control" placeholder="NIP" style="font-size:12.5px">
-                            </div>
+                            <input type="text" name="pegawai[{{ $key }}][nama]"
+                                value="{{ old('pegawai.'.$key.'.nama', $p['nama']) }}"
+                                class="form-control" placeholder="Nama lengkap" style="font-size:12.5px">
+                            <input type="text" name="pegawai[{{ $key }}][nip]"
+                                value="{{ old('pegawai.'.$key.'.nip', $p['nip']) }}"
+                                class="form-control" placeholder="NIP" style="font-size:12.5px">
                         </div>
                     </div>
                     <div style="padding-top:22px">
@@ -230,45 +230,34 @@ input[type=file].hidden-file{display:none}
             </div>
         </div>
 
-        <button type="submit" class="btn-save"><i class="bi bi-floppy-fill"></i> Simpan Semua Perubahan</button>
+
+        {{-- ══════════════════════════════
+             SECTION: BATAS WILAYAH
+        ══════════════════════════════ --}}
+        <div class="form-card" style="margin-top:20px">
+            <div class="form-card-header">
+                <div class="form-card-header-icon" style="background:#fef2f2;color:#ef4444"><i class="bi bi-geo-fill"></i></div>
+                <div><h3>Batas Wilayah</h3><p>Teks keterangan batas wilayah kelurahan</p></div>
+            </div>
+            <div class="form-card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    @foreach(['utara'=>'⬆️ Utara','selatan'=>'⬇️ Selatan','barat'=>'⬅️ Barat','timur'=>'➡️ Timur'] as $arah => $lbl)
+                    <div>
+                        <label class="form-label">{{ $lbl }}</label>
+                        <input type="text" name="batas_{{ $arah }}"
+                            value="{{ old('batas_'.$arah, $batasWilayah[$arah]) }}"
+                            class="form-control" placeholder="Nama wilayah...">
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:16px;padding-bottom:40px">
+            <button type="submit" class="btn-save"><i class="bi bi-floppy-fill"></i> Simpan Semua Perubahan</button>
+        </div>
     </div>
 </div>
 </form>
+
 @endsection
-
-@push('scripts')
-<script>
-document.getElementById('fotoInput').addEventListener('change', function(){
-    const file = this.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-        const preview = document.getElementById('fotoPreview');
-        const placeholder = document.getElementById('fotoPlaceholder');
-        const sidebar = document.getElementById('sidebarFoto');
-        const sidebarPh = document.getElementById('sidebarPlaceholder');
-        preview.src = e.target.result;
-        preview.style.display = 'block';
-        sidebar.src = e.target.result;
-        sidebar.style.display = 'block';
-        if (placeholder) placeholder.style.display = 'none';
-        if (sidebarPh) sidebarPh.style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-});
-
-document.querySelectorAll('.pegawai-foto-input').forEach(input => {
-    input.addEventListener('change', function(){
-        const key = this.dataset.key;
-        const file = this.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-            const wrap = document.getElementById('prev-wrap-' + key);
-            wrap.innerHTML = `<img id="prev-${key}" class="pegawai-avatar" src="${e.target.result}" alt="">`;
-        };
-        reader.readAsDataURL(file);
-    });
-});
-</script>
-@endpush

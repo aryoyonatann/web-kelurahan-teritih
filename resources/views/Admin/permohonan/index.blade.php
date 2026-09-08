@@ -68,7 +68,7 @@
 
     /* ── STATS GRID ── */
     .stats-grid {
-        display: grid; grid-template-columns: repeat(4, 1fr);
+        display: grid; grid-template-columns: repeat(5, 1fr);
         gap: 16px; margin-bottom: 24px;
     }
     .stat-card {
@@ -90,6 +90,7 @@
     .stat-card.yellow::after { background: var(--warning); }
     .stat-card.green::after  { background: var(--success); }
     .stat-card.red::after    { background: var(--danger); }
+    .stat-card[data-color="orange"]::after { background: #f97316; }
     .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .stat-icon {
         width: 48px; height: 48px; border-radius: var(--radius-sm);
@@ -100,6 +101,7 @@
     .stat-icon.yellow { background: var(--warning-light);  color: var(--warning); }
     .stat-icon.green  { background: var(--success-light);  color: var(--success); }
     .stat-icon.red    { background: var(--danger-light);   color: var(--danger); }
+    .stat-icon.orange { background: #fff7ed; color: #ea580c; }
     .stat-info small  { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-400); }
     .stat-info strong { font-size: 28px; font-weight: 800; color: var(--gray-900); display: block; line-height: 1.1; margin-top: 2px; font-family: 'DM Mono', monospace; }
 
@@ -178,16 +180,24 @@
         font-size: 11px; font-weight: 700; letter-spacing: .04em;
     }
     .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .status-pending  { background: #fffbeb; color: #92400e; }
-    .status-pending .status-dot  { background: #f59e0b; animation: pulse-warn 1.5s infinite; }
-    .status-approved { background: #ecfdf5; color: #064e3b; }
-    .status-approved .status-dot { background: #10b981; }
-    .status-rejected { background: #fef2f2; color: #7f1d1d; }
-    .status-rejected .status-dot { background: #ef4444; }
+    .status-pending       { background: #fffbeb; color: #92400e; }
+    .status-pending .status-dot       { background: #f59e0b; animation: pulse-warn 1.5s infinite; }
+    .status-approved      { background: #ecfdf5; color: #064e3b; }
+    .status-approved .status-dot      { background: #10b981; }
+    .status-rejected      { background: #fef2f2; color: #7f1d1d; }
+    .status-rejected .status-dot      { background: #ef4444; }
+    .status-siap-diambil  { background: #fff7ed; color: #9a3412; }
+    .status-siap-diambil .status-dot  { background: #f97316; animation: pulse-orange 1.5s infinite; }
+    .status-selesai       { background: #f0fdf4; color: #14532d; }
+    .status-selesai .status-dot       { background: #16a34a; }
 
     @keyframes pulse-warn {
         0%, 100% { opacity: 1; transform: scale(1); }
         50%       { opacity: .6; transform: scale(1.3); }
+    }
+    @keyframes pulse-orange {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: .5; transform: scale(1.4); }
     }
 
     /* ── ACTION BUTTONS ── */
@@ -208,6 +218,10 @@
     .btn-reject:hover  { background: #fecaca; }
     .btn-print   { background: #f3e8ff; color: #8b5cf6; }
     .btn-print:hover   { background: #f5f3ff; }
+    .btn-siap    { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+    .btn-siap:hover    { background: #ffedd5; }
+    .btn-selesai { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .btn-selesai:hover { background: #dcfce7; }
     .btn-dok     { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; width:32px; height:32px; padding:0; justify-content:center; border-radius: var(--radius-sm); position: relative; }
     .btn-dok:hover { background: #e0f2fe; }
     .btn-dok::after {
@@ -242,11 +256,11 @@
         to   { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 900px) {
-        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 1100px) {
+        .stats-grid { grid-template-columns: repeat(3, 1fr); }
     }
-    @media (max-width: 600px) {
-        .stats-grid { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 700px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
         .page-hero { padding: 24px 20px; }
         .page-hero h1 { font-size: 20px; }
         .search-wrap input { width: 200px; }
@@ -320,6 +334,17 @@
                 <strong>{{ $data->filter(fn($d) => optional($d->approval)->status === 'disetujui')->count() }}</strong>
             </div>
         </div>
+        <div class="stat-card" style="border-top-color:#f97316" data-color="orange">
+            <div class="stat-icon orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <small>Siap Diambil</small>
+                <strong>{{ $data->filter(fn($d) => optional($d->approval)->status === 'siap_diambil')->count() }}</strong>
+            </div>
+        </div>
         <div class="stat-card red">
             <div class="stat-icon red">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -345,6 +370,8 @@
             <option value="">Semua Status</option>
             <option value="pending">Pending</option>
             <option value="disetujui">Disetujui</option>
+            <option value="siap_diambil">Siap Diambil</option>
+            <option value="selesai">Selesai</option>
             <option value="ditolak">Ditolak</option>
         </select>
         <div class="toolbar-right">
@@ -404,6 +431,14 @@
                             <span class="status-pill status-rejected">
                                 <span class="status-dot"></span> Ditolak
                             </span>
+                        @elseif($rowStatus === 'siap_diambil')
+                            <span class="status-pill status-siap-diambil">
+                                <span class="status-dot"></span> Siap Diambil
+                            </span>
+                        @elseif($rowStatus === 'selesai')
+                            <span class="status-pill status-selesai">
+                                <span class="status-dot"></span> Selesai
+                            </span>
                         @else
                             <span class="status-pill status-pending">
                                 <span class="status-dot"></span> Pending
@@ -454,6 +489,29 @@
                                     </svg>
                                     Cetak
                                 </a>
+                                <form action="{{ route('permohonan.siapDiambil', $d->id_permohonan) }}" method="POST" style="display:inline;" id="form-siap-{{ $d->id_permohonan }}">
+                                    @csrf @method('PUT')
+                                    <button type="button" class="btn-act btn-siap"
+                                            onclick="showConfirm('Tandai surat <strong>{{ addslashes($d->jenisSurat->nama_surat ?? '') }}</strong> milik <strong>{{ addslashes($namaPemohon) }}</strong> sebagai <strong>Siap Diambil</strong>?', () => document.getElementById('form-siap-{{ $d->id_permohonan }}').submit(), {confirmText:'Ya, Siap Diambil', type:'info'})">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                        </svg>
+                                        Siap Diambil
+                                    </button>
+                                </form>
+                            @endif
+
+                            @if($rowStatus === 'siap_diambil')
+                                <form action="{{ route('permohonan.selesai', $d->id_permohonan) }}" method="POST" style="display:inline;" id="form-selesai-{{ $d->id_permohonan }}">
+                                    @csrf @method('PUT')
+                                    <button type="button" class="btn-act btn-selesai"
+                                            onclick="showConfirm('Konfirmasi surat sudah diambil oleh <strong>{{ addslashes($namaPemohon) }}</strong>?', () => document.getElementById('form-selesai-{{ $d->id_permohonan }}').submit(), {confirmText:'Ya, Sudah Diambil', type:'success'})">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        Selesai
+                                    </button>
+                                </form>
                             @endif
 
                             @if($rowStatus === 'pending')

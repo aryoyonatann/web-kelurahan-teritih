@@ -82,9 +82,14 @@ class StatistikController extends Controller
             $dataSingkat['jumlah_penduduk'] = (string) $totalPendudukDB;
         }
 
+        // Fasilitas lokasi — pindah dari Pengaturan ke sini
+        $fasilitasLokasi = \App\Http\Controllers\Admin\PengaturanController::getFasilitasLokasi();
+        $fasKategori     = \App\Http\Controllers\Admin\PengaturanController::getFasKategori();
+
         return view('Admin.statistik.edit', compact(
             'statistik', 'dataSingkat', 'adaDataPenduduk',
-            'currentYear', 'totalPendudukDB', 'perTahun'
+            'currentYear', 'totalPendudukDB', 'perTahun',
+            'fasilitasLokasi', 'fasKategori'
         ));
     }
 
@@ -139,6 +144,21 @@ class StatistikController extends Controller
                 );
             }
         }
+
+        // ── Simpan daftar fasilitas lokasi ──────────────────
+        $fasilitasBersih = [];
+        foreach ($request->input('fasilitas', []) as $item) {
+            $nama = trim($item['nama'] ?? '');
+            if ($nama === '') continue;
+            $fasilitasBersih[] = [
+                'nama'         => $nama,
+                'kategori'     => trim($item['kategori']     ?? 'ibadah'),
+                'sub_kategori' => trim($item['sub_kategori'] ?? ''),
+                'alamat'       => trim($item['alamat']       ?? ''),
+                'link_gmaps'   => trim($item['link_gmaps']   ?? ''),
+            ];
+        }
+        Pengaturan::setValue('fasilitas_lokasi', json_encode($fasilitasBersih, JSON_UNESCAPED_UNICODE));
 
         // ── Sinkronkan seluruh angka turunan data warga ke DB ──────────
         // (jenis kelamin, agama, umur, dst + Jumlah Penduduk di Data
