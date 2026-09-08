@@ -433,7 +433,7 @@ class PendudukController extends Controller
             'hubungan_keluarga' => ['required', 'in:' . implode(',', $this->pilihanHubungan)],
             'rt'                => ['required', 'string', 'max:10'],
             'rw'                => ['required', 'string', 'max:10'],
-            'alamat'            => ['nullable', 'string', 'max:255'],
+            'alamat'            => ['required', 'string', 'max:255'],
             'tahun_data'        => ['required', 'integer', 'min:2000', 'max:' . ((int) date('Y') + 1)],
         ], [
             'nik.required'     => 'NIK wajib diisi.',

@@ -28,13 +28,24 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
+        // Bulan & tahun terakhir yang punya data permohonan — untuk default dropdown
+        $lastPermohonan = PermohonanSurat::latest('tanggal_pengajuan')->first();
+        $defaultBulan   = $lastPermohonan
+            ? (int) \Carbon\Carbon::parse($lastPermohonan->tanggal_pengajuan)->format('m')
+            : now()->month;
+        $defaultTahun   = $lastPermohonan
+            ? (int) \Carbon\Carbon::parse($lastPermohonan->tanggal_pengajuan)->format('Y')
+            : now()->year;
+
         return view('Admin.dashboard', compact(
             'totalWarga',
             'perluVerifikasi',
             'suratKeluar',
             'suratHariIni',
             'beritaTerbaru',
-            'permohonanTerbaru'
+            'permohonanTerbaru',
+            'defaultBulan',
+            'defaultTahun'
         ));
     }
 
@@ -59,11 +70,11 @@ class DashboardController extends Controller
             });
 
         return response()->json([
-            'data'      => $data->values(),
-            'total'     => $data->count(),
-            'disetujui' => $data->where('status', 'disetujui')->count(),
-            'ditolak'   => $data->where('status', 'ditolak')->count(),
-            'pending'   => $data->where('status', 'pending')->count(),
+            'data'        => $data->values(),
+            'total'       => $data->count(),
+            'disetujui'   => $data->whereIn('status', ['disetujui','siap_diambil','selesai'])->count(),
+            'ditolak'     => $data->where('status', 'ditolak')->count(),
+            'pending'     => $data->whereIn('status', ['pending','diproses'])->count(),
         ]);
     }
 }

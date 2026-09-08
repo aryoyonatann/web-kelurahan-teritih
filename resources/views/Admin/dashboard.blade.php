@@ -1,4 +1,4 @@
-@extends('Admin.layouts.app')
+﻿@extends('Admin.layouts.app')
 
 @section('title', 'Dashboard')
 
@@ -558,13 +558,13 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <select class="month-select" id="selectBulan">
                 @php $bulanList = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
                 @foreach($bulanList as $i => $bln)
-                    <option value="{{ $i+1 }}" {{ ($i+1) == now()->month ? 'selected' : '' }}>{{ $bln }}</option>
+                    <option value="{{ $i+1 }}" {{ ($i+1) == $defaultBulan ? 'selected' : '' }}>{{ $bln }}</option>
                 @endforeach
             </select>
             <label>Tahun:</label>
             <select class="month-select" id="selectTahun">
-                @for($y = now()->year; $y >= now()->year - 4; $y--)
-                    <option value="{{ $y }}" {{ $y == now()->year ? 'selected' : '' }}>{{ $y }}</option>
+                @for($y = now()->year; $y >= min(now()->year - 4, $defaultTahun); $y--)
+                    <option value="{{ $y }}" {{ $y == $defaultTahun ? 'selected' : '' }}>{{ $y }}</option>
                 @endfor
             </select>
             <button class="btn-filter-apply" id="btnApplyFilter">
@@ -590,316 +590,349 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
 @endsection
 
+
+
 @push('scripts')
 <script>
-// Status Kantor
-function updateStatusKantor() {
-    const now  = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Jakarta'}));
-    const day  = now.getDay();
-    const hour = now.getHours();
-    const min  = now.getMinutes();
-    const time = hour + min / 60;
-    let buka   = false;
-
-    document.querySelectorAll('.jam-row').forEach(r => r.style.background = '');
-    if (day >= 1 && day <= 4) {
-        document.getElementById('row-senin-kamis').style.background = '#f0f9ff';
-        buka = time >= 8 && time < 15;
-    } else if (day === 5) {
-        document.getElementById('row-jumat').style.background = '#f0f9ff';
-        buka = time >= 8 && time < 11.5;
-    } else {
-        document.getElementById('row-sabtu-minggu').style.background = '#fef2f2';
-    }
-
-    const el = document.getElementById('status-kantor');
-    if (buka) {
-        el.style.cssText = 'background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;margin-top:12px;border-radius:8px;padding:9px 12px;font-size:12px;display:flex;align-items:center;gap:6px';
-        el.innerHTML = `<i class="bi bi-circle-fill" style="font-size:8px;color:#16a34a"></i> Kantor sedang <strong style="margin-left:3px">Buka</strong>`;
-    } else {
-        el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;color:#991b1b;margin-top:12px;border-radius:8px;padding:9px 12px;font-size:12px;display:flex;align-items:center;gap:6px';
-        const msg = (day === 6 || day === 0) ? 'Libur akhir pekan' : 'Di luar jam operasional';
-        el.innerHTML = `<i class="bi bi-circle-fill" style="font-size:8px;color:#ef4444"></i> Kantor sedang <strong style="margin-left:3px">Tutup</strong> — ${msg}`;
-    }
+// ── Utility global ──────────────────────────────────────────────────────────
+function escHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
 }
-updateStatusKantor();
-setInterval(updateStatusKantor, 60000);
 
-// Notifikasi sidebar
-(function() {
-    const API   = '{{ route("admin.notifikasi") }}';
-    const panel = document.getElementById('dash-notif-list');
-    const pill  = document.getElementById('dash-notif-count');
+// ── Status Kantor ────────────────────────────────────────────────────────────
+(function () {
+    function update() {
+        var now  = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+        var day  = now.getDay();
+        var time = now.getHours() + now.getMinutes() / 60;
+        var buka = false;
 
-    function escHtml(s) {
-        return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+        document.querySelectorAll('.jam-row').forEach(function (r) { r.style.background = ''; });
+
+        if (day >= 1 && day <= 4) {
+            document.getElementById('row-senin-kamis').style.background = '#f0f9ff';
+            buka = time >= 8 && time < 15;
+        } else if (day === 5) {
+            document.getElementById('row-jumat').style.background = '#f0f9ff';
+            buka = time >= 8 && time < 11.5;
+        } else {
+            document.getElementById('row-sabtu-minggu').style.background = '#fef2f2';
+        }
+
+        var el = document.getElementById('status-kantor');
+        if (buka) {
+            el.style.cssText = 'background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;margin-top:12px;border-radius:8px;padding:9px 12px;font-size:12px;display:flex;align-items:center;gap:6px';
+            el.innerHTML = '<i class="bi bi-circle-fill" style="font-size:8px;color:#16a34a"></i> Kantor sedang <strong style="margin-left:3px">Buka</strong>';
+        } else {
+            el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;color:#991b1b;margin-top:12px;border-radius:8px;padding:9px 12px;font-size:12px;display:flex;align-items:center;gap:6px';
+            var msg = (day === 6 || day === 0) ? 'Libur akhir pekan' : 'Di luar jam operasional';
+            el.innerHTML = '<i class="bi bi-circle-fill" style="font-size:8px;color:#ef4444"></i> Kantor sedang <strong style="margin-left:3px">Tutup</strong> &mdash; ' + msg;
+        }
     }
-
-    function loadNotif() {
-        fetch(API,{headers:{'Accept':'application/json'}})
-        .then(r=>r.json())
-        .then(data=>{
-            const items = data.items||[];
-            const count = data.count||0;
-            pill.style.display = count > 0 ? '' : 'none';
-            if (count > 0) pill.textContent = count+' baru';
-
-            if (!items.length) {
-                panel.innerHTML = `<div style="padding:20px 18px;text-align:center;color:#94a3b8;font-size:13px">
-                    <i class="bi bi-bell-slash" style="font-size:22px;display:block;margin-bottom:6px;color:#e2e8f0"></i>
-                    Tidak ada notifikasi baru</div>`;
-                return;
-            }
-            panel.innerHTML = items.slice(0,5).map(n=>`
-                <a href="${escHtml(n.url)}"
-                   style="display:flex;gap:10px;align-items:flex-start;padding:10px 16px;border-bottom:1px dashed #e2e8f0;text-decoration:none;color:inherit;transition:background .15s"
-                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
-                    <div style="width:8px;height:8px;border-radius:50%;background:#1c64f2;margin-top:5px;flex-shrink:0"></div>
-                    <div style="flex:1">
-                        <div style="font-size:12px;color:#334155;line-height:1.5">${escHtml(n.message)}</div>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:2px">
-                            <i class="bi bi-clock" style="font-size:10px"></i> ${escHtml(n.time)}
-                        </div>
-                    </div>
-                </a>`).join('');
-        })
-        .catch(()=>{ panel.innerHTML='<div style="padding:16px;font-size:12px;color:#94a3b8">Gagal memuat.</div>'; });
-    }
-
-    loadNotif();
-    setInterval(loadNotif, 30000);
+    update();
+    setInterval(update, 60000);
 })();
 
-// Modal Permohonan per Bulan
-(function() {
-    const overlay  = document.getElementById('monthModalOverlay');
-    const btnOpen  = document.getElementById('btn-open-month-modal');
-    const btnClose = document.getElementById('btnCloseMonthModal');
-    const btnApply = document.getElementById('btnApplyFilter');
-    const btnPrint = document.getElementById('btnPrintRekap');
-    const btnExcel = document.getElementById('btnExcelRekap');
-    const body     = document.getElementById('monthModalBody');
-    const selBulan = document.getElementById('selectBulan');
-    const selTahun = document.getElementById('selectTahun');
+// ── Notifikasi sidebar ───────────────────────────────────────────────────────
+(function () {
+    var API   = '{{ route("admin.notifikasi") }}';
+    var panel = document.getElementById('dash-notif-list');
+    var pill  = document.getElementById('dash-notif-count');
 
-    const BULAN_NAMES = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    function load() {
+        fetch(API, { headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var items = data.items || [];
+                var count = data.count || 0;
 
-    // Menyimpan data hasil fetch terakhir supaya bisa dipakai tombol Cetak/Rekap
-    let lastResult = null;
-    let lastBulan  = null;
-    let lastTahun  = null;
+                pill.style.display = count > 0 ? '' : 'none';
+                if (count > 0) pill.textContent = count + ' baru';
 
-    const openModal  = () => { overlay.classList.add('show'); document.body.style.overflow='hidden'; };
-    const closeModal = () => { overlay.classList.remove('show'); document.body.style.overflow=''; };
+                if (!items.length) {
+                    panel.innerHTML = '<div style="padding:20px 18px;text-align:center;color:#94a3b8;font-size:13px">'
+                        + '<i class="bi bi-bell-slash" style="font-size:22px;display:block;margin-bottom:6px;color:#e2e8f0"></i>'
+                        + 'Tidak ada notifikasi baru</div>';
+                    return;
+                }
+
+                panel.innerHTML = items.slice(0, 5).map(function (n) {
+                    return '<a href="' + escHtml(n.url) + '"'
+                        + ' style="display:flex;gap:10px;align-items:flex-start;padding:10px 16px;border-bottom:1px dashed #e2e8f0;text-decoration:none;color:inherit;transition:background .15s"'
+                        + ' onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'\'">'
+                        + '<div style="width:8px;height:8px;border-radius:50%;background:#1c64f2;margin-top:5px;flex-shrink:0"></div>'
+                        + '<div style="flex:1">'
+                        + '<div style="font-size:12px;color:#334155;line-height:1.5">' + escHtml(n.message) + '</div>'
+                        + '<div style="font-size:11px;color:#94a3b8;margin-top:2px">'
+                        + '<i class="bi bi-clock" style="font-size:10px"></i> ' + escHtml(n.time)
+                        + '</div></div></a>';
+                }).join('');
+            })
+            .catch(function () {
+                panel.innerHTML = '<div style="padding:16px;font-size:12px;color:#94a3b8">Gagal memuat notifikasi.</div>';
+            });
+    }
+
+    load();
+    setInterval(load, 30000);
+})();
+
+// ── Modal Data Permohonan per Bulan ─────────────────────────────────────────
+(function () {
+    var overlay  = document.getElementById('monthModalOverlay');
+    var btnOpen  = document.getElementById('btn-open-month-modal');
+    var btnClose = document.getElementById('btnCloseMonthModal');
+    var btnApply = document.getElementById('btnApplyFilter');
+    var btnPrint = document.getElementById('btnPrintRekap');
+    var btnExcel = document.getElementById('btnExcelRekap');
+    var body     = document.getElementById('monthModalBody');
+    var selBulan = document.getElementById('selectBulan');
+    var selTahun = document.getElementById('selectTahun');
+
+    var BULAN = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    // State fetch terakhir — dipakai tombol Cetak & Excel
+    var lastResult = null;
+    var lastBulan  = null;
+    var lastTahun  = null;
+
+    // Buka / tutup modal
+    function openModal()  { overlay.classList.add('show');    document.body.style.overflow = 'hidden'; }
+    function closeModal() { overlay.classList.remove('show'); document.body.style.overflow = '';       }
 
     btnOpen.addEventListener('click', openModal);
     btnClose.addEventListener('click', closeModal);
-    overlay.addEventListener('click', e => { if (e.target===overlay) closeModal(); });
-    document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
 
-    function statusBadge(status) {
-        if (status==='disetujui') return '<span class="bdg bdg-approved">Disetujui</span>';
-        if (status==='ditolak')  return '<span class="bdg bdg-rejected">Ditolak</span>';
-        return '<span class="bdg bdg-pending">Pending</span>';
+    // Badge status berwarna
+    function statusBadge(s) {
+        var map = {
+            disetujui:    '<span class="bdg bdg-approved">Disetujui</span>',
+            ditolak:      '<span class="bdg bdg-rejected">Ditolak</span>',
+            siap_diambil: '<span class="bdg" style="background:#eff6ff;color:#1c64f2;border:1px solid #bfdbfe">Siap Diambil</span>',
+            selesai:      '<span class="bdg" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0">Selesai</span>',
+            diproses:     '<span class="bdg" style="background:#fffbeb;color:#92400e;border:1px solid #fde68a">Diproses</span>',
+        };
+        return map[s] || '<span class="bdg bdg-pending">Pending</span>';
     }
 
-    function statusLabel(status) {
-        if (status==='disetujui') return 'Disetujui';
-        if (status==='ditolak')  return 'Ditolak';
-        return 'Pending';
+    // Label teks status (untuk cetak/CSV)
+    function statusLabel(s) {
+        var map = {
+            disetujui: 'Disetujui', ditolak: 'Ditolak',
+            siap_diambil: 'Siap Diambil', selesai: 'Selesai', diproses: 'Diproses',
+        };
+        return map[s] || 'Pending';
     }
 
+    // ── Fetch & render tabel ─────────────────────────────────────────────────
     function loadData() {
-        const bulan = selBulan.value;
-        const tahun = selTahun.value;
+        var bulan = selBulan.value;
+        var tahun = selTahun.value;
+
         btnPrint.disabled = true;
         btnExcel.disabled = true;
-        body.innerHTML = `<div style="padding:48px 20px;text-align:center;color:#94a3b8;font-size:13px">
-            <i class="bi bi-arrow-clockwise" style="font-size:32px;display:block;margin-bottom:10px;color:#e2e8f0"></i>
-            Memuat data...</div>`;
+        body.innerHTML = '<div style="padding:48px 20px;text-align:center;color:#94a3b8;font-size:13px">'
+            + '<i class="bi bi-arrow-clockwise" style="font-size:32px;display:block;margin-bottom:10px;color:#e2e8f0"></i>'
+            + 'Memuat data...</div>';
 
-        fetch(`{{ url('admin/dashboard/permohonan-bulan') }}?bulan=${bulan}&tahun=${tahun}`, {
-            headers: { 'Accept':'application/json', 'X-Requested-With':'XMLHttpRequest' }
-        })
-        .then(r=>r.json())
-        .then(data=>{
-            const items  = data.data||[];
-            const total  = data.total||0;
-            const setuju = data.disetujui||0;
-            const tolak  = data.ditolak||0;
-            const pend   = data.pending||0;
+        var url = '{{ url("admin/dashboard/permohonan-bulan") }}?bulan=' + bulan + '&tahun=' + tahun;
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.setRequestHeader('Accept', 'application/json');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.withCredentials = true;
 
-            // Simpan untuk keperluan cetak/rekap
+        xhr.onload = function () {
+            var ct = xhr.getResponseHeader('Content-Type') || '';
+
+            // Sesi berakhir atau response bukan JSON
+            if (xhr.status === 401 || !ct.includes('application/json')) {
+                body.innerHTML = '<div class="month-empty" style="padding:36px 20px;text-align:center">'
+                    + '<i class="bi bi-lock-fill" style="font-size:32px;display:block;margin-bottom:10px;color:#e2e8f0"></i>'
+                    + '<div style="font-size:14px;font-weight:700;color:#64748b;margin-bottom:6px">Sesi telah berakhir</div>'
+                    + '<a href="{{ route("admin.login") }}" style="display:inline-flex;align-items:center;gap:5px;padding:8px 18px;background:#1c64f2;color:white;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">'
+                    + '<i class="bi bi-box-arrow-in-right"></i> Login Ulang</a></div>';
+                return;
+            }
+
+            var data;
+            try {
+                data = JSON.parse(xhr.responseText);
+            } catch (e) {
+                body.innerHTML = '<div class="month-empty"><i class="bi bi-exclamation-circle"></i> Gagal memproses data dari server.</div>';
+                return;
+            }
+
+            var items  = data.data      || [];
+            var total  = data.total     || 0;
+            var setuju = data.disetujui || 0;
+            var tolak  = data.ditolak   || 0;
+            var pend   = data.pending   || 0;
+
             lastResult = data;
             lastBulan  = bulan;
             lastTahun  = tahun;
             btnPrint.disabled = items.length === 0;
             btnExcel.disabled = items.length === 0;
 
-            let html = `<div class="month-summary">
-                <div class="month-sum-item"><div class="month-sum-val">${total}</div><div class="month-sum-lbl">Total</div></div>
-                <div class="month-sum-item" style="border-color:#bbf7d0"><div class="month-sum-val" style="color:var(--green)">${setuju}</div><div class="month-sum-lbl">Disetujui</div></div>
-                <div class="month-sum-item" style="border-color:#fecaca"><div class="month-sum-val" style="color:var(--red)">${tolak}</div><div class="month-sum-lbl">Ditolak</div></div>
-                <div class="month-sum-item" style="border-color:#bfdbfe"><div class="month-sum-val" style="color:var(--blue)">${pend}</div><div class="month-sum-lbl">Pending</div></div>
-            </div>`;
+            // Ringkasan angka
+            var html = '<div class="month-summary">'
+                + '<div class="month-sum-item"><div class="month-sum-val">' + total + '</div><div class="month-sum-lbl">Total</div></div>'
+                + '<div class="month-sum-item" style="border-color:#bbf7d0"><div class="month-sum-val" style="color:var(--green)">' + setuju + '</div><div class="month-sum-lbl">Disetujui</div></div>'
+                + '<div class="month-sum-item" style="border-color:#fecaca"><div class="month-sum-val" style="color:var(--red)">'   + tolak  + '</div><div class="month-sum-lbl">Ditolak</div></div>'
+                + '<div class="month-sum-item" style="border-color:#bfdbfe"><div class="month-sum-val" style="color:var(--blue)">'  + pend   + '</div><div class="month-sum-lbl">Pending</div></div>'
+                + '</div>';
 
             if (!items.length) {
-                html += `<div class="month-empty"><i class="bi bi-inbox"></i>Tidak ada permohonan di ${BULAN_NAMES[bulan]} ${tahun}</div>`;
+                html += '<div class="month-empty"><i class="bi bi-inbox"></i>Tidak ada permohonan di '
+                    + BULAN[parseInt(bulan, 10)] + ' ' + tahun + '</div>';
             } else {
-                html += `<div class="table-responsive"><table class="month-tbl">
-                    <thead><tr><th>NO</th><th>NAMA PEMOHON</th><th>JENIS SURAT</th><th>TANGGAL</th><th>STATUS</th></tr></thead>
-                    <tbody>${items.map((p,i)=>`
-                        <tr>
-                            <td style="color:var(--muted);font-size:12px">${i+1}</td>
-                            <td>
-                                <div style="font-weight:600;color:var(--navy);font-size:13px">${escHtml(p.nama_pemohon||'-')}</div>
-                                <div style="font-size:11px;color:var(--muted)">NIK: ${escHtml(p.nik_pemohon||'-')}</div>
-                            </td>
-                            <td style="font-size:12px">${escHtml(p.jenis_surat||'-')}</td>
-                            <td style="font-size:12px;color:var(--muted)">${escHtml(p.tanggal)}</td>
-                            <td>${statusBadge(p.status)}</td>
-                        </tr>`).join('')}
-                    </tbody></table></div>`;
+                html += '<div class="table-responsive"><table class="month-tbl">'
+                    + '<thead><tr>'
+                    + '<th>NO</th><th>NAMA PEMOHON</th><th>JENIS SURAT</th><th>TANGGAL</th><th>STATUS</th>'
+                    + '</tr></thead><tbody>';
+
+                items.forEach(function (p, i) {
+                    html += '<tr>'
+                        + '<td style="color:var(--muted);font-size:12px">' + (i + 1) + '</td>'
+                        + '<td>'
+                        +   '<div style="font-weight:600;color:var(--navy);font-size:13px">' + escHtml(p.nama_pemohon || '-') + '</div>'
+                        +   '<div style="font-size:11px;color:var(--muted)">NIK: ' + escHtml(p.nik_pemohon || '-') + '</div>'
+                        + '</td>'
+                        + '<td style="font-size:12px">' + escHtml(p.jenis_surat || '-') + '</td>'
+                        + '<td style="font-size:12px;color:var(--muted)">' + escHtml(p.tanggal || '-') + '</td>'
+                        + '<td>' + statusBadge(p.status) + '</td>'
+                        + '</tr>';
+                });
+
+                html += '</tbody></table></div>';
             }
+
             body.innerHTML = html;
-        })
-        .catch(()=>{
-            body.innerHTML = `<div class="month-empty"><i class="bi bi-wifi-off"></i>Gagal memuat data. Coba lagi.</div>`;
+        };
+
+        xhr.onerror = function () {
+            body.innerHTML = '<div class="month-empty"><i class="bi bi-wifi-off"></i>Tidak dapat terhubung ke server.</div>';
             btnPrint.disabled = true;
             btnExcel.disabled = true;
-        });
+        };
+
+        xhr.send();
     }
 
+    // ── Cetak rekap ──────────────────────────────────────────────────────────
     function cetakRekap() {
         if (!lastResult || !lastResult.data || !lastResult.data.length) return;
 
-        const items    = lastResult.data;
-        const periode  = `${BULAN_NAMES[lastBulan]} ${lastTahun}`;
-        const tanggalCetak = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+        var items        = lastResult.data;
+        var periode      = BULAN[parseInt(lastBulan, 10)] + ' ' + lastTahun;
+        var tanggalCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-        const rows = items.map((p, i) => `
-            <tr>
-                <td style="text-align:center">${i+1}</td>
-                <td>${escHtml(p.nama_pemohon||'-')}</td>
-                <td>${escHtml(p.nik_pemohon||'-')}</td>
-                <td>${escHtml(p.jenis_surat||'-')}</td>
-                <td>${escHtml(p.tanggal)}</td>
-                <td style="text-align:center">${statusLabel(p.status)}</td>
-            </tr>`).join('');
+        var rows = items.map(function (p, i) {
+            return '<tr>'
+                + '<td style="text-align:center">' + (i + 1) + '</td>'
+                + '<td>' + escHtml(p.nama_pemohon || '-') + '</td>'
+                + '<td>' + escHtml(p.nik_pemohon  || '-') + '</td>'
+                + '<td>' + escHtml(p.jenis_surat  || '-') + '</td>'
+                + '<td>' + escHtml(p.tanggal      || '-') + '</td>'
+                + '<td style="text-align:center">' + statusLabel(p.status) + '</td>'
+                + '</tr>';
+        }).join('');
 
-        const printHtml = `<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<title>Rekap Permohonan Surat - ${periode}</title>
-<style>
-    * { box-sizing:border-box; }
-    body { font-family: Arial, Helvetica, sans-serif; color:#0f172a; padding:32px; }
-    .print-header { display:flex; align-items:center; gap:14px; border-bottom:2px solid #0d1b3e; padding-bottom:14px; margin-bottom:18px; }
-    .print-header h1 { font-size:16px; margin:0; color:#0d1b3e; }
-    .print-header p { font-size:12px; margin:2px 0 0; color:#475569; }
-    .print-title { text-align:center; margin-bottom:6px; }
-    .print-title h2 { font-size:15px; margin:0; text-transform:uppercase; letter-spacing:.03em; }
-    .print-title p { font-size:12px; margin:2px 0 16px; color:#475569; }
-    table { width:100%; border-collapse:collapse; font-size:12px; margin-top:10px; }
-    th, td { border:1px solid #cbd5e1; padding:7px 10px; }
-    th { background:#f1f5f9; text-transform:uppercase; font-size:10.5px; letter-spacing:.03em; }
-    .summary { display:flex; gap:14px; margin:14px 0 4px; font-size:12px; }
-    .summary div { border:1px solid #cbd5e1; border-radius:6px; padding:8px 14px; }
-    .summary strong { display:block; font-size:16px; }
-    .footer-note { margin-top:26px; font-size:11px; color:#64748b; display:flex; justify-content:space-between; }
-    @media print {
-        body { padding:0 24px; }
-        @page { margin:18mm 14mm; }
-    }
-</style>
-</head>
-<body>
-    <div class="print-header">
-        <div>
-            <h1>Pemerintah Kota Serang — Kelurahan Teritih</h1>
-            <p>Jl. Raya Kaloran - Sidapurna No.1 Teritih, Kecamatan Walantaka, Kota Serang, Banten 42183</p>
-        </div>
-    </div>
+        var printHtml = '<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">'
+            + '<title>Rekap Permohonan Surat - ' + periode + '</title>'
+            + '<style>'
+            + '* { box-sizing:border-box; }'
+            + 'body { font-family:Arial,Helvetica,sans-serif; color:#0f172a; padding:32px; }'
+            + '.hdr { border-bottom:2px solid #0d1b3e; padding-bottom:14px; margin-bottom:18px; }'
+            + '.hdr h1 { font-size:16px; margin:0; color:#0d1b3e; }'
+            + '.hdr p  { font-size:12px; margin:2px 0 0; color:#475569; }'
+            + '.ttl { text-align:center; margin-bottom:6px; }'
+            + '.ttl h2 { font-size:15px; margin:0; text-transform:uppercase; letter-spacing:.03em; }'
+            + '.ttl p  { font-size:12px; margin:2px 0 16px; color:#475569; }'
+            + '.sum { display:flex; gap:14px; margin:14px 0 4px; font-size:12px; }'
+            + '.sum div { border:1px solid #cbd5e1; border-radius:6px; padding:8px 14px; }'
+            + '.sum strong { display:block; font-size:16px; }'
+            + 'table { width:100%; border-collapse:collapse; font-size:12px; margin-top:10px; }'
+            + 'th, td { border:1px solid #cbd5e1; padding:7px 10px; }'
+            + 'th { background:#f1f5f9; text-transform:uppercase; font-size:10.5px; letter-spacing:.03em; }'
+            + '.foot { margin-top:26px; font-size:11px; color:#64748b; display:flex; justify-content:space-between; }'
+            + '@media print { body { padding:0 24px; } @page { margin:18mm 14mm; } }'
+            + '</style></head><body>'
+            + '<div class="hdr">'
+            + '<h1>Pemerintah Kota Serang &mdash; Kelurahan Teritih</h1>'
+            + '<p>Jl. Raya Kaloran - Sidapurna No.1 Teritih, Kecamatan Walantaka, Kota Serang, Banten 42183</p>'
+            + '</div>'
+            + '<div class="ttl"><h2>Rekap Data Permohonan Surat</h2><p>Periode: ' + periode + '</p></div>'
+            + '<div class="sum">'
+            + '<div>Total<strong>'     + (lastResult.total     || 0) + '</strong></div>'
+            + '<div>Disetujui<strong>' + (lastResult.disetujui || 0) + '</strong></div>'
+            + '<div>Ditolak<strong>'   + (lastResult.ditolak   || 0) + '</strong></div>'
+            + '<div>Pending<strong>'   + (lastResult.pending   || 0) + '</strong></div>'
+            + '</div>'
+            + '<table><thead><tr>'
+            + '<th>No</th><th>Nama Pemohon</th><th>NIK</th><th>Jenis Surat</th><th>Tanggal</th><th>Status</th>'
+            + '</tr></thead><tbody>' + rows + '</tbody></table>'
+            + '<div class="foot">'
+            + '<span>Dicetak pada ' + tanggalCetak + '</span>'
+            + '<span>Sistem Layanan Informasi Kelurahan Teritih</span>'
+            + '</div></body></html>';
 
-    <div class="print-title">
-        <h2>Rekap Data Permohonan Surat</h2>
-        <p>Periode: ${periode}</p>
-    </div>
-
-    <div class="summary">
-        <div>Total<strong>${lastResult.total||0}</strong></div>
-        <div>Disetujui<strong>${lastResult.disetujui||0}</strong></div>
-        <div>Ditolak<strong>${lastResult.ditolak||0}</strong></div>
-        <div>Pending<strong>${lastResult.pending||0}</strong></div>
-    </div>
-
-    <table>
-        <thead>
-            <tr><th>No</th><th>Nama Pemohon</th><th>NIK</th><th>Jenis Surat</th><th>Tanggal</th><th>Status</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-    </table>
-
-    <div class="footer-note">
-        <span>Dicetak pada ${tanggalCetak}</span>
-        <span>Sistem Layanan Informasi Kelurahan Teritih</span>
-    </div>
-</body>
-</html>`;
-
-        const printWindow = window.open('', '_blank', 'width=900,height=700');
-        if (!printWindow) {
+        var win = window.open('', '_blank', 'width=900,height=700');
+        if (!win) {
             alert('Popup diblokir browser. Izinkan popup untuk situs ini agar bisa mencetak.');
             return;
         }
-        printWindow.document.open();
-        printWindow.document.write(printHtml);
-        printWindow.document.close();
-        printWindow.onload = function() {
-            printWindow.focus();
-            printWindow.print();
-        };
+        win.document.open();
+        win.document.write(printHtml);
+        win.document.close();
+        win.onload = function () { win.focus(); win.print(); };
     }
 
+    // ── Unduh Excel (CSV + BOM UTF-8) ────────────────────────────────────────
     function unduhExcel() {
         if (!lastResult || !lastResult.data || !lastResult.data.length) return;
 
-        const items   = lastResult.data;
-        const periode = `${BULAN_NAMES[lastBulan]}_${lastTahun}`;
+        var items   = lastResult.data;
+        var periode = BULAN[parseInt(lastBulan, 10)] + '_' + lastTahun;
 
-        // Fungsi kecil untuk membungkus nilai CSV supaya koma/tanda kutip di dalam
-        // data (misal alamat atau nama dengan koma) tidak merusak kolom.
         function csvCell(val) {
-            const s = String(val ?? '-').replace(/"/g, '""');
-            return `"${s}"`;
+            return '"' + String(val != null ? val : '-').replace(/"/g, '""') + '"';
         }
 
-        const header = ['No', 'Nama Pemohon', 'NIK', 'Jenis Surat', 'Tanggal', 'Status'];
-        const rows = items.map((p, i) => [
-            i + 1,
-            p.nama_pemohon || '-',
-            p.nik_pemohon || '-',
-            p.jenis_surat || '-',
-            p.tanggal || '-',
-            statusLabel(p.status),
-        ]);
+        var header = ['No', 'Nama Pemohon', 'NIK', 'Jenis Surat', 'Tanggal', 'Status'];
+        var csv = header.map(csvCell).join(',') + '\r\n';
 
-        let csv = header.map(csvCell).join(',') + '\r\n';
-        rows.forEach(r => { csv += r.map(csvCell).join(',') + '\r\n'; });
+        items.forEach(function (p, i) {
+            var row = [
+                i + 1,
+                p.nama_pemohon || '-',
+                p.nik_pemohon  || '-',
+                p.jenis_surat  || '-',
+                p.tanggal      || '-',
+                statusLabel(p.status),
+            ];
+            csv += row.map(csvCell).join(',') + '\r\n';
+        });
 
-        // BOM UTF-8 supaya karakter dan format terbaca benar saat dibuka di Excel
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
+        // BOM UTF-8 agar Excel membaca karakter Indonesia dengan benar
+        var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        var url  = URL.createObjectURL(blob);
+        var a    = document.createElement('a');
         a.href     = url;
-        a.download = `rekap-permohonan-${periode}.csv`;
+        a.download = 'rekap-permohonan-' + periode + '.csv';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
 
+    // Event listeners tombol
     btnApply.addEventListener('click', loadData);
     btnPrint.addEventListener('click', cetakRekap);
     btnExcel.addEventListener('click', unduhExcel);

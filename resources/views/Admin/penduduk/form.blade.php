@@ -138,11 +138,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 <div class="grid2">
                     <div class="field">
                         <label>RT <span style="color:#ef4444">*</span></label>
-                        <input type="text" name="rt" value="{{ old('rt', $warga->rt) }}" required placeholder="Misal: 2">
+                        <select name="rt" required>
+                            @for($i = 1; $i <= 20; $i++)
+                                <option value="{{ $i }}" @selected((int) old('rt', $warga->rt) === $i)>RT {{ $i }}</option>
+                            @endfor
+                        </select>
                     </div>
                     <div class="field">
                         <label>RW <span style="color:#ef4444">*</span></label>
-                        <input type="text" name="rw" value="{{ old('rw', $warga->rw) }}" required placeholder="Misal: 3">
+                        <select name="rw" required>
+                            @for($i = 1; $i <= 11; $i++)
+                                <option value="{{ $i }}" @selected((int) old('rw', $warga->rw) === $i)>RW {{ $i }}</option>
+                            @endfor
+                        </select>
                     </div>
                 </div>
 
@@ -178,8 +186,33 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
                 </div>
 
                 <div class="field">
-                    <label>Alamat (opsional)</label>
-                    <input type="text" name="alamat" value="{{ old('alamat', $warga->alamat) }}">
+                    <label>Kampung/Lingkungan <span style="color:#ef4444">*</span></label>
+                    @php
+                        $alamatTersimpan = old('alamat', $warga->alamat ?? '');
+                        $pilihanAlamat = [
+                            'Kemanduran','Kewunen','Sidapurna','Sindangraksa',
+                            'Kubang Semar','Kubang Lutung','Jengkol','Ketileng',
+                            'Komplek Persada Banten','Komplek Puri Anggrek',
+                            'Komplek Grand Sutera','Komplek Puri Cempaka',
+                        ];
+                        $isLainnya = $alamatTersimpan !== '' && !in_array($alamatTersimpan, $pilihanAlamat);
+                    @endphp
+                    <select name="alamat_pilihan" id="alamat-select" required onchange="toggleAlamatLainnya(this)">
+                        <option value="">-- Pilih Kampung/Lingkungan --</option>
+                        @foreach($pilihanAlamat as $opt)
+                            <option value="{{ $opt }}" @selected(!$isLainnya && $alamatTersimpan === $opt)>{{ $opt }}</option>
+                        @endforeach
+                        <option value="lainnya" @selected($isLainnya)>Lainnya (ketik manual)</option>
+                    </select>
+                    <div id="alamat-lainnya-wrap" style="{{ $isLainnya ? '' : 'display:none' }}; margin-top:8px">
+                        <input type="text" id="alamat-lainnya-input" name="alamat_lainnya"
+                            value="{{ $isLainnya ? $alamatTersimpan : '' }}"
+                            placeholder="Ketik alamat kampung/lingkungan lainnya..."
+                            maxlength="100"
+                            style="width:100%">
+                    </div>
+                    {{-- Hidden input yang dikirim ke server --}}
+                    <input type="hidden" name="alamat" id="alamat-final" value="{{ $alamatTersimpan }}">
                 </div>
 
                 <div class="form-footer">
@@ -228,6 +261,53 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f1f5f9}
 
     pekerjaanSel.addEventListener('change', toggleLainnya);
     toggleLainnya();
+})();
+
+// ── Kampung/Lingkungan: dropdown + input manual ──────────────
+function toggleAlamatLainnya(sel) {
+    const wrap   = document.getElementById('alamat-lainnya-wrap');
+    const input  = document.getElementById('alamat-lainnya-input');
+    const hidden = document.getElementById('alamat-final');
+    const selReq = document.getElementById('alamat-select');
+
+    if (sel.value === 'lainnya') {
+        wrap.style.display  = '';
+        input.required      = true;
+        hidden.value        = input.value.trim();
+    } else {
+        wrap.style.display  = 'none';
+        input.required      = false;
+        input.value         = '';
+        hidden.value        = sel.value;
+    }
+}
+
+// Sync hidden field saat ketik di input manual
+(function() {
+    const input  = document.getElementById('alamat-lainnya-input');
+    const hidden = document.getElementById('alamat-final');
+    if (!input || !hidden) return;
+
+    input.addEventListener('input', function() {
+        hidden.value = this.value.trim();
+    });
+
+    // Sync saat form submit — pastikan hidden terisi
+    const form = input.closest('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const sel = document.getElementById('alamat-select');
+            if (sel && sel.value === 'lainnya') {
+                hidden.value = input.value.trim();
+            } else if (sel) {
+                hidden.value = sel.value;
+            }
+        });
+    }
+
+    // Init saat halaman load
+    const sel = document.getElementById('alamat-select');
+    if (sel) toggleAlamatLainnya(sel);
 })();
 </script>
 @endpush

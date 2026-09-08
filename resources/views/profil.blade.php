@@ -715,7 +715,7 @@
 
     @php
         $galeri = [
-            ['thumb'=>'images/STRUKTUR-RT-RW-KEL-TERITIH.jpg','full'=>'images/STRUKTUR-RT-RW-TERITIH.jpg','name'=>'Struktur RT/RW Kelurahan Teritih','desc'=>'Daftar Ketua RT dan RW di seluruh wilayah Kelurahan Teritih','icon'=>'bi-people-fill','color'=>'#a855f7','bg'=>'#fdf4ff'],
+            ['thumb'=>'images/STRUKTUR-RT-RW-KEL-TERITIH.jpg','full'=>'images/STRUKTUR-RT-RW-KEL-TERITIH.jpg','name'=>'Struktur RT/RW Kelurahan Teritih','desc'=>'Daftar Ketua RT dan RW di seluruh wilayah Kelurahan Teritih','icon'=>'bi-people-fill','color'=>'#a855f7','bg'=>'#fdf4ff'],
         ];
     @endphp
     <div class="galeri-section">

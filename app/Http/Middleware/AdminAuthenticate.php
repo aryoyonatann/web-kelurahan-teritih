@@ -12,6 +12,10 @@ class AdminAuthenticate
     public function handle(Request $request, Closure $next): Response
     {
         if (! Auth::guard('admin')->check()) {
+            // Kalau request AJAX / expects JSON → kembalikan 401 JSON, bukan redirect HTML
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['message' => 'Unauthenticated. Silakan login ulang.'], 401);
+            }
             return redirect()->route('admin.login');
         }
 
