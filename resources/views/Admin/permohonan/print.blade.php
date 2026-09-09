@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -99,18 +99,18 @@
     elseif (is_string($dtRaw)) { $decoded = json_decode($dtRaw, true); $dt = is_string($decoded) ? json_decode($decoded, true) ?? [] : ($decoded ?? []); }
     else { $dt = []; }
 
-    $jenis = $dt['jenis'] ?? $permohonan->jenisSurat->slug ?? null;
+    $js = $permohonan->jenisSurat; // bisa null jika jenis surat dihapus
+    $jenis = $dt['jenis'] ?? optional($js)->slug ?? null;
     $jenisMap = ['surat-keterangan-kematian'=>'kematian','surat-keterangan-suami-istri'=>'suami-istri','surat-keterangan-izin-cuti'=>'izin-cuti','surat-keterangan-tidak-mampu'=>'sktm'];
     $jenis = $jenisMap[$jenis] ?? $jenis;
-    $js = $permohonan->jenisSurat;
 
-    // Ambil dari database jika ada
-    $prefix = $js->kode_klasifikasi ?? '470';
-    $kode = $js->kode_surat ?? 'SK';
-    $judulSurat = strtoupper($js->nama_surat ?? 'SURAT KETERANGAN');
-    $fieldsConfig = $js->fields_config ?? [];
-    $templatePembuka = $js->template_pembuka ?? 'Yang bertanda tangan di bawah ini Kepala Kelurahan Teritih Kecamatan Walantaka Kota Serang menerangkan bahwa:';
-    $templateIsi = $js->template_isi ?? '';
+    // Ambil dari database jika ada, fallback ke default jika jenis surat dihapus
+    $prefix = optional($js)->kode_klasifikasi ?? '470';
+    $kode = optional($js)->kode_surat ?? 'SK';
+    $judulSurat = strtoupper(optional($js)->nama_surat ?? 'SURAT KETERANGAN');
+    $fieldsConfig = optional($js)->fields_config ?? [];
+    $templatePembuka = optional($js)->template_pembuka ?? 'Yang bertanda tangan di bawah ini Kepala Kelurahan Teritih Kecamatan Walantaka Kota Serang menerangkan bahwa:';
+    $templateIsi = optional($js)->template_isi ?? '';
     $templatePenutup = $js->template_penutup ?? 'Demikian surat keterangan ini kami buat dengan sebenar-benarnya dan untuk dipergunakan sebagaimana mestinya.';
 
     // Data pemohon

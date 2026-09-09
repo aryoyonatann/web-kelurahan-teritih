@@ -51,6 +51,16 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Cek apakah akun diblokir oleh admin
+        if (Auth::user()->status === 'blokir') {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda telah dinonaktifkan. Hubungi admin kelurahan untuk informasi lebih lanjut.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

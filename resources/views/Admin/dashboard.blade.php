@@ -494,7 +494,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                                 $initials    = collect(explode(' ', $namaPemohon))->map(fn($w) => strtoupper(substr($w,0,1)))->take(2)->join('');
                                 $colors      = ['blue','green','purple','orange'];
                                 $color       = $colors[$loop->index % count($colors)];
-                                $status      = $p->approval->status ?? 'pending';
+                                $status      = optional($p->approval)->status ?? 'pending';
                             @endphp
                             <tr>
                                 <td>

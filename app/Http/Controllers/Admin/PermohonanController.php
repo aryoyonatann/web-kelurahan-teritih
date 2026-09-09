@@ -7,6 +7,7 @@ use App\Models\PermohonanSurat;
 use App\Models\Approval;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PermohonanController extends Controller
 {
@@ -32,7 +33,7 @@ class PermohonanController extends Controller
         Approval::updateOrCreate(
             ['id_permohonan' => $id],
             [
-                'id_admin'         => auth('admin')->id() ?? 1,
+                'id_admin'         => auth('admin')->id(),
                 'status'           => Approval::STATUS_DISETUJUI,
                 'tanggal_approval' => now(),
             ]
@@ -43,10 +44,14 @@ class PermohonanController extends Controller
 
     public function reject(Request $request, $id)
     {
+        $request->validate([
+            'catatan' => 'nullable|string|max:1000',
+        ]);
+
         Approval::updateOrCreate(
             ['id_permohonan' => $id],
             [
-                'id_admin'         => auth('admin')->id() ?? 1,
+                'id_admin'         => auth('admin')->id(),
                 'status'           => Approval::STATUS_DITOLAK,
                 'tanggal_approval' => now(),
                 'catatan'          => $request->input('catatan'),
@@ -101,18 +106,35 @@ class PermohonanController extends Controller
         $permohonan = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])
             ->findOrFail($id);
 
+        // Hanya permohonan yang sudah disetujui/siap diambil/selesai yang boleh dicetak
+        $statusDiizinkan = [
+            Approval::STATUS_DISETUJUI,
+            Approval::STATUS_SIAP_DIAMBIL,
+            Approval::STATUS_SELESAI,
+        ];
+        $approvalStatus = optional($permohonan->approval)->status;
+        if (!$approvalStatus || !in_array($approvalStatus, $statusDiizinkan)) {
+            return redirect()->back()->with('error', 'Surat hanya bisa dicetak setelah permohonan disetujui.');
+        }
+
         $tahun = now()->year;
 
-        $nomorUrutTertinggi = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
-            ->whereYear('tanggal_pengajuan', $tahun)
-            ->whereNotNull('nomor_surat')
-            ->get('nomor_surat')
-            ->map(function ($p) {
-                $parts = explode(' / ', $p->nomor_surat);
-                return isset($parts[1]) ? (int) trim($parts[1]) : 0;
-            })
-            ->max() ?? 0;
-        $nomorUrut = $nomorUrutTertinggi + 1;
+        // Hitung nomor urut dengan locking untuk mencegah race condition
+        $nomorUrut = DB::transaction(function () use ($permohonan, $tahun) {
+            // lockForUpdate() mencegah dua proses membaca nilai yang sama bersamaan
+            $nomorUrutTertinggi = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
+                ->whereYear('tanggal_pengajuan', $tahun)
+                ->whereNotNull('nomor_surat')
+                ->lockForUpdate()
+                ->get('nomor_surat')
+                ->map(function ($p) {
+                    $parts = explode(' / ', $p->nomor_surat);
+                    return isset($parts[1]) ? (int) trim($parts[1]) : 0;
+                })
+                ->max() ?? 0;
+
+            return $nomorUrutTertinggi + 1;
+        });
 
         $bulanRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now()->month - 1];
 

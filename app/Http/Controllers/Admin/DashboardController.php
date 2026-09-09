@@ -15,9 +15,10 @@ class DashboardController extends Controller
     {
         // Stat cards
         $totalWarga       = User::count();
-        $perluVerifikasi  = PermohonanSurat::whereDoesntHave('approval')
-            ->orWhereHas('approval', fn($q) => $q->whereRaw('LOWER(status) = ?', ['pending']))
-            ->count();
+        $perluVerifikasi  = PermohonanSurat::where(function ($q) {
+                $q->whereDoesntHave('approval')
+                  ->orWhereHas('approval', fn($q2) => $q2->whereRaw('LOWER(status) = ?', ['pending']));
+            })->count();
         $suratKeluar      = Approval::whereRaw('LOWER(status) = ?', ['disetujui'])->count();
         $suratHariIni     = PermohonanSurat::whereDate('tanggal_pengajuan', today())->count();
 
@@ -65,7 +66,7 @@ class DashboardController extends Controller
                     'nik_pemohon'  => $p->nik_pemohon  ?? $p->user->nik  ?? '-',
                     'jenis_surat'  => $p->jenisSurat->nama_surat ?? '-',
                     'tanggal'      => \Carbon\Carbon::parse($p->tanggal_pengajuan)->format('d M Y'),
-                    'status'       => strtolower($p->approval->status ?? 'pending'),
+                    'status'       => strtolower(optional($p->approval)->status ?? 'pending'),
                 ];
             });
 

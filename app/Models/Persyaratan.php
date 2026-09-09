@@ -13,6 +13,7 @@ class Persyaratan extends Model
     protected $fillable = [
         'id_permohonan',
         'nama_file',
+        'jenis_dokumen',
         'path_file',
         'uploaded_at',
     ];

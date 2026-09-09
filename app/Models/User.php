@@ -17,7 +17,10 @@ class User extends Authenticatable
     protected $fillable = [
         'nama', 'nik', 'alamat', 'no_hp', 'email',
         'tempat_lahir', 'tanggal_lahir', 'password',
-        'rt', 'rw', 'kelurahan', 'kecamatan', 'foto', 'status',
+        'rt', 'rw', 'kelurahan', 'kecamatan', 'foto',
+        // 'status' sengaja TIDAK ada di sini — diset langsung via assignment ($user->status = ...)
+        // di controller yang trusted (KelolaAkunController, RegisteredUserController)
+        // untuk mencegah user memanipulasi status sendiri lewat request.
         'last_login_at',
     ];
 
@@ -46,9 +49,21 @@ class User extends Authenticatable
             'email' => $this->email,
         ], false));
 
-        Mail::send('emails.reset-password', ['url' => $url, 'notifiable' => $this], function ($message) {
-            $message->to($this->email)
-                    ->subject('Reset Kata Sandi – Kelurahan Teritih');
-        });
+        try {
+            Mail::send('emails.reset-password', ['url' => $url, 'notifiable' => $this], function ($message) {
+                $message->to($this->email)
+                        ->subject('Reset Kata Sandi – Kelurahan Teritih');
+            });
+        } catch (\Throwable $e) {
+            // Gagal kirim email (SMTP tidak terkonfigurasi, dll.)
+            // Log error tapi jangan crash — user mendapat pesan error yang bersih
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim email reset password: ' . $e->getMessage(), [
+                'user_id' => $this->getKey(),
+            ]);
+
+            throw new \RuntimeException(
+                'Gagal mengirim email reset kata sandi. Pastikan konfigurasi email sudah benar atau hubungi admin.'
+            );
+        }
     }
 }

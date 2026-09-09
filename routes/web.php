@@ -31,8 +31,8 @@ Route::get('/berita/{slug}',    [PublicController::class, 'detailBerita'])->name
 Route::redirect('/informasi',         '/demografi', 301);
 Route::redirect('/informasi/berita',  '/berita',    301);
 
-// Chatbot AI
-Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+// Chatbot AI — hanya untuk user yang sudah login
+Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->middleware('auth')->name('chatbot.ask');
 
 // =========================================================
 // ADMIN AREA
@@ -42,7 +42,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/', fn () => redirect()->route('admin.login'));
 
     Route::get('/login',  [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/login', [AdminLoginController::class, 'login']);
+    Route::post('/login', [AdminLoginController::class, 'login'])->middleware('throttle:5,1');
 
     Route::middleware('auth.admin')->group(function () {
 
@@ -139,9 +139,16 @@ Route::middleware('auth')->group(function () {
 // =========================================================
 if (!is_link(public_path('storage'))) {
     Route::get('/storage/{path}', function (string $path) {
-        $fullPath = storage_path('app/public/' . $path);
+        // Sanitasi: normalkan path dan pastikan tidak keluar dari direktori yang diizinkan
+        $allowedBase = realpath(storage_path('app/public'));
+        $fullPath    = realpath($allowedBase . DIRECTORY_SEPARATOR . $path);
 
-        if (!file_exists($fullPath)) {
+        // Tolak jika path tidak valid atau mencoba keluar dari direktori (path traversal)
+        if ($fullPath === false || !str_starts_with($fullPath, $allowedBase . DIRECTORY_SEPARATOR)) {
+            abort(403);
+        }
+
+        if (!file_exists($fullPath) || is_dir($fullPath)) {
             abort(404);
         }
 

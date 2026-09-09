@@ -198,7 +198,7 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
             </thead>
             <tbody>
                 @foreach($data as $d)
-                @php $status = $d->approval->status ?? 'pending'; @endphp
+                @php $status = optional($d->approval)->status ?? 'pending'; @endphp
                 <tr>
                     <td class="td-no">{{ $loop->iteration }}</td>
                     <td>

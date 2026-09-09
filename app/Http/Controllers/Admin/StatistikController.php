@@ -41,15 +41,8 @@ class StatistikController extends Controller
         $totalPendudukDB = \App\Models\Penduduk::count();
         $perTahun        = \App\Models\Penduduk::hitungPerTahun(); // [tahun => jumlah]
 
-        // Sync ke statistik_demografi: upsert semua tahun yang ada di tabel penduduk
-        foreach ($perTahun as $tahun => $jumlah) {
-            \App\Models\StatistikDemografi::updateOrCreate(
-                ['kunci' => 'penduduk_' . $tahun],
-                ['label' => 'Tahun ' . $tahun, 'nilai' => $jumlah]
-            );
-        }
-
-        // Pastikan semua tahun dari DB juga muncul di koleksi statistik (untuk view)
+        // Pastikan semua tahun dari DB muncul di koleksi statistik (untuk view) — READ ONLY,
+        // tidak tulis ke DB di sini. Penulisan ke DB hanya terjadi di update() via POST.
         foreach ($perTahun as $tahun => $jumlah) {
             $k = 'penduduk_' . $tahun;
             if (!$statistik->has($k)) {
@@ -166,6 +159,15 @@ class StatistikController extends Controller
         // halaman publik (Profil, Chatbot) selalu akurat, bukan cuma
         // halaman edit ini.
         if ($adaDataPenduduk) {
+            // Sync data pertumbuhan per tahun ke DB (dipindah dari edit() agar
+            // tidak menulis ke DB saat GET request)
+            $perTahun = \App\Models\Penduduk::hitungPerTahun();
+            foreach ($perTahun as $tahun => $jumlah) {
+                \App\Models\StatistikDemografi::updateOrCreate(
+                    ['kunci' => 'penduduk_' . $tahun],
+                    ['label' => 'Tahun ' . $tahun, 'nilai' => $jumlah]
+                );
+            }
             \App\Models\Penduduk::syncSemuaStatistik();
         }
 

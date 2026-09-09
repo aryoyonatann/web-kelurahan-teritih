@@ -254,8 +254,8 @@
 
             @php
                 $isPerwakilan = $data->isPerwakilan();
-                $allFields = collect($data->jenisSurat->fields_config ?? []);
-                if (is_string($data->jenisSurat->fields_config)) $allFields = collect(json_decode($data->jenisSurat->fields_config, true) ?? []);
+                $allFields = collect(optional($data->jenisSurat)->fields_config ?? []);
+                if ($data->jenisSurat && is_string($data->jenisSurat->fields_config)) $allFields = collect(json_decode($data->jenisSurat->fields_config, true) ?? []);
             @endphp
             <div class="section-card">
                 <div class="section-head">

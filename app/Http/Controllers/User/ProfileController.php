@@ -59,12 +59,10 @@ class ProfileController extends Controller
         $user->tanggal_lahir = $request->input('tanggal_lahir', $user->tanggal_lahir);
 
         foreach (['rt', 'rw', 'kelurahan', 'kecamatan'] as $col) {
-            if (\Schema::hasColumn('users', $col)) {
-                $user->$col = $request->input($col, $user->$col ?? null);
-            }
+            $user->$col = $request->input($col, $user->$col ?? null);
         }
 
-        if ($request->hasFile('foto') && \Schema::hasColumn('users', 'foto')) {
+        if ($request->hasFile('foto')) {
             if ($user->foto) Storage::disk('public')->delete($user->foto);
             $user->foto = $request->file('foto')->store('foto-profil', 'public');
         }

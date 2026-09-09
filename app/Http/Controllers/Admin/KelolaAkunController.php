@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\PermohonanSurat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class KelolaAkunController extends Controller
 {
@@ -122,8 +125,10 @@ class KelolaAkunController extends Controller
 
     public function toggleStatus($id)
     {
-        $user         = User::findOrFail($id);
-        $user->status = $user->status === 'aktif' ? 'blokir' : 'aktif';
+        $user = User::findOrFail($id);
+        // Jika status null atau bukan 'aktif', set ke 'aktif' (aktifkan).
+        // Jika sudah 'aktif', set ke 'blokir'.
+        $user->status = ($user->status === 'aktif') ? 'blokir' : 'aktif';
         $user->save();
 
         $label = $user->status === 'aktif' ? 'diaktifkan' : 'diblokir';
@@ -132,8 +137,33 @@ class KelolaAkunController extends Controller
 
     public function destroy($id)
     {
-        User::findOrFail($id)->delete();
-        return back()->with('success', 'Akun masyarakat berhasil dihapus.');
+        $user = User::with(['permohonan.persyaratan'])->findOrFail($id);
+
+        DB::transaction(function () use ($user) {
+            // Hapus file dokumen persyaratan dari storage
+            foreach ($user->permohonan as $permohonan) {
+                foreach ($permohonan->persyaratan as $dok) {
+                    Storage::disk('public')->delete($dok->path_file);
+                }
+            }
+
+            // Hapus file foto profil
+            if ($user->foto) {
+                Storage::disk('public')->delete($user->foto);
+            }
+
+            // Hapus user (permohonan & persyaratan terhapus via cascade di DB,
+            // atau kita hapus manual jika tidak ada cascade)
+            $user->permohonan()->each(function ($p) {
+                $p->persyaratan()->delete();
+                optional($p->approval)->delete();
+                $p->delete();
+            });
+
+            $user->delete();
+        });
+
+        return back()->with('success', 'Akun masyarakat beserta seluruh data permohonannya berhasil dihapus.');
     }
 
     public function export(Request $request)

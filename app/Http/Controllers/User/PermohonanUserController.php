@@ -8,6 +8,7 @@ use App\Models\JenisSurat;
 use App\Models\Persyaratan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
@@ -262,18 +263,22 @@ class PermohonanUserController extends Controller
             ? ($request->input('alamat_suami') ?? Auth::user()->alamat ?? '-')
             : ($request->alamat_pemohon ?? Auth::user()->alamat ?? '-');
 
-        $permohonan = PermohonanSurat::create([
-            'id_user'           => Auth::id(),
-            'id_jenis_surat'    => $jenisSurat->id_jenis_surat,
-            'nama_pemohon'      => $namaPemohon,
-            'nik_pemohon'       => $nikPemohon,
-            'alamat_pemohon'    => $alamatPemohon,
-            'keperluan'         => $keperluan,
-            'data_tambahan'     => $dataTambahan,
-            'tanggal_pengajuan' => now(),
-        ]);
+        $permohonan = DB::transaction(function () use ($request, $jenisSurat, $namaPemohon, $nikPemohon, $alamatPemohon, $keperluan, $dataTambahan) {
+            $permohonan = PermohonanSurat::create([
+                'id_user'           => Auth::id(),
+                'id_jenis_surat'    => $jenisSurat->id_jenis_surat,
+                'nama_pemohon'      => $namaPemohon,
+                'nik_pemohon'       => $nikPemohon,
+                'alamat_pemohon'    => $alamatPemohon,
+                'keperluan'         => $keperluan,
+                'data_tambahan'     => $dataTambahan,
+                'tanggal_pengajuan' => now(),
+            ]);
 
-        $this->simpanDokumen($request, $permohonan);
+            $this->simpanDokumen(request(), $permohonan);
+
+            return $permohonan;
+        });
 
         return redirect()
             ->route('user.permohonan.index')

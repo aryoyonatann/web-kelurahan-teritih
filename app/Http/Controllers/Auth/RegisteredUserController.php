@@ -44,6 +44,9 @@ class RegisteredUserController extends Controller
             'tanggal_lahir' => $request->tanggal_lahir,
             'password'      => Hash::make($request->password),
         ]);
+        // status diset langsung (bukan mass assignment) karena tidak ada di $fillable
+        $user->status = 'aktif';
+        $user->save();
 
         event(new Registered($user));
 

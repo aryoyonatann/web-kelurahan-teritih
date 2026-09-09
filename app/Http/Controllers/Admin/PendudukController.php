@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Penduduk;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PendudukController extends Controller
 {
@@ -213,6 +214,7 @@ class PendudukController extends Controller
         $berhasil = 0;
         $gagal    = [];
 
+        DB::transaction(function () use ($rows, $idx, &$berhasil, &$gagal) {
         foreach (array_slice($rows, 1) as $i => $row) {
             $baris = $i + 2; // +2 karena 1-indexed + skip header
 
@@ -297,6 +299,7 @@ class PendudukController extends Controller
                 }
             }
         }
+        }); // end DB::transaction
 
         if ($berhasil > 0) {
             Penduduk::syncSemuaStatistik();

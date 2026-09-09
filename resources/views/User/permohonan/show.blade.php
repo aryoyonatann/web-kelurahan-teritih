@@ -193,7 +193,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     @endif
 
     @php
-        $status = $permohonan->approval->status ?? 'pending';
+        $status = optional($permohonan->approval)->status ?? 'pending';
 
         // Decode data_tambahan — handle array, string JSON, dan double-encoded
         $dtRaw = $permohonan->data_tambahan;
@@ -275,7 +275,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </div>
     </div>
 
-    @if($status === 'ditolak' && ($permohonan->approval->catatan ?? false))
+    @if($status === 'ditolak' && (optional($permohonan->approval)->catatan ?? false))
     <div class="tolak-box">
         <i class="bi bi-exclamation-triangle-fill"></i>
         <div>
@@ -293,7 +293,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
             <div class="siap-desc">
                 Surat <strong>{{ $permohonan->jenisSurat->nama_surat ?? '' }}</strong> atas nama <strong>{{ $permohonan->nama_pemohon }}</strong> telah selesai diproses dan siap diambil.<br>
                 Silakan datang ke <strong>Kantor Kelurahan Teritih</strong> pada jam kerja (Senin–Jumat, 08.00–16.00 WIB) dengan membawa KTP asli.
-                @if($permohonan->approval->tanggal_siap_diambil)
+                @if(optional($permohonan->approval)->tanggal_siap_diambil)
                 <br><small style="opacity:.75">Disiapkan sejak {{ \Carbon\Carbon::parse($permohonan->approval->tanggal_siap_diambil)->isoFormat('D MMMM Y, HH:mm') }} WIB</small>
                 @endif
             </div>
@@ -307,7 +307,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <div class="selesai-box-body">
             <div class="selesai-title">Permohonan Selesai</div>
             <div class="selesai-desc">Surat telah diambil.
-                @if($permohonan->approval->tanggal_selesai)
+                @if(optional($permohonan->approval)->tanggal_selesai)
                 Diselesaikan pada {{ \Carbon\Carbon::parse($permohonan->approval->tanggal_selesai)->isoFormat('D MMMM Y') }}.
                 @endif
             </div>
@@ -316,8 +316,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     @endif
 
     @php
-        $allFields = collect($permohonan->jenisSurat->fields_config ?? []);
-        if (is_string($permohonan->jenisSurat->fields_config)) $allFields = collect(json_decode($permohonan->jenisSurat->fields_config, true) ?? []);
+        $allFields = collect(optional($permohonan->jenisSurat)->fields_config ?? []);
+        if ($permohonan->jenisSurat && is_string($permohonan->jenisSurat->fields_config)) $allFields = collect(json_decode($permohonan->jenisSurat->fields_config, true) ?? []);
         $isPerwakilan = $permohonan->isPerwakilan();
         $nama  = $permohonan->nama_pemohon ?? auth()->user()->nama ?? '-';
         $nik   = $permohonan->nik_pemohon  ?? auth()->user()->nik  ?? '-';

@@ -19,8 +19,10 @@ class NotifikasiController extends Controller
     {
         // 1) Permohonan pending (belum diproses admin)
         $pending = PermohonanSurat::with(['user', 'jenisSurat'])
-            ->whereDoesntHave('approval')
-            ->orWhereHas('approval', fn($q) => $q->whereRaw('LOWER(status) = ?', ['pending']))
+            ->where(function ($q) {
+                $q->whereDoesntHave('approval')
+                  ->orWhereHas('approval', fn($q2) => $q2->whereRaw('LOWER(status) = ?', ['pending']));
+            })
             ->latest('tanggal_pengajuan')
             ->take(8)
             ->get();
@@ -88,7 +90,8 @@ class NotifikasiController extends Controller
      */
     public function userNotif(Request $request)
     {
-        $userId = Auth::id();
+        // Route ini dipanggil dari navbar user via AJAX — harus pakai guard 'web' (user)
+        $userId = auth('web')->id();
 
         $siapDiambil = PermohonanSurat::with(['jenisSurat', 'approval'])
             ->where('id_user', $userId)
