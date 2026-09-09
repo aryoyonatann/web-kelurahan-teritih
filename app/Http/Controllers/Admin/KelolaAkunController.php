@@ -120,7 +120,7 @@ class KelolaAkunController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return back()->with('success', "Password akun {$user->nama} berhasil diubah.");
+        return redirect()->route('kelola-akun.index')->with('success', "Password akun {$user->nama} berhasil diubah.");
     }
 
     public function toggleStatus($id)
@@ -132,7 +132,7 @@ class KelolaAkunController extends Controller
         $user->save();
 
         $label = $user->status === 'aktif' ? 'diaktifkan' : 'diblokir';
-        return back()->with('success', "Akun masyarakat berhasil {$label}.");
+        return redirect()->route('kelola-akun.index')->with('success', "Akun masyarakat berhasil {$label}.");
     }
 
     public function destroy($id)
@@ -163,7 +163,7 @@ class KelolaAkunController extends Controller
             $user->delete();
         });
 
-        return back()->with('success', 'Akun masyarakat beserta seluruh data permohonannya berhasil dihapus.');
+        return redirect()->route('kelola-akun.index')->with('success', 'Akun masyarakat beserta seluruh data permohonannya berhasil dihapus.');
     }
 
     public function export(Request $request)

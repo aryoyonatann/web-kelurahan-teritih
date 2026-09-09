@@ -109,7 +109,7 @@ class BeritaController extends Controller
         $data = Berita::findOrFail($id);
         if ($data->gambar) Storage::disk('public')->delete($data->gambar);
         $data->delete();
-        return back()->with('success', 'Berita berhasil dihapus.');
+        return redirect()->route('berita-admin.index')->with('success', 'Berita berhasil dihapus.');
     }
 
     private function generateUniqueSlug(string $judul, $excludeId = null): string
