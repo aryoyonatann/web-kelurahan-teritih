@@ -31,8 +31,8 @@ Route::get('/berita/{slug}',    [PublicController::class, 'detailBerita'])->name
 Route::redirect('/informasi',         '/demografi', 301);
 Route::redirect('/informasi/berita',  '/berita',    301);
 
-// Chatbot AI — hanya untuk user yang sudah login
-Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->middleware('auth')->name('chatbot.ask');
+// Chatbot AI — tersedia untuk semua pengunjung (tanpa login)
+Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 
 // =========================================================
 // ADMIN AREA

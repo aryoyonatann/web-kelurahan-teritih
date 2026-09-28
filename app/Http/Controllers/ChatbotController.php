@@ -308,18 +308,60 @@ class ChatbotController extends Controller
         $kodPos      = Pengaturan::getValue('kode_pos',     '42183');
         $luasWilayah = Pengaturan::getValue('luas_wilayah', '4.33');
 
+        $batasUtara   = Pengaturan::getValue('batas_utara',   'Kec. Kasemen');
+        $batasSelatan = Pengaturan::getValue('batas_selatan', 'Kel. Kepuren & Kalodran');
+        $batasBarat   = Pengaturan::getValue('batas_barat',   'Kec. Cipocokjaya');
+        $batasTimur   = Pengaturan::getValue('batas_timur',   'Kabupaten Serang');
+
         $statistik     = StatistikDemografi::asCollection();
+
+        // Demografi utama
         $totalPenduduk = isset($statistik['total_penduduk']) ? number_format($statistik['total_penduduk']->nilai, 0, ',', '.') : '-';
         $jumlahKK      = isset($statistik['jumlah_kk'])      ? number_format($statistik['jumlah_kk']->nilai,      0, ',', '.') : '-';
         $jumlahRT      = isset($statistik['jumlah_rt'])      ? $statistik['jumlah_rt']->nilai      : '-';
         $jumlahRW      = isset($statistik['jumlah_rw'])      ? $statistik['jumlah_rw']->nilai      : '-';
         $jiwaLaki      = isset($statistik['jiwa_lakilaki'])  ? number_format($statistik['jiwa_lakilaki']->nilai,  0, ',', '.') : '-';
         $jiwaPerempuan = isset($statistik['jiwa_perempuan']) ? number_format($statistik['jiwa_perempuan']->nilai, 0, ',', '.') : '-';
+
+        // Agama
         $jiwaIslam     = isset($statistik['jiwa_islam'])     ? number_format($statistik['jiwa_islam']->nilai,     0, ',', '.') : '-';
         $jiwaKristen   = isset($statistik['jiwa_kristen'])   ? number_format($statistik['jiwa_kristen']->nilai,   0, ',', '.') : '-';
         $jiwaKatolik   = isset($statistik['jiwa_katolik'])   ? number_format($statistik['jiwa_katolik']->nilai,   0, ',', '.') : '-';
         $jiwaHindu     = isset($statistik['jiwa_hindu'])     ? number_format($statistik['jiwa_hindu']->nilai,     0, ',', '.') : '-';
         $jiwaBuddha    = isset($statistik['jiwa_buddha'])    ? number_format($statistik['jiwa_buddha']->nilai,    0, ',', '.') : '-';
+        $jiwaKonghucu  = isset($statistik['jiwa_konghucu'])  ? number_format($statistik['jiwa_konghucu']->nilai,  0, ',', '.') : '0';
+
+        // Kelompok usia
+        $umurAnak    = isset($statistik['umur4_anak'])   ? $statistik['umur4_anak']->nilai   : '-';
+        $umurRemaja  = isset($statistik['umur4_remaja']) ? $statistik['umur4_remaja']->nilai : '-';
+        $umurDewasa  = isset($statistik['umur4_dewasa']) ? $statistik['umur4_dewasa']->nilai : '-';
+        $umurLansia  = isset($statistik['umur4_lansia']) ? $statistik['umur4_lansia']->nilai : '-';
+
+        // Pekerjaan
+        $kerjaPelajar   = isset($statistik['kerja_pelajar'])   ? $statistik['kerja_pelajar']->nilai   : '-';
+        $kerjaIRT       = isset($statistik['kerja_irt'])       ? $statistik['kerja_irt']->nilai       : '-';
+        $kerjaWira      = isset($statistik['kerja_wiraswasta'])? $statistik['kerja_wiraswasta']->nilai : '-';
+        $kerjaBuruh     = isset($statistik['kerja_buruh'])     ? $statistik['kerja_buruh']->nilai     : '-';
+        $kerjaPetani    = isset($statistik['kerja_petani'])    ? $statistik['kerja_petani']->nilai    : '-';
+        $kerjaSwasta    = isset($statistik['kerja_swasta'])    ? $statistik['kerja_swasta']->nilai    : '-';
+        $kerjaPemerintah= isset($statistik['kerja_pemerintah'])? $statistik['kerja_pemerintah']->nilai : '-';
+        $kerjaBelum     = isset($statistik['kerja_belum'])     ? $statistik['kerja_belum']->nilai     : '-';
+
+        // Pendidikan
+        $pendBelumSekolah = isset($statistik['pend_belum_sekolah'])  ? $statistik['pend_belum_sekolah']->nilai  : '-';
+        $pendSedangSekolah= isset($statistik['pend_sedang_sekolah']) ? $statistik['pend_sedang_sekolah']->nilai : '-';
+        $pendSD           = isset($statistik['pend_sd'])             ? $statistik['pend_sd']->nilai             : '-';
+        $pendSMP          = isset($statistik['pend_smp'])            ? $statistik['pend_smp']->nilai            : '-';
+        $pendSMA          = isset($statistik['pend_sma'])            ? $statistik['pend_sma']->nilai            : '-';
+        $pendDiploma      = isset($statistik['pend_diploma'])        ? $statistik['pend_diploma']->nilai        : '-';
+        $pendS1           = isset($statistik['pend_s1'])             ? $statistik['pend_s1']->nilai             : '-';
+        $pendS2           = isset($statistik['pend_s2'])             ? $statistik['pend_s2']->nilai             : '-';
+
+        // Fasilitas
+        $fasMasjid    = isset($statistik['fas_masjid'])   ? $statistik['fas_masjid']->nilai   : '-';
+        $fasSD        = isset($statistik['fas_sd'])       ? $statistik['fas_sd']->nilai       : '-';
+        $fasSMP       = isset($statistik['fas_smp'])      ? $statistik['fas_smp']->nilai      : '-';
+        $fasSMA       = isset($statistik['fas_sma'])      ? $statistik['fas_sma']->nilai      : '-';
 
         $beritaTerbaru = Berita::where('status', 'publish')
             ->orderByDesc('tanggal_publish')
@@ -350,12 +392,18 @@ Jika warga bertanya di luar topik kelurahan, SELALU tolak dengan sopan menggunak
 "Maaf, saya hanya bisa membantu pertanyaan seputar layanan dan informasi Kelurahan Teritih. Ada yang bisa saya bantu terkait kelurahan? 😊"
 
 === INFORMASI KELURAHAN ===
-- Nama        : Kelurahan Teritih
-- Alamat      : Jl. Raya Kalodran - Sidapurna No.1, Teritih, Kec. {$kecamatan}, Kota {$kota}, {$provinsi} {$kodPos}
-- WhatsApp    : 085282267612
-- Email       : kel.teritih@serangkota.go.id
-- Instagram   : @kelurahanteritih
-- Luas Wilayah: {$luasWilayah} km²
+- Nama         : Kelurahan Teritih
+- Alamat       : Jl. Raya Kalodran - Sidapurna No.1, Teritih, Kec. {$kecamatan}, Kota {$kota}, {$provinsi} {$kodPos}
+- WhatsApp     : 085282267612
+- Email        : kel.teritih@serangkota.go.id
+- Instagram    : @kelurahanteritih
+- Luas Wilayah : {$luasWilayah} km²
+
+Batas Wilayah:
+  • Utara  : {$batasUtara}
+  • Selatan: {$batasSelatan}
+  • Barat  : {$batasBarat}
+  • Timur  : {$batasTimur}
 
 Jam Operasional Kantor:
   • Senin – Kamis : 07.30 – 16.00 WIB
@@ -366,17 +414,53 @@ Jam Operasional Kantor:
 {$pegawaiText}
 
 === DATA KEPENDUDUKAN ===
+Jumlah & Struktur:
 - Total Penduduk  : {$totalPenduduk} jiwa
 - Kepala Keluarga : {$jumlahKK} KK
 - Rukun Tetangga  : {$jumlahRT} RT
 - Rukun Warga     : {$jumlahRW} RW
 - Laki-laki       : {$jiwaLaki} jiwa
 - Perempuan       : {$jiwaPerempuan} jiwa
-- Islam           : {$jiwaIslam} jiwa
-- Kristen         : {$jiwaKristen} jiwa
-- Katolik         : {$jiwaKatolik} jiwa
-- Hindu           : {$jiwaHindu} jiwa
-- Buddha          : {$jiwaBuddha} jiwa
+
+Agama:
+- Islam    : {$jiwaIslam} jiwa
+- Kristen  : {$jiwaKristen} jiwa
+- Katolik  : {$jiwaKatolik} jiwa
+- Hindu    : {$jiwaHindu} jiwa
+- Buddha   : {$jiwaBuddha} jiwa
+- Konghucu : {$jiwaKonghucu} jiwa
+
+Kelompok Usia:
+- Anak (< 7 tahun)     : {$umurAnak} jiwa
+- Remaja (7–18 tahun)  : {$umurRemaja} jiwa
+- Dewasa (19–55 tahun) : {$umurDewasa} jiwa
+- Lansia (≥ 56 tahun)  : {$umurLansia} jiwa
+
+Pekerjaan (dominan):
+- Pelajar/Mahasiswa : {$kerjaPelajar} jiwa
+- Belum Bekerja     : {$kerjaBelum} jiwa
+- Wiraswasta        : {$kerjaWira} jiwa
+- Petani            : {$kerjaPetani} jiwa
+- Ibu Rumah Tangga  : {$kerjaIRT} jiwa
+- Buruh Harian      : {$kerjaBuruh} jiwa
+- Karyawan Swasta   : {$kerjaSwasta} jiwa
+- Karyawan Pemerintah: {$kerjaPemerintah} jiwa
+
+Pendidikan:
+- Belum Sekolah (PAUD/TK) : {$pendBelumSekolah} jiwa
+- Sedang Sekolah (7–18 th): {$pendSedangSekolah} jiwa
+- SD/Sederajat             : {$pendSD} jiwa
+- SMP/Sederajat            : {$pendSMP} jiwa
+- SMA/Sederajat            : {$pendSMA} jiwa
+- Diploma (D1–D3)          : {$pendDiploma} jiwa
+- Sarjana (S1)             : {$pendS1} jiwa
+- Pascasarjana (S2/S3)     : {$pendS2} jiwa
+
+Fasilitas Umum:
+- Masjid : {$fasMasjid} buah
+- SD/MI  : {$fasSD} sekolah
+- SMP    : {$fasSMP} sekolah
+- SMA    : {$fasSMA} sekolah
 
 === JENIS SURAT YANG TERSEDIA DI PORTAL ===
 {$jenisSuratText}
@@ -385,28 +469,36 @@ Jam Operasional Kantor:
 {$beritaText}
 
 === AKUN PORTAL ===
-- Daftar akun baru : kelurahanteritih.online/register
-- Login akun       : kelurahanteritih.online/login
-- Lupa password    : gunakan fitur "Lupa Password" di halaman login, cek email untuk link reset
+- Daftar akun baru : http://127.0.0.1:8000/register
+- Login akun       : http://127.0.0.1:8000/login
+- Lupa password    : gunakan fitur "Lupa Kata Sandi" di halaman login, sistem akan kirim tautan reset ke email terdaftar
 
 === CARA MENGAJUKAN SURAT ONLINE ===
 1. Daftar/Login akun masyarakat di portal
 2. Pilih menu "Layanan" → "Permohonan Surat"
-3. Pilih jenis surat dan isi formulir
+3. Pilih jenis surat dan isi formulir dengan data lengkap
 4. Unggah dokumen pendukung (KTP, KK, surat pengantar RT/RW, dll)
 5. Klik "Kirim Permohonan"
 6. Tunggu verifikasi admin (estimasi 1–3 hari kerja)
-7. Cek status di menu "Permohonan Saya"
+7. Pantau status di menu "Permohonan Saya" di akun portal
 
 STATUS PERMOHONAN:
-- 🟡 Pending   : sedang diproses admin
-- 🟢 Disetujui : surat siap diambil/cetak
-- 🔴 Ditolak   : lihat alasan penolakan, perbaiki dokumen, ajukan ulang
+- 🟡 Pending      : permohonan sedang diproses admin
+- 🟢 Disetujui    : surat disetujui, datang ke kantor untuk mengambil/cetak
+- 🔴 Ditolak      : lihat alasan penolakan, perbaiki dokumen, ajukan ulang
+- 📦 Siap Diambil : surat sudah siap, silakan datang ke kantor kelurahan
+- ✅ Selesai       : surat sudah diambil/proses selesai
+
+DOKUMEN YANG UMUMNYA DIPERLUKAN:
+- Foto/scan KTP pemohon (JPG/PNG/PDF, maks 10 MB)
+- Foto/scan Kartu Keluarga (JPG/PNG/PDF, maks 10 MB)
+- Dokumen pendukung sesuai jenis surat yang dipilih
+- Data diri lengkap dan valid sesuai KTP
 
 === ATURAN WAJIB ===
 1. TOLAK semua pertanyaan yang tidak berkaitan dengan Kelurahan Teritih dan layanannya.
 2. JANGAN mengarang informasi. Jika data tidak tersedia di atas, jawab: "Maaf, saya belum punya informasi tersebut. Silakan hubungi kantor via WhatsApp 085282267612."
-3. JANGAN menjawab status permohonan spesifik milik warga — arahkan ke menu "Permohonan Saya".
+3. JANGAN menjawab status permohonan spesifik milik warga — arahkan ke menu "Permohonan Saya" di portal.
 4. JANGAN meminta data pribadi sensitif (NIK, password, nomor rekening, dll).
 5. JANGAN memberi janji pasti (contoh: "surat pasti selesai hari ini").
 
