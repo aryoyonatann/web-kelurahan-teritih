@@ -187,7 +187,7 @@ class PermohonanUserController extends Controller
         if (!$isPasangan) {
             // Standard biodata validation
             if (in_array('nama', $bioFields))            $rules['nama_pemohon']   = 'required|string|max:255';
-            if (in_array('nik', $bioFields))             $rules['nik_pemohon']    = 'required|string|size:16';
+            if (in_array('nik', $bioFields))             $rules['nik_pemohon']    = 'required|digits:16';
             if (in_array('tempat_tgl_lahir', $bioFields)){ $rules['tempat_lahir'] = 'required|string|max:100'; $rules['tanggal_lahir'] = 'required|date'; }
             if (in_array('jenis_kelamin', $bioFields))   $rules['jenis_kelamin']  = 'required|in:Laki-Laki,Perempuan';
             if (in_array('agama', $bioFields))           $rules['agama']          = 'required|string';

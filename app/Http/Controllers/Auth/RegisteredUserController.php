@@ -23,7 +23,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'nama'          => ['required', 'string', 'max:255'],
-            'nik'           => ['required', 'string', 'max:20', 'unique:users,nik'],
+            'nik'           => ['required', 'digits:16', 'unique:users,nik'],
             'alamat'        => ['required', 'string', 'max:255'],
             'no_hp'         => ['required', 'string', 'max:15'],
             'email'         => ['nullable', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
