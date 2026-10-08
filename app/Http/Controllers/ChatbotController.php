@@ -274,7 +274,7 @@ class ChatbotController extends Controller
         $jabatLurah = Pengaturan::getValue('jabat_lurah', 'Kepala Kelurahan Teritih');
 
         $nodeLabels = [
-            'sekretaris'     => 'Sekretaris Kelurahan',
+            'sekretaris'     => 'Sekretaris Kelurahan', 
             'kasi-pemum'     => 'Kepala Seksi Pemerintahan & Umum (Kasi Pemum)',
             'pelaksana'      => 'Pelaksana Pelayanan Umum',
             'op-sanusi'      => 'Operator Layanan',

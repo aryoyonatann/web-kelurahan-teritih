@@ -196,7 +196,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
                 <i class="bi bi-download"></i> Export CSV
             </a>
             <button class="btn-tambah" onclick="openModal('modalTambah')">
-                <i class="bi bi-person-plus-fill"></i> Tambah Warga
+                <i class="bi bi-person-plus-fill"></i> Tambah Akun Warga
             </button>
         </div>
     </div>
@@ -519,7 +519,7 @@ input[type=checkbox] { accent-color:var(--blue); width:15px; height:15px; cursor
 <div class="modal-overlay" id="modalTambah">
     <div class="modal-box">
         <div class="modal-header">
-            <div class="modal-title"><i class="bi bi-person-plus-fill me-2" style="color:var(--blue)"></i>Tambah Data Warga</div>
+            <div class="modal-title"><i class="bi bi-person-plus-fill me-2" style="color:var(--blue)"></i>Tambah Akun Warga</div>
             <button class="modal-close" onclick="closeModal('modalTambah')"><i class="bi bi-x-lg"></i></button>
         </div>
         <form method="POST" action="{{ route('kelola-akun.store') }}">
