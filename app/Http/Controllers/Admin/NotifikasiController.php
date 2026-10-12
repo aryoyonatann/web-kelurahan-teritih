@@ -27,7 +27,7 @@ class NotifikasiController extends Controller
             ->get();
 
         // Load relasi manual untuk menghindari konflik eager loading dengan cast array
-        $pending->each(function ($p) {
+        $pending->each(function (PermohonanSurat $p) {
             $p->load('user', 'jenisSurat');
         });
 
@@ -55,7 +55,7 @@ class NotifikasiController extends Controller
             ->take(4)
             ->get();
 
-        $siapLama->each(function ($p) {
+        $siapLama->each(function (PermohonanSurat $p) {
             $p->load('user', 'jenisSurat');
         });
 
