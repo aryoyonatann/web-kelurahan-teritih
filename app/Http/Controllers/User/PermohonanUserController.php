@@ -149,7 +149,9 @@ class PermohonanUserController extends Controller
 
         $siapDiambil = PermohonanSurat::with(['jenisSurat', 'approval'])
             ->where('id_user', $userId)
-            ->whereHas('approval', fn($q) => $q->where('status', \App\Models\Approval::STATUS_SIAP_DIAMBIL))
+            ->whereHas('approval', function ($q) {
+                $q->where('status', \App\Models\Approval::STATUS_SIAP_DIAMBIL);
+            })
             ->latest('tanggal_pengajuan')
             ->get();
 

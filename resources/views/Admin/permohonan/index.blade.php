@@ -527,8 +527,9 @@
                                 </form>
                                 <form action="{{ route('permohonan.reject', $d->id_permohonan) }}" method="POST" style="display:inline;" id="form-reject-{{ $d->id_permohonan }}">
                                     @csrf @method('PUT')
+                                    <input type="hidden" name="catatan" id="catatan-{{ $d->id_permohonan }}">
                                     <button type="button" class="btn-act btn-reject"
-                                            onclick="showConfirm('Tolak permohonan dari <strong>{{ addslashes($namaPemohon) }}</strong>?', () => document.getElementById('form-reject-{{ $d->id_permohonan }}').submit(), {confirmText:'Ya, Tolak', type:'danger'})">
+                                            onclick="showModalTolakIndex('{{ $d->id_permohonan }}', '{{ addslashes($namaPemohon) }}')">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                                         </svg>
@@ -658,6 +659,72 @@ document.getElementById('modalDokumen').addEventListener('click', function(e) {
     if (e.target === this) closeDokModal();
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDokModal(); });
+</script>
+
+{{-- Modal Tolak Permohonan (dari index) --}}
+<div id="modal-tolak-index" style="display:none;position:fixed;inset:0;z-index:1600;background:rgba(15,23,42,.45);backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:28px 28px 24px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.18);margin:16px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+            <div style="width:40px;height:40px;border-radius:10px;background:#fef2f2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" style="width:20px;height:20px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <div>
+                <div style="font-size:15px;font-weight:700;color:#1e293b">Tolak Permohonan</div>
+                <div style="font-size:12px;color:#64748b;margin-top:1px" id="modal-tolak-index-nama">-</div>
+            </div>
+        </div>
+        <div style="margin-bottom:16px">
+            <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#64748b;display:block;margin-bottom:6px">
+                Catatan Alasan Penolakan
+                <span style="font-weight:400;color:#94a3b8;text-transform:none;letter-spacing:0"> (opsional)</span>
+            </label>
+            <textarea id="textarea-catatan-index" rows="4"
+                placeholder="Contoh: Dokumen persyaratan tidak lengkap, NIK tidak sesuai, dll."
+                style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13.5px;color:#1e293b;font-family:inherit;resize:vertical;transition:border-color .2s;box-sizing:border-box"
+                onfocus="this.style.borderColor='#ef4444'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+            <button type="button" onclick="tutupModalTolakIndex()" style="flex:1;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;font-size:13.5px;font-weight:600;color:#64748b;cursor:pointer">
+                Batal
+            </button>
+            <button type="button" onclick="konfirmasiTolakIndex()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#ef4444;font-size:13.5px;font-weight:700;color:#fff;cursor:pointer">
+                Ya, Tolak Permohonan
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+var _tolakTargetId = null;
+
+function showModalTolakIndex(id, nama) {
+    _tolakTargetId = id;
+    document.getElementById('modal-tolak-index-nama').textContent = nama;
+    document.getElementById('textarea-catatan-index').value = '';
+    document.getElementById('modal-tolak-index').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ document.getElementById('textarea-catatan-index').focus(); }, 100);
+}
+
+function tutupModalTolakIndex() {
+    document.getElementById('modal-tolak-index').style.display = 'none';
+    document.body.style.overflow = '';
+    _tolakTargetId = null;
+}
+
+function konfirmasiTolakIndex() {
+    if (!_tolakTargetId) return;
+    var catatan = document.getElementById('textarea-catatan-index').value.trim();
+    document.getElementById('catatan-' + _tolakTargetId).value = catatan;
+    document.getElementById('form-reject-' + _tolakTargetId).submit();
+}
+
+document.getElementById('modal-tolak-index').addEventListener('click', function(e) {
+    if (e.target === this) tutupModalTolakIndex();
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') tutupModalTolakIndex();
+});
 </script>
 
 @include('Admin.partials.footer')

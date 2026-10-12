@@ -17,9 +17,9 @@ class DashboardController extends Controller
         $totalWarga       = User::count();
         $perluVerifikasi  = PermohonanSurat::where(function ($q) {
                 $q->whereDoesntHave('approval')
-                  ->orWhereHas('approval', fn($q2) => $q2->whereRaw('LOWER(status) = ?', ['pending']));
+                  ->orWhereHas('approval', function ($q2) { $q2->where('status', 'pending'); });
             })->count();
-        $suratKeluar      = Approval::whereRaw('LOWER(status) = ?', ['disetujui'])->count();
+        $suratKeluar      = Approval::where('status', 'disetujui')->count();
         $suratHariIni     = PermohonanSurat::whereDate('tanggal_pengajuan', today())->count();
 
         $beritaTerbaru = Berita::orderBy('tanggal_publish', 'desc')->take(6)->get();

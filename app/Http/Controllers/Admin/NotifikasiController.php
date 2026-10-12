@@ -18,56 +18,61 @@ class NotifikasiController extends Controller
     public function index(Request $request)
     {
         // 1) Permohonan pending (belum diproses admin)
-        $pending = PermohonanSurat::with(['user', 'jenisSurat'])
-            ->where(function ($q) {
-                $q->whereDoesntHave('approval')
-                  ->orWhereHas('approval', fn($q2) => $q2->whereRaw('LOWER(status) = ?', ['pending']));
+        $pending = PermohonanSurat::whereDoesntHave('approval')
+            ->orWhereHas('approval', function ($q) {
+                $q->where('status', Approval::STATUS_PENDING);
             })
             ->latest('tanggal_pengajuan')
             ->take(8)
             ->get();
 
+        // Load relasi manual untuk menghindari konflik eager loading dengan cast array
+        $pending->each(function ($p) {
+            $p->load('user', 'jenisSurat');
+        });
+
         $notifsPending = $pending->map(function ($p) {
             return [
-                'id'       => $p->id_permohonan,
-                'type'     => 'permohonan',
-                'icon'     => 'envelope-open',
-                'color'    => 'blue',
-                'title'    => 'Permohonan surat masuk',
-                'message'  => ($p->user->nama ?? 'Warga') . ' mengajukan ' . ($p->jenisSurat->nama_surat ?? 'surat'),
-                'time'     => $p->tanggal_pengajuan
+                'id'      => $p->id_permohonan,
+                'type'    => 'permohonan',
+                'icon'    => 'envelope-open',
+                'color'   => 'blue',
+                'title'   => 'Permohonan surat masuk',
+                'message' => (optional($p->user)->nama ?? 'Warga') . ' mengajukan ' . (optional($p->jenisSurat)->nama_surat ?? 'surat'),
+                'time'    => $p->tanggal_pengajuan
                     ? \Carbon\Carbon::parse($p->tanggal_pengajuan)->diffForHumans()
                     : '-',
-                'url'      => route('permohonan.show', $p->id_permohonan),
-                'raw_time' => $p->tanggal_pengajuan,
+                'url'     => route('permohonan.show', $p->id_permohonan),
             ];
         });
 
-        // 2) Permohonan siap_diambil yang belum di-selesaikan lebih dari 3 hari (reminder)
-        $siapLama = PermohonanSurat::with(['user', 'jenisSurat', 'approval'])
-            ->whereHas('approval', fn($q) => $q->where('status', Approval::STATUS_SIAP_DIAMBIL)
-                ->where('tanggal_siap_diambil', '<=', now()->subDays(3)))
+        // 2) Permohonan siap_diambil yang belum diambil > 3 hari (reminder)
+        $siapLama = PermohonanSurat::whereHas('approval', function ($q) {
+                $q->where('status', Approval::STATUS_SIAP_DIAMBIL)
+                  ->where('tanggal_siap_diambil', '<=', now()->subDays(3));
+            })
             ->latest('tanggal_pengajuan')
             ->take(4)
             ->get();
 
+        $siapLama->each(function ($p) {
+            $p->load('user', 'jenisSurat');
+        });
+
         $notifsReminder = $siapLama->map(function ($p) {
             return [
-                'id'       => $p->id_permohonan,
-                'type'     => 'reminder',
-                'icon'     => 'bell',
-                'color'    => 'orange',
-                'title'    => 'Surat belum diambil (3+ hari)',
-                'message'  => ($p->user->nama ?? 'Warga') . ' — ' . ($p->jenisSurat->nama_surat ?? 'surat') . ' masih belum diambil',
-                'time'     => $p->approval->tanggal_siap_diambil
-                    ? \Carbon\Carbon::parse($p->approval->tanggal_siap_diambil)->diffForHumans()
-                    : '-',
-                'url'      => route('permohonan.show', $p->id_permohonan),
-                'raw_time' => optional($p->approval)->tanggal_siap_diambil,
+                'id'      => $p->id_permohonan,
+                'type'    => 'reminder',
+                'icon'    => 'bell',
+                'color'   => 'orange',
+                'title'   => 'Surat belum diambil (3+ hari)',
+                'message' => (optional($p->user)->nama ?? 'Warga') . ' — ' . (optional($p->jenisSurat)->nama_surat ?? 'surat') . ' masih belum diambil',
+                'time'    => \Carbon\Carbon::parse($p->tanggal_pengajuan)->diffForHumans(),
+                'url'     => route('permohonan.show', $p->id_permohonan),
             ];
         });
 
-        $notifs = $notifsReminder->merge($notifsPending)->values();
+        $notifs = collect($notifsReminder->values())->merge(collect($notifsPending->values()))->values();
 
         return response()->json([
             'count' => $notifs->count(),
@@ -95,7 +100,9 @@ class NotifikasiController extends Controller
 
         $siapDiambil = PermohonanSurat::with(['jenisSurat', 'approval'])
             ->where('id_user', $userId)
-            ->whereHas('approval', fn($q) => $q->where('status', Approval::STATUS_SIAP_DIAMBIL))
+            ->whereHas('approval', function ($q) {
+                $q->where('status', Approval::STATUS_SIAP_DIAMBIL);
+            })
             ->latest('tanggal_pengajuan')
             ->get();
 

@@ -439,7 +439,8 @@
                 </form>
                 <form action="{{ route('permohonan.reject', $data->id_permohonan) }}" method="POST" id="form-reject-show">
                     @csrf @method('PUT')
-                    <button type="button" class="btn-full btn-reject-full" onclick="showConfirm('Tolak permohonan dari <strong>{{ addslashes($nama) }}</strong>?', () => document.getElementById('form-reject-show').submit(), {confirmText:'Ya, Tolak', type:'danger'})">
+                    <input type="hidden" name="catatan" id="input-catatan-reject">
+                    <button type="button" class="btn-full btn-reject-full" onclick="showModalTolak()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                         Tolak Permohonan
                     </button>
@@ -515,7 +516,48 @@
                     <p>Permohonan ini telah ditolak</p>
                     <span class="pill pill-rejected" style="display:inline-flex"><span class="pill-dot"></span> Ditolak</span>
                 </div>
+                <div style="margin-top:12px;background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:12px 14px">
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#b91c1c;margin-bottom:5px">Catatan Alasan Penolakan</div>
+                    @if(!empty($data->approval->catatan))
+                    <div style="font-size:13px;color:#7f1d1d;line-height:1.6">{{ $data->approval->catatan }}</div>
+                    @else
+                    <div style="font-size:13px;color:#9f1239;font-style:italic;line-height:1.6">Tidak ada catatan alasan penolakan.</div>
+                    @endif
+                </div>
                 @endif
+            </div>
+
+            {{-- Modal Tolak Permohonan — di luar @if agar selalu ada di DOM --}}
+            <div id="modal-tolak" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.45);backdrop-filter:blur(2px);align-items:center;justify-content:center">
+                <div style="background:#fff;border-radius:16px;padding:28px 28px 24px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.18);margin:16px">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+                        <div style="width:40px;height:40px;border-radius:10px;background:#fef2f2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" style="width:20px;height:20px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size:15px;font-weight:700;color:#1e293b">Tolak Permohonan</div>
+                            <div style="font-size:12px;color:#64748b;margin-top:1px">{{ $nama }}</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px">
+                        <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#64748b;display:block;margin-bottom:6px">
+                            Catatan Alasan Penolakan
+                            <span style="font-weight:400;color:#94a3b8;text-transform:none;letter-spacing:0"> (opsional)</span>
+                        </label>
+                        <textarea id="textarea-catatan-reject" rows="4"
+                            placeholder="Contoh: Dokumen persyaratan tidak lengkap, NIK tidak sesuai, dll."
+                            style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13.5px;color:#1e293b;font-family:inherit;resize:vertical;transition:border-color .2s;box-sizing:border-box"
+                            onfocus="this.style.borderColor='#ef4444'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                    </div>
+                    <div style="display:flex;gap:8px">
+                        <button type="button" onclick="tutupModalTolak()" style="flex:1;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;font-size:13.5px;font-weight:600;color:#64748b;cursor:pointer">
+                            Batal
+                        </button>
+                        <button type="button" onclick="konfirmasiTolak()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#ef4444;font-size:13.5px;font-weight:700;color:#fff;cursor:pointer">
+                            Ya, Tolak Permohonan
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {{-- INFO RINGKAS --}}
@@ -629,6 +671,29 @@
 @include('Admin.partials.footer')
 
 @push('scripts')
+<script>
+/* ── Modal Tolak Permohonan ── */
+function showModalTolak() {
+    var modal = document.getElementById('modal-tolak');
+    modal.style.display = 'flex';
+    document.getElementById('textarea-catatan-reject').value = '';
+    document.getElementById('textarea-catatan-reject').focus();
+}
+function tutupModalTolak() {
+    document.getElementById('modal-tolak').style.display = 'none';
+}
+function konfirmasiTolak() {
+    var catatan = document.getElementById('textarea-catatan-reject').value.trim();
+    document.getElementById('input-catatan-reject').value = catatan;
+    document.getElementById('form-reject-show').submit();
+}
+// Tutup modal jika klik di luar kotak
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('modal-tolak').addEventListener('click', function(e) {
+        if (e.target === this) tutupModalTolak();
+    });
+});
+</script>
 <script>
 function isWrappedBold(val) {
     var t = (val || '').trim();

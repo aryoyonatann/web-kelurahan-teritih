@@ -275,12 +275,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </div>
     </div>
 
-    @if($status === 'ditolak' && (optional($permohonan->approval)->catatan ?? false))
+    @if($status === 'ditolak')
     <div class="tolak-box">
         <i class="bi bi-exclamation-triangle-fill"></i>
         <div>
             <div style="font-size:13px;font-weight:700;color:#991b1b;margin-bottom:4px">Alasan Penolakan:</div>
+            @if(!empty(optional($permohonan->approval)->catatan))
             <div style="font-size:13px;color:#7f1d1d">{{ $permohonan->approval->catatan }}</div>
+            @else
+            <div style="font-size:13px;color:#9f1239;font-style:italic">Admin tidak memberikan catatan alasan penolakan.</div>
+            @endif
         </div>
     </div>
     @endif
