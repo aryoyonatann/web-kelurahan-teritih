@@ -97,6 +97,7 @@
 .admin-dd-item:hover { background:#f8fafc; }
 .admin-dd-logout { color:#ef4444; }
 .admin-dd-logout:hover { background:#fef2f2; }
+.admin-dd-active { background:#eff6ff; color:#1c64f2; font-weight:600; }
 
 /* =========================================================
    NOTIFIKASI DROPDOWN
@@ -297,6 +298,9 @@
                 <a href="{{ route('admin.password.form') }}" class="admin-dd-item">
                     <i class="bi bi-shield-lock"></i> Ganti Password
                 </a>
+                <a href="{{ route('admin.ttd.index') }}" class="admin-dd-item {{ request()->routeIs('admin.ttd.*') ? 'admin-dd-active' : '' }}">
+                    <i class="bi bi-pen"></i> TTD Digital
+                </a>
                 <div class="admin-dd-divider"></div>
                 <form action="{{ route('admin.logout') }}" method="POST" class="m-0" id="form-logout-dropdown">
                     @csrf
@@ -355,6 +359,10 @@
     <a href="{{ route('admin.master-data') }}"
        class="nav-pill {{ request()->routeIs('admin.master-data','jenis-surat.*','kelola-akun.*','admin.pengaturan.*') ? 'active' : '' }}">
         <i class="bi bi-database-fill"></i> Master Data
+    </a>
+    <a href="{{ route('admin.ttd.index') }}"
+       class="nav-pill {{ request()->routeIs('admin.ttd.*') ? 'active' : '' }}">
+        <i class="bi bi-pen"></i> TTD Digital
     </a>
 </div>
 

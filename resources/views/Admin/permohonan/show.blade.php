@@ -73,6 +73,7 @@
     .pill-rejected { background:var(--danger-light); color:#7f1d1d; } .pill-rejected .pill-dot { background:var(--danger); }
     .pill-siap     { background:#fff7ed;color:#9a3412; } .pill-siap .pill-dot { background:#f97316;animation:pulse-orange 1.5s infinite; }
     .pill-selesai  { background:#f0fdf4;color:#14532d; } .pill-selesai .pill-dot { background:#16a34a; }
+    .pill-cancelled { background:#f1f5f9;color:#64748b; } .pill-cancelled .pill-dot { background:#94a3b8; }
     @keyframes pulse-warn   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
     @keyframes pulse-orange { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 
@@ -160,6 +161,7 @@
     .btn-print-full   { background:var(--purple-light); color:var(--purple);text-decoration:none;display:flex; } .btn-print-full:hover { background:#ddd6fe; }
     .btn-siap-full    { background:#fff7ed;color:#c2410c;border:1.5px solid #fed7aa; } .btn-siap-full:hover { background:#ffedd5; }
     .btn-selesai-full { background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0; } .btn-selesai-full:hover { background:#dcfce7; }
+    .btn-wa-full { background:#dcfce7;color:#15803d;border:1.5px solid #86efac;text-decoration:none;display:flex; } .btn-wa-full:hover { background:#bbf7d0; }
     .action-done { text-align:center;padding:16px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px dashed var(--gray-200); }
     .action-done p { font-size:12px;color:var(--gray-400);margin:0 0 6px; }
 
@@ -231,6 +233,8 @@
                 <span class="pill pill-siap"><span class="pill-dot"></span> Siap Diambil</span>
             @elseif($status === 'selesai')
                 <span class="pill pill-selesai"><span class="pill-dot"></span> Selesai</span>
+            @elseif($status === 'cancelled')
+                <span class="pill pill-cancelled"><span class="pill-dot"></span> Dibatalkan Otomatis</span>
             @else
                 <span class="pill pill-pending"><span class="pill-dot"></span> Menunggu Proses</span>
             @endif
@@ -494,6 +498,39 @@
                     </button>
                 </form>
 
+                @php
+                    $noHpShow   = $data->user->no_hp ?? '';
+                    $noHpWaShow = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $noHpShow));
+                    $jenisSuratNama = $data->jenisSurat->nama_surat ?? 'Surat';
+                    $tglPengajuan   = \Carbon\Carbon::parse($data->tanggal_pengajuan)->format('d M Y');
+                    $pesanWaShow = urlencode(
+                        "Assalamu'alaikum Wr. Wb.\n\n" .
+                        "Yth. Bapak/Ibu *{$nama}*,\n\n" .
+                        "Kami informasikan bahwa permohonan *{$jenisSuratNama}* Anda telah selesai diproses dan *siap untuk diambil* di Kantor Kelurahan Teritih.\n\n" .
+                        "📋 *Detail Permohonan:*\n" .
+                        "• Jenis Surat : {$jenisSuratNama}\n" .
+                        "• Tanggal     : {$tglPengajuan}\n\n" .
+                        "Mohon segera hadir ke kantor kelurahan pada jam kerja (Senin–Jumat, 08.00–15.00 WIB) untuk mengambil surat Anda.\n\n" .
+                        "Terima kasih 🙏\n" .
+                        "*Kelurahan Teritih, Kecamatan Walantaka, Kota Serang*"
+                    );
+                @endphp
+                @if($noHpWaShow)
+                <button type="button"
+                    class="btn-full btn-wa-full"
+                    style="margin-top:10px"
+                    onclick="openModalKirimWa({{ $data->id_permohonan }}, '{{ addslashes($nama) }}', '{{ $noHpShow }}')">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Kirim Surat via WhatsApp (PDF + TTD)
+                </button>
+                @else
+                <div style="margin-top:10px;padding:10px 12px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:8px;font-size:12px;color:#92400e">
+                    ⚠️ User belum mengisi nomor WhatsApp
+                </div>
+                @endif
+
                 @elseif($status === 'selesai')
                 <div class="action-done" style="background:#f0fdf4;border-color:#bbf7d0">
                     <p style="color:#166534">Permohonan selesai — surat sudah diambil</p>
@@ -508,6 +545,17 @@
                         </svg>
                         Cetak / Print Surat
                     </a>
+                </div>
+
+                @elseif($status === 'cancelled')
+                {{-- dibatalkan otomatis --}}
+                <div class="action-done" style="background:#f8fafc;border-color:#e2e8f0">
+                    <p style="color:#475569">Permohonan ini dibatalkan otomatis</p>
+                    <span class="pill pill-cancelled" style="display:inline-flex"><span class="pill-dot"></span> Dibatalkan Otomatis</span>
+                </div>
+                <div style="margin-top:12px;background:#f1f5f9;border:1.5px solid #cbd5e1;border-radius:10px;padding:12px 14px">
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#64748b;margin-bottom:5px">Keterangan</div>
+                    <div style="font-size:13px;color:#475569;line-height:1.6">{{ $data->approval->catatan ?? 'Permohonan dibatalkan otomatis karena tidak ada tindak lanjut dari admin dalam 72 jam.' }}</div>
                 </div>
 
                 @else
@@ -749,4 +797,141 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+
+{{-- ══ MODAL KIRIM WA + PILIH TTD ══ --}}
+<div id="modal-kirim-wa" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(15,23,42,.5);backdrop-filter:blur(3px);align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;width:100%;max-width:500px;margin:16px;box-shadow:0 24px 64px rgba(0,0,0,.2);overflow:hidden">
+        <div style="padding:18px 22px 14px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">
+            <div>
+                <div style="font-size:15px;font-weight:800;color:#0f172a">📱 Kirim Surat via WhatsApp</div>
+                <div style="font-size:12px;color:#64748b;margin-top:2px" id="wa-modal-sub">-</div>
+            </div>
+            <button onclick="closeModalKirimWa()" style="width:30px;height:30px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;cursor:pointer;font-size:16px;color:#64748b;display:flex;align-items:center;justify-content:center">&times;</button>
+        </div>
+        <div style="padding:20px 22px">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;margin-bottom:12px">Pilih Tanda Tangan Digital:</div>
+            <div id="wa-ttd-list" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
+                <div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Memuat daftar TTD...</div>
+            </div>
+            <div id="wa-no-ttd" style="display:none;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:14px;font-size:13px;color:#92400e">
+                ⚠️ Belum ada TTD Digital yang aktif.
+                <a href="{{ route('admin.ttd.create') }}" style="color:#1c64f2;font-weight:700;text-decoration:none">Tambah TTD Digital →</a>
+            </div>
+        </div>
+        <div style="padding:14px 22px;border-top:1px solid #e2e8f0;display:flex;gap:10px;justify-content:flex-end">
+            <button onclick="closeModalKirimWa()" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:600;color:#64748b;cursor:pointer">Batal</button>
+            <button id="btn-kirim-wa-submit" onclick="submitKirimWa()" style="padding:9px 22px;border-radius:8px;border:none;background:#15803d;color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px" disabled>
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Generate PDF & Kirim WA
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+var _waPermohonanId = null;
+var _waTtdId       = null;
+var _waCsrfToken   = '{{ csrf_token() }}';
+
+function openModalKirimWa(id, nama, noHp) {
+    _waPermohonanId = id;
+    _waTtdId = null;
+    document.getElementById('wa-modal-sub').textContent = nama + ' · ' + noHp;
+    document.getElementById('btn-kirim-wa-submit').disabled = true;
+    document.getElementById('wa-no-ttd').style.display = 'none';
+    document.getElementById('wa-ttd-list').innerHTML = '<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Memuat daftar TTD...</div>';
+    document.getElementById('modal-kirim-wa').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    fetch('/admin/permohonan/' + id + '/ttd-list', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(ttds => {
+        const list = document.getElementById('wa-ttd-list');
+        if (!ttds.length) {
+            list.innerHTML = '';
+            document.getElementById('wa-no-ttd').style.display = 'block';
+            return;
+        }
+        list.innerHTML = ttds.map(t => `
+            <label onclick="selectTtd(${t.id})" style="display:flex;align-items:center;gap:14px;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .15s" id="ttd-card-${t.id}">
+                <input type="radio" name="wa_ttd" value="${t.id}" style="display:none">
+                ${t.ttd_url ? `<img src="${escH(t.ttd_url)}" style="height:52px;width:120px;object-fit:contain;border:1px solid #e2e8f0;border-radius:6px;padding:3px;background:#fafafa;flex-shrink:0">` : '<div style="width:120px;height:52px;background:#f1f5f9;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#94a3b8">Tidak ada gambar</div>'}
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:700;color:#0f172a">${escH(t.nama)}</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:2px">${escH(t.jabatan)}</div>
+                    ${t.nip && t.nip !== '-' ? `<div style="font-size:11px;color:#94a3b8;font-family:monospace">NIP. ${escH(t.nip)}</div>` : ''}
+                </div>
+                <div class="ttd-check-${t.id}" style="display:none;width:22px;height:22px;border-radius:50%;background:#15803d;flex-shrink:0;align-items:center;justify-content:center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="width:12px;height:12px"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+            </label>
+        `).join('');
+        if (ttds.length === 1) { selectTtd(ttds[0].id); }
+    })
+    .catch(() => {
+        document.getElementById('wa-ttd-list').innerHTML = '<div style="color:#ef4444;font-size:13px;padding:16px">Gagal memuat daftar TTD</div>';
+    });
+}
+
+function selectTtd(id) {
+    _waTtdId = id;
+    document.querySelectorAll('[id^="ttd-card-"]').forEach(el => {
+        el.style.borderColor = '#e2e8f0';
+        el.style.background  = '#fff';
+    });
+    const card = document.getElementById('ttd-card-' + id);
+    if (card) { card.style.borderColor = '#15803d'; card.style.background = '#f0fdf4'; }
+    document.getElementById('btn-kirim-wa-submit').disabled = false;
+}
+
+function closeModalKirimWa() {
+    document.getElementById('modal-kirim-wa').style.display = 'none';
+    document.body.style.overflow = '';
+    const btn = document.getElementById('btn-kirim-wa-submit');
+    btn.disabled = true;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Generate PDF & Kirim WA`;
+    _waTtdId = null;
+}
+
+function submitKirimWa() {
+    if (!_waPermohonanId) return;
+    if (!_waTtdId) { showToastWa('⚠️ Pilih tanda tangan terlebih dahulu!', 'warning'); return; }
+    const btn = document.getElementById('btn-kirim-wa-submit');
+    btn.disabled = true;
+    btn.textContent = '⏳ Mengirim...';
+
+    fetch('/admin/permohonan/' + _waPermohonanId + '/kirim-wa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': _waCsrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ ttd_id: _waTtdId }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) { closeModalKirimWa(); showToastWa('✅ ' + data.message, 'success'); }
+        else { showToastWa('❌ ' + data.message, 'danger'); }
+    })
+    .catch(() => { showToastWa('❌ Terjadi kesalahan. Coba lagi.', 'danger'); })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Generate PDF & Kirim WA`;
+    });
+}
+
+function showToastWa(msg, type) {
+    const t = document.createElement('div');
+    const bg = type==='success'?'#15803d':type==='warning'?'#d97706':'#dc2626';
+    t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;background:${bg};box-shadow:0 4px 16px rgba(0,0,0,.2)`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+}
+
+function escH(s) { return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+document.getElementById('modal-kirim-wa').addEventListener('click', function(e) { if (e.target === this) closeModalKirimWa(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalKirimWa(); });
+</script>
+
 @endsection

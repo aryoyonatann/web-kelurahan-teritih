@@ -65,6 +65,7 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
 .pill-ditolak{background:#fee2e2;color:#7f1d1d}.pill-ditolak::before{background:var(--red)}
 .pill-siap_diambil{background:#fff7ed;color:#9a3412}.pill-siap_diambil::before{background:#f97316;animation:pulse-orange 1.5s infinite}
 .pill-selesai{background:#f0fdf4;color:#14532d}.pill-selesai::before{background:#16a34a}
+.pill-cancelled{background:#f1f5f9;color:#64748b}.pill-cancelled::before{background:#94a3b8}
 @keyframes pulse-orange{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
 .action-group{display:flex;align-items:center;gap:6px}
 .btn-sm{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;text-decoration:none;white-space:nowrap;font-family:inherit}
@@ -217,10 +218,14 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
                         </span>
                         @elseif($status === 'selesai')
                         <span class="pill pill-selesai">✅ Selesai</span>
+                        @elseif($status === 'cancelled')
+                        <span class="pill pill-cancelled">🚫 Dibatalkan</span>
+                        @elseif($status === 'ditolak')
+                        <span class="pill pill-ditolak">❌ Ditolak</span>
+                        @elseif($status === 'disetujui')
+                        <span class="pill pill-disetujui">✔ Disetujui</span>
                         @else
-                        <span class="pill pill-{{ $status }}">
-                            {{ $status === 'disetujui' ? 'Disetujui' : ($status === 'ditolak' ? 'Ditolak' : 'Pending') }}
-                        </span>
+                        <span class="pill pill-pending">⏳ Pending</span>
                         @endif
                     </td>
                     <td>

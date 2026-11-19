@@ -12,6 +12,8 @@ use App\Http\Controllers\User\PermohonanUserController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\PendudukController;
+use App\Http\Controllers\Admin\TtdDigitalController;
+use App\Http\Controllers\Admin\KirimWaController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\ChatbotController;
@@ -105,6 +107,19 @@ Route::prefix('admin')->group(function () {
         Route::get( 'pengaturan',             [PengaturanController::class, 'edit'])         ->name('admin.pengaturan.edit');
         Route::put( 'pengaturan',             [PengaturanController::class, 'update'])       ->name('admin.pengaturan.update');
         Route::post('pengaturan/resolve-gmaps',[PengaturanController::class,'resolveGmaps']) ->name('admin.pengaturan.resolve-gmaps');
+
+        // TTD Digital
+        Route::get( 'ttd-digital',            [TtdDigitalController::class, 'index'])  ->name('admin.ttd.index');
+        Route::get( 'ttd-digital/create',     [TtdDigitalController::class, 'create']) ->name('admin.ttd.create');
+        Route::post('ttd-digital',            [TtdDigitalController::class, 'store'])  ->name('admin.ttd.store');
+        Route::get( 'ttd-digital/{ttd}/edit', [TtdDigitalController::class, 'edit'])   ->name('admin.ttd.edit');
+        Route::put( 'ttd-digital/{ttd}',      [TtdDigitalController::class, 'update']) ->name('admin.ttd.update');
+        Route::delete('ttd-digital/{ttd}',    [TtdDigitalController::class, 'destroy'])->name('admin.ttd.destroy');
+        Route::get( 'ttd-digital/list',       [TtdDigitalController::class, 'list'])   ->name('admin.ttd.list');
+
+        // Kirim WA dengan PDF + TTD
+        Route::get( 'permohonan/{id}/ttd-list', [KirimWaController::class, 'getTtdList'])->name('permohonan.ttd.list');
+        Route::post('permohonan/{id}/kirim-wa', [KirimWaController::class, 'kirim'])     ->name('permohonan.kirim.wa');
     });
 });
 

@@ -16,6 +16,7 @@ class Approval extends Model
     const STATUS_DITOLAK       = 'ditolak';
     const STATUS_SIAP_DIAMBIL  = 'siap_diambil';
     const STATUS_SELESAI       = 'selesai';
+    const STATUS_CANCELLED     = 'cancelled';
 
     protected $fillable = [
         'id_permohonan',
@@ -51,6 +52,7 @@ class Approval extends Model
             self::STATUS_DITOLAK,
             self::STATUS_SIAP_DIAMBIL,
             self::STATUS_SELESAI,
+            self::STATUS_CANCELLED,
         ]);
     }
 }

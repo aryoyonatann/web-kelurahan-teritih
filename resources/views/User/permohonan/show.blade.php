@@ -33,6 +33,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .hero-top.ditolak  {background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 55%,#f87171 100%)}
 .hero-top.siap_diambil{background:linear-gradient(135deg,#7c2d12 0%,#ea580c 55%,#fb923c 100%)}
 .hero-top.selesai  {background:linear-gradient(135deg,#14532d 0%,#16a34a 55%,#4ade80 100%)}
+.hero-top.cancelled{background:linear-gradient(135deg,#374151 0%,#4b5563 55%,#9ca3af 100%)}
 .hero-top::before{content:'';position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;border:48px solid rgba(255,255,255,.06);pointer-events:none}
 .hero-top::after{content:'';position:absolute;right:80px;bottom:-40px;width:140px;height:140px;border-radius:50%;border:28px solid rgba(255,255,255,.04);pointer-events:none}
 .hero-inner{position:relative;z-index:1;display:flex;align-items:flex-start;gap:20px;margin-bottom:20px}
@@ -120,6 +121,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sb-icon.ditolak  {background:#fef2f2;color:var(--red)}
 .sb-icon.siap_diambil{background:#fff7ed;color:#ea580c}
 .sb-icon.selesai  {background:#ecfdf5;color:var(--green)}
+.sb-icon.cancelled{background:#f3f4f6;color:#6b7280}
 .sb-label{font-size:11px;color:var(--muted);margin-bottom:2px}
 .sb-val{font-size:16px;font-weight:800}
 .sb-val.pending  {color:var(--blue)}
@@ -223,6 +225,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
                     @elseif($status==='ditolak') <i class="bi bi-x-circle-fill"></i>
                     @elseif($status==='siap_diambil') <i class="bi bi-bag-check-fill"></i>
                     @elseif($status==='selesai') <i class="bi bi-patch-check-fill"></i>
+                    @elseif($status==='cancelled') <i class="bi bi-slash-circle-fill"></i>
                     @else <i class="bi bi-hourglass-split"></i>
                     @endif
                 </div>
@@ -239,6 +242,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
                         @elseif($status==='ditolak') Permohonan Ditolak
                         @elseif($status==='siap_diambil') 📦 Surat Siap Diambil!
                         @elseif($status==='selesai') ✅ Selesai — Surat Sudah Diambil
+                        @elseif($status==='cancelled') 🚫 Permohonan Dibatalkan Otomatis
                         @else Menunggu Proses Admin
                         @endif
                     </div>
@@ -268,6 +272,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
                     @elseif($status==='ditolak') Ditolak ❌
                     @elseif($status==='siap_diambil') Siap Diambil 📦
                     @elseif($status==='selesai') Selesai ✅
+                    @elseif($status==='cancelled') Dibatalkan 🚫
                     @else Pending ⏳
                     @endif
                 </div>
@@ -285,6 +290,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
             @else
             <div style="font-size:13px;color:#9f1239;font-style:italic">Admin tidak memberikan catatan alasan penolakan.</div>
             @endif
+        </div>
+    </div>
+    @endif
+
+    @if($status === 'cancelled')
+    <div style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:2px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:flex-start;gap:16px">
+        <div style="font-size:36px;flex-shrink:0">🚫</div>
+        <div>
+            <div style="font-size:15px;font-weight:800;color:#374151;margin-bottom:4px">Permohonan Dibatalkan Otomatis</div>
+            <div style="font-size:13px;color:#6b7280;line-height:1.6">
+                Permohonan ini dibatalkan karena tidak ada tindak lanjut dari admin dalam <strong>72 jam</strong> sejak pengajuan.<br>
+                Anda dapat mengajukan permohonan baru kapan saja.
+            </div>
         </div>
     </div>
     @endif

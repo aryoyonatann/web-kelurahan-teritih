@@ -90,6 +90,42 @@
     #suratCetak.measure-mode{display:block!important;position:absolute!important;top:-99999px;left:-99999px;visibility:hidden}
     #suratCetak.measure-mode .surat{width:210mm;min-height:0;padding:10mm 18mm 10mm 22mm;font-family:'Times New Roman',Times,serif}
     </style>
+@if($pdfMode ?? false)
+{{-- ═══ CSS khusus PDF mode — ditaruh di <head> agar DomPDF baca duluan ═══ --}}
+<style>
+/* Reset total untuk PDF */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !important;line-height:1.5 !important;color:black !important;background:white !important}
+/* Sembunyikan elemen mode normal */
+#formPanel,#suratCetak,link{display:none !important}
+/* KOP */
+.pdf-surat{width:100%;padding:10mm 18mm 10mm 22mm}
+.pdf-kop-table{width:100%;border-collapse:collapse;border-bottom:3px double black;margin-bottom:0;padding-bottom:6px}
+.pdf-kop-logo{width:85px;vertical-align:middle}
+.pdf-kop-logo img{width:75px;height:auto}
+.pdf-kop-teks{text-align:center;vertical-align:middle;line-height:1.2}
+.pdf-k1,.pdf-k2,.pdf-k3{font-size:16pt;font-weight:bold;letter-spacing:.04em;display:block}
+.pdf-k4{font-size:10pt;font-style:italic;display:block;margin-top:2px}
+/* Judul & Nomor */
+.pdf-judul{text-align:center;font-size:14pt;font-weight:bold;text-decoration:underline;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 2px}
+.pdf-nomor{text-align:center;font-size:12pt;margin-bottom:14px}
+/* Isi */
+.pdf-pembuka{text-align:justify;margin-bottom:14px;text-indent:36px;font-size:12pt}
+.pdf-bio{width:100%;border-collapse:collapse;margin-bottom:14px}
+.pdf-bio tr td{padding:1px 0;vertical-align:top;font-size:12pt}
+.pdf-bio tr td:first-child{width:145px}
+.pdf-bio tr td:nth-child(2){width:12px;padding:0 6px}
+.pdf-isi{text-align:justify;margin-bottom:14px;text-indent:36px;font-size:12pt}
+.pdf-penutup{text-align:justify;margin-bottom:8px;text-indent:36px;font-size:12pt}
+.pdf-keterangan{text-align:justify;margin:4pt 0;font-size:12pt}
+.pdf-center-bold{text-align:center;font-weight:bold;font-style:italic;margin:14px 0;font-size:12pt}
+/* TTD */
+.pdf-ttd-table{width:100%;border-collapse:collapse;margin-top:20pt}
+.pdf-ttd-right{text-align:center;vertical-align:top;width:220px}
+.pdf-ttd-nama{font-weight:bold;text-decoration:underline;line-height:1.3;font-size:12pt}
+.pdf-ttd-nip{font-weight:bold;font-size:12pt;margin-top:1px}
+</style>
+@endif
 </head>
 <body>
 
@@ -136,6 +172,175 @@
     $isiDefault = str_replace(array_keys($replacements), array_values($replacements), $templateIsi);
 @endphp
 
+{{-- ══════════════════════════════════════════════════════════════════
+     MODE PDF (DomPDF) — hanya aktif ketika $pdfMode = true
+     Controller kirim: $pdfMode, $nomorUrut, $bulanRomawi, $ttd, $tglSurat
+     ═══════════════════════════════════════════════════════════════════ --}}
+@if($pdfMode ?? false)
+@php
+    // Nomor surat
+    $nomorFormatted = $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
+        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year;
+
+    // Pengaturan kelurahan
+    $pengaturan    = \App\Models\Pengaturan::pluck('nilai','kunci');
+    $namaKelurahan = $pengaturan['nama_kelurahan'] ?? 'KELURAHAN TERITIH';
+    $namaKecamatan = $pengaturan['nama_kecamatan'] ?? 'KECAMATAN WALANTAKA';
+    $namaKota      = $pengaturan['nama_kota']      ?? 'KOTA SERANG';
+    $alamatKel     = $pengaturan['alamat_kelurahan'] ?? 'Jln. Kalodran-Sidapurna Nomor 001 Kel. Teritih Kec. Walantaka';
+
+    // Logo (embed base64 agar DomPDF tidak perlu HTTP request)
+    $logoPath = public_path('images/lambang_kota_serang.jpg');
+    if (!file_exists($logoPath)) $logoPath = storage_path('app/public/' . ($pengaturan['logo'] ?? 'images/logo.png'));
+    $logoData = file_exists($logoPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+    // Parse **bold** → <strong>
+    function parseBoldPdf($text) {
+        $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+        return preg_replace('/\*\*(.+?)\*\*/', '<strong style="text-decoration:underline">$1</strong>', $html);
+    }
+
+    // TTD image (embed base64)
+    $ttdImgTag = '';
+    if (!empty($ttd->ttd_data)) {
+        $ttdImgTag = '<img src="' . $ttd->ttd_data . '" style="height:70px;width:auto;max-width:200px" alt="TTD">';
+    } elseif (!empty($ttd->ttd_path)) {
+        $ttdFile = storage_path('app/public/' . $ttd->ttd_path);
+        if (file_exists($ttdFile)) {
+            $ttdExt  = strtolower(pathinfo($ttdFile, PATHINFO_EXTENSION));
+            $ttdMime = $ttdExt === 'png' ? 'image/png' : 'image/jpeg';
+            $ttdB64  = 'data:' . $ttdMime . ';base64,' . base64_encode(file_get_contents($ttdFile));
+            $ttdImgTag = '<img src="' . $ttdB64 . '" style="height:70px;width:auto;max-width:200px" alt="TTD">';
+        }
+    }
+@endphp
+<div class="pdf-surat">
+
+{{-- KOP --}}
+<table class="pdf-kop-table">
+    <tr>
+        @if($logoData)
+        <td class="pdf-kop-logo"><img src="{{ $logoData }}" alt="Logo"></td>
+        @endif
+        <td class="pdf-kop-teks">
+            <span class="pdf-k1">PEMERINTAH {{ strtoupper($namaKota) }}</span>
+            <span class="pdf-k2">{{ strtoupper($namaKecamatan) }}</span>
+            <span class="pdf-k3">{{ strtoupper($namaKelurahan) }}</span>
+            <span class="pdf-k4">{{ $alamatKel }}</span>
+        </td>
+    </tr>
+</table>
+
+{{-- JUDUL & NOMOR --}}
+<div class="pdf-judul">{{ $judulSurat }}</div>
+<div class="pdf-nomor">Nomor: {{ $nomorFormatted }}</div>
+
+{{-- PEMBUKA --}}
+<p class="pdf-pembuka">{!! parseBoldPdf($templatePembuka) !!}</p>
+
+{{-- BIODATA DINAMIS (sama persis dengan print.blade.php #suratCetak) --}}
+@php $bioConfig = collect($fieldsConfig)->where('group','biodata')->values(); $tblOpen = false; @endphp
+@foreach($bioConfig as $bf)
+    @if(($bf['type'] ?? '') === 'section')
+        @if($tblOpen)</table>@php $tblOpen = false; @endphp @endif
+        @php
+            $bSecCss = 'margin:12pt 0 6pt;font-size:12pt;';
+            $bSecSt  = $bf['print_style'] ?? 'bold_underline';
+            if (in_array($bSecSt,['bold','bold_underline'])) $bSecCss .= 'font-weight:bold;';
+            if (in_array($bSecSt,['underline','bold_underline'])) $bSecCss .= 'text-decoration:underline;';
+        @endphp
+        <p style="{{ $bSecCss }}">{{ $bf['label'] }}</p>
+    @else
+        @if(!$tblOpen)<table class="pdf-bio">@php $tblOpen = true; @endphp @endif
+        @php
+            $bVal = match($bf['key']) {
+                'nama'           => $nama,
+                'nik'            => $nik,
+                'tempat_tgl_lahir' => $ttlStr,
+                'umur'           => ($dt['umur'] ?? '-') . ' tahun',
+                'jenis_kelamin'  => $jk,
+                'agama'          => $agama,
+                'status_kawin'   => $dt['status_kawin'] ?? '-',
+                'kewarganegaraan'=> $dt['kewarganegaraan'] ?? 'WNI',
+                'pekerjaan'      => $pekerjaan,
+                'pendidikan'     => $dt['pendidikan'] ?? '-',
+                'alamat'         => $alamat,
+                'rt_rw'          => ($dt['rt'] ?? '-') . ' / ' . ($dt['rw'] ?? '-'),
+                'kelurahan'      => $dt['kelurahan'] ?? 'Teritih',
+                'kecamatan'      => $dt['kecamatan'] ?? 'Walantaka',
+                'no_hp'          => $dt['no_hp'] ?? '-',
+                default          => $dt[$bf['key']] ?? '-',
+            };
+            $bLabel = $bf['print_label'] ?? $bf['label'] ?? $bf['key'];
+            $isNama = $bf['key'] === 'nama';
+        @endphp
+        <tr>
+            <td>{{ $bLabel }}</td><td>:</td>
+            <td>@if($isNama)<strong>{{ $bVal }}</strong>@else{{ $bVal }}@endif</td>
+        </tr>
+    @endif
+@endforeach
+@if($tblOpen)</table>@endif
+
+{{-- EXTRA FIELDS --}}
+@php $extras = collect($fieldsConfig)->where('group','extra')->values(); $exTblOpen = false; @endphp
+@foreach($extras as $ef)
+    @if(($ef['type'] ?? '') === 'section')
+        @if($exTblOpen)</table>@php $exTblOpen = false; @endphp @endif
+        @php
+            $secLbl = str_replace(array_keys($replacements), array_values($replacements), $ef['label']);
+            $secSt  = $ef['print_style'] ?? '';
+            $secCss = 'font-size:12pt;';
+            if (in_array($secSt,['bold','bold_underline'])) $secCss .= 'font-weight:bold;';
+            if (in_array($secSt,['underline','bold_underline'])) $secCss .= 'text-decoration:underline;';
+        @endphp
+        <p class="pdf-keterangan" style="{{ $secCss }}">{{ $secLbl }}</p>
+    @elseif(($ef['print_style'] ?? '') === 'center_bold')
+        @php
+            $cbVal = $dt[$ef['key']] ?? '';
+            $cbPfx = str_replace(array_keys($replacements), array_values($replacements), $ef['template_text'] ?? '');
+            $cbPfx = $cbPfx ? $cbPfx . ' ' : '';
+        @endphp
+        @if($cbVal)<p class="pdf-center-bold">{{ $cbPfx }}{{ $cbVal }}</p>@endif
+    @elseif($ef['on_print'] ?? false)
+        @if(!$exTblOpen)<table class="pdf-bio">@php $exTblOpen = true; @endphp @endif
+        @php
+            $exVal = $dt[$ef['key']] ?? '-';
+            if (($ef['type'] ?? '') === 'date' && $exVal && $exVal !== '-')
+                $exVal = \Carbon\Carbon::parse($exVal)->locale('id')->isoFormat('D MMMM Y');
+        @endphp
+        <tr><td>{{ $ef['print_label'] ?? $ef['label'] }}</td><td>:</td><td>{{ $exVal }}</td></tr>
+    @endif
+@endforeach
+@if($exTblOpen)</table>@endif
+
+{{-- ISI SURAT --}}
+@if($isiDefault)
+<p class="pdf-isi">{!! parseBoldPdf($isiDefault) !!}</p>
+@endif
+
+{{-- PENUTUP --}}
+<p class="pdf-penutup">{{ $templatePenutup }}</p>
+
+{{-- TTD DIGITAL --}}
+<table class="pdf-ttd-table">
+    <tr>
+        <td style="vertical-align:top">&nbsp;</td>
+        <td class="pdf-ttd-right">
+            <div>{{ $tglSurat }}</div>
+            <div>{{ $ttd->jabatan }}</div>
+            <div style="height:70px;margin:6px 0;text-align:center">{!! $ttdImgTag !!}</div>
+            <div class="pdf-ttd-nama">{{ $ttd->nama }}</div>
+            @if($ttd->nip)<div class="pdf-ttd-nip">NIP. {{ $ttd->nip }}</div>@endif
+        </td>
+    </tr>
+</table>
+
+</div>{{-- end .pdf-surat --}}
+@else
+{{-- ══════════════════════════════════════════════════════════════════
+     MODE NORMAL (browser) — form + cetak manual seperti biasa
+     ═══════════════════════════════════════════════════════════════════ --}}
 
 {{-- ═══ FORM INPUT ADMIN ═══ --}}
 <div id="formPanel" class="panel-wrap">
@@ -817,5 +1022,7 @@ function showAlert(message, type = 'warning') {
     overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
 }
 </script>
+@endif
+{{-- ═══ END MODE NORMAL ═══ --}}
 </body>
 </html>
