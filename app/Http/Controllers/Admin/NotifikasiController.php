@@ -106,9 +106,10 @@ class NotifikasiController extends Controller
             ->latest('tanggal_pengajuan')
             ->get();
 
-        $notifs = $siapDiambil->map(function ($p) {
+        $notifsSiap = $siapDiambil->map(function ($p) {
             return [
                 'id'      => $p->id_permohonan,
+                'type'    => 'siap_diambil',
                 'surat'   => $p->jenisSurat->nama_surat ?? 'Surat',
                 'message' => '🎉 Surat Anda sudah siap diambil di kantor kelurahan!',
                 'time'    => optional($p->approval->tanggal_siap_diambil)
@@ -118,9 +119,33 @@ class NotifikasiController extends Controller
             ];
         });
 
+        $cancelled = PermohonanSurat::with(['jenisSurat', 'approval'])
+            ->where('id_user', $userId)
+            ->whereHas('approval', function ($q) {
+                $q->where('status', Approval::STATUS_CANCELLED)
+                  ->where('tanggal_approval', '>=', now()->subDays(3));
+            })
+            ->latest('tanggal_pengajuan')
+            ->get();
+
+        $notifsCancelled = $cancelled->map(function ($p) {
+            return [
+                'id'      => $p->id_permohonan,
+                'type'    => 'cancelled',
+                'surat'   => $p->jenisSurat->nama_surat ?? 'Surat',
+                'message' => '🚫 Permohonan Anda dibatalkan otomatis karena tidak ada tindak lanjut dari admin dalam 72 jam.',
+                'time'    => optional($p->approval->tanggal_approval)
+                    ? \Carbon\Carbon::parse($p->approval->tanggal_approval)->diffForHumans()
+                    : '-',
+                'url'     => route('user.permohonan.show', $p->id_permohonan),
+            ];
+        });
+
+        $notifs = $notifsSiap->merge($notifsCancelled)->values();
+
         return response()->json([
             'count' => $notifs->count(),
-            'items' => $notifs->values(),
+            'items' => $notifs,
         ]);
     }
 }

@@ -435,7 +435,7 @@ document.addEventListener('keydown', function(e) {
 
 // Notifikasi
 (function () {
-    const POLL_MS  = 30000;
+    const POLL_MS  = 15000;
     const API_URL  = '{{ route("admin.notifikasi") }}';
     const MARK_URL = '{{ route("admin.notifikasi.read") }}';
     const CSRF     = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';

@@ -405,6 +405,338 @@
 })();
 </script>
 
+@guest
+{{-- ============================================================
+     POPUP TUTORIAL PENGGUNA (hanya untuk tamu / belum login)
+     ============================================================ --}}
+<style>
+/* Overlay */
+#tutorialOverlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(10,20,50,.65); backdrop-filter: blur(5px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s ease;
+}
+#tutorialOverlay.show { opacity: 1; pointer-events: all; }
+
+/* Modal box */
+#tutorialModal {
+    background: white; border-radius: 20px;
+    width: 100%; max-width: 780px; max-height: 90vh;
+    overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 24px 72px rgba(0,0,0,.25);
+    transform: scale(.95) translateY(16px);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+}
+#tutorialOverlay.show #tutorialModal { transform: scale(1) translateY(0); }
+
+/* Header */
+.tut-header {
+    background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
+    padding: 20px 24px 16px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    flex-shrink: 0;
+}
+.tut-header-text {}
+.tut-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 20px; padding: 3px 12px;
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #fbbf24; margin-bottom: 8px;
+}
+.tut-title { font-size: 20px; font-weight: 800; color: white; margin: 0 0 4px; }
+.tut-subtitle { font-size: 13px; color: rgba(255,255,255,.65); margin: 0; }
+.tut-close {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    border: 1.5px solid rgba(255,255,255,.25); background: rgba(255,255,255,.1);
+    color: white; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .18s; line-height: 1;
+}
+.tut-close:hover { background: rgba(255,255,255,.25); }
+
+/* Tab nav */
+.tut-tabs {
+    display: flex; border-bottom: 2px solid #e2e8f0;
+    padding: 0 24px; gap: 4px; flex-shrink: 0; background: white;
+}
+.tut-tab {
+    padding: 12px 18px; font-size: 13px; font-weight: 700;
+    color: #64748b; border: none; background: none; cursor: pointer;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+    transition: color .18s, border-color .18s; display: flex; align-items: center; gap: 7px;
+}
+.tut-tab:hover { color: #1c64f2; }
+.tut-tab.active { color: #1c64f2; border-bottom-color: #1c64f2; }
+
+/* Body scroll */
+.tut-body { overflow-y: auto; flex: 1; padding: 24px; }
+
+/* Tab panel */
+.tut-panel { display: none; }
+.tut-panel.active { display: block; }
+
+/* Video wrapper 16:9 */
+.tut-video-wrap {
+    position: relative; padding-top: 56.25%;
+    border-radius: 12px; overflow: hidden;
+    background: #0d1b3e; margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.15);
+}
+.tut-video-wrap iframe,
+.tut-video-wrap video {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: none;
+}
+/* placeholder saat belum ada video */
+.tut-video-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: rgba(255,255,255,.5); gap: 12px;
+}
+.tut-video-placeholder i { font-size: 48px; }
+.tut-video-placeholder p { font-size: 13px; margin: 0; }
+
+/* Steps */
+.tut-steps-title { font-size: 14px; font-weight: 800; color: #0d1b3e; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.tut-steps-title i { color: #1c64f2; }
+.tut-step {
+    display: flex; gap: 14px; padding: 14px 16px;
+    border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px;
+    background: #f8fafc; transition: border-color .18s, background .18s;
+}
+.tut-step:hover { border-color: #bfdbfe; background: #eff6ff; }
+.tut-step-num {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: #1c64f2; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800;
+}
+.tut-step-body {}
+.tut-step-title { font-size: 14px; font-weight: 700; color: #0d1b3e; margin-bottom: 3px; }
+.tut-step-desc  { font-size: 13px; color: #64748b; line-height: 1.6; margin: 0; }
+
+/* CTA bottom */
+.tut-cta {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 16px 24px; border-top: 1px solid #e2e8f0;
+    background: #f8fafc; flex-shrink: 0; align-items: center; justify-content: space-between;
+}
+.tut-cta-left { font-size: 13px; color: #64748b; }
+.tut-cta-left a { color: #1c64f2; font-weight: 700; text-decoration: none; }
+.tut-cta-right { display: flex; gap: 8px; }
+.btn-tut-dismiss {
+    padding: 9px 18px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid #e2e8f0; background: white; color: #334155;
+    cursor: pointer; transition: all .18s; font-family: inherit;
+}
+.btn-tut-dismiss:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.btn-tut-daftar {
+    padding: 9px 18px; border-radius: 9px; font-size: 13px; font-weight: 700;
+    border: none; background: #1c64f2; color: white;
+    cursor: pointer; transition: background .18s; font-family: inherit;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 7px;
+}
+.btn-tut-daftar:hover { background: #1a56db; color: white; }
+
+@media (max-width: 600px) {
+    .tut-header { padding: 16px 16px 12px; }
+    .tut-body   { padding: 16px; }
+    .tut-tabs   { padding: 0 12px; }
+    .tut-tab    { padding: 10px 12px; font-size: 12px; }
+    .tut-title  { font-size: 17px; }
+    .tut-cta    { padding: 12px 16px; }
+}
+</style>
+
+<div id="tutorialOverlay">
+    <div id="tutorialModal">
+
+        {{-- Header --}}
+        <div class="tut-header">
+            <div class="tut-header-text">
+                <div class="tut-badge"><i class="bi bi-play-circle-fill" style="font-size:10px"></i> Panduan Penggunaan</div>
+                <h2 class="tut-title">Cara Menggunakan Layanan Online</h2>
+                <p class="tut-subtitle">Kelurahan Teritih — Portal Pelayanan Publik Digital</p>
+            </div>
+            <button class="tut-close" id="tutClose" title="Tutup">✕</button>
+        </div>
+
+        {{-- Tab Nav --}}
+        <div class="tut-tabs">
+            <button class="tut-tab active" data-tab="daftar">
+                <i class="bi bi-person-plus-fill"></i> Daftar Akun
+            </button>
+            <button class="tut-tab" data-tab="permohonan">
+                <i class="bi bi-file-earmark-text-fill"></i> Ajukan Surat
+            </button>
+        </div>
+
+        {{-- Tab Body --}}
+        <div class="tut-body">
+
+            {{-- Tab: Daftar Akun --}}
+            <div class="tut-panel active" id="panel-daftar">
+
+                {{-- Video --}}
+                <div class="tut-video-wrap">
+                    {{-- Ganti src di bawah dengan link YouTube embed atau path video lokal --}}
+                    {{-- YouTube  : src="https://www.youtube.com/embed/VIDEO_ID?rel=0" --}}
+                    {{-- Video lokal : <video controls src="{{ asset('videos/tutorial-daftar.mp4') }}"></video> --}}
+                    <div class="tut-video-placeholder">
+                        <i class="bi bi-camera-video-off"></i>
+                        <p>Video tutorial pendaftaran akan ditampilkan di sini</p>
+                    </div>
+                </div>
+
+                {{-- Langkah-langkah --}}
+                <div class="tut-steps-title"><i class="bi bi-list-ol"></i> Langkah Pendaftaran Akun</div>
+
+                <div class="tut-step">
+                    <div class="tut-step-num">1</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Buka halaman Login</div>
+                        <p class="tut-step-desc">Klik tombol <strong>"Login Masyarakat"</strong> di pojok kanan atas navbar, lalu pilih <strong>"Daftar Sekarang"</strong> di halaman login.</p>
+                    </div>
+                </div>
+                <div class="tut-step">
+                    <div class="tut-step-num">2</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Isi data diri</div>
+                        <p class="tut-step-desc">Masukkan nama lengkap, NIK (16 digit), nomor WhatsApp aktif, alamat, serta email dan password yang akan digunakan untuk login.</p>
+                    </div>
+                </div>
+                <div class="tut-step">
+                    <div class="tut-step-num">3</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Klik "Daftar"</div>
+                        <p class="tut-step-desc">Pastikan semua kolom sudah terisi dengan benar, lalu klik tombol <strong>Daftar</strong>. Sistem akan membuat akun Anda secara otomatis.</p>
+                    </div>
+                </div>
+                <div class="tut-step">
+                    <div class="tut-step-num">4</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Login ke akun Anda</div>
+                        <p class="tut-step-desc">Setelah berhasil mendaftar, Anda akan diarahkan ke halaman login. Masukkan email dan password, lalu klik <strong>Masuk</strong>.</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Tab: Ajukan Surat --}}
+            <div class="tut-panel" id="panel-permohonan">
+
+                {{-- Video --}}
+                <div class="tut-video-wrap">
+                    <div class="tut-video-placeholder">
+                        <i class="bi bi-camera-video-off"></i>
+                        <p>Video tutorial pengajuan surat akan ditampilkan di sini</p>
+                    </div>
+                </div>
+
+                {{-- Langkah-langkah --}}
+                <div class="tut-steps-title"><i class="bi bi-list-ol"></i> Langkah Pengajuan Surat</div>
+
+                <div class="tut-step">
+                    <div class="tut-step-num">1</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Login ke akun Anda</div>
+                        <p class="tut-step-desc">Pastikan Anda sudah memiliki akun dan berhasil login. Jika belum, ikuti langkah pendaftaran di tab <strong>"Daftar Akun"</strong>.</p>
+                    </div>
+                </div>
+                <div class="tut-step">
+                    <div class="tut-step-num">2</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Pilih jenis surat</div>
+                        <p class="tut-step-desc">Buka menu <strong>Layanan</strong> di navbar, lalu pilih jenis surat yang ingin Anda ajukan, misalnya Surat Keterangan Usaha atau Surat Keterangan Tidak Mampu.</p>
+                    </div>
+                </div>
+                <div class="tut-step">
+                    <div class="tut-step-num">3</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Isi formulir permohonan</div>
+                        <p class="tut-step-desc">Lengkapi data yang diminta pada formulir — nama pemohon, NIK, alamat, dan keperluan surat. Upload dokumen persyaratan jika diperlukan.</p>
+                    </div>
+                </div>
+                <div class="tut-step">
+                    <div class="tut-step-num">4</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Kirim permohonan</div>
+                        <p class="tut-step-desc">Periksa kembali data yang diisi, lalu klik <strong>Kirim Permohonan</strong>. Status permohonan bisa dipantau di menu <strong>Permohonan Saya</strong>.</p>
+                    </div>
+                </div>
+                <div class="tut-step">
+                    <div class="tut-step-num">5</div>
+                    <div class="tut-step-body">
+                        <div class="tut-step-title">Tunggu notifikasi</div>
+                        <p class="tut-step-desc">Admin akan memproses permohonan Anda. Anda akan mendapat notifikasi di ikon 🔔 navbar begitu surat siap diambil di kantor kelurahan.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>{{-- /.tut-body --}}
+
+        {{-- Footer CTA --}}
+        <div class="tut-cta">
+            <span class="tut-cta-left">Sudah punya akun? <a href="{{ route('login') }}">Login di sini</a></span>
+            <div class="tut-cta-right">
+                <button class="btn-tut-dismiss" id="tutDismiss">Jangan tampilkan lagi</button>
+                <a href="{{ route('register') }}" class="btn-tut-daftar">
+                    <i class="bi bi-person-plus-fill"></i> Daftar Sekarang
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+(function () {
+    var STORAGE_KEY = 'tut_dismissed_v1';
+    var overlay     = document.getElementById('tutorialOverlay');
+
+    // Jangan tampilkan kalau user pilih "jangan tampilkan lagi"
+    if (localStorage.getItem(STORAGE_KEY)) return;
+
+    // Tampilkan setelah 1 detik
+    setTimeout(function () { overlay.classList.add('show'); }, 1000);
+
+    // Tutup dengan tombol ✕
+    document.getElementById('tutClose').addEventListener('click', close);
+
+    // Klik overlay di luar modal
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) close();
+    });
+
+    // ESC
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') close();
+    });
+
+    // "Jangan tampilkan lagi"
+    document.getElementById('tutDismiss').addEventListener('click', function () {
+        localStorage.setItem(STORAGE_KEY, '1');
+        close();
+    });
+
+    function close() { overlay.classList.remove('show'); }
+
+    // Tab switching
+    document.querySelectorAll('.tut-tab').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var target = this.dataset.tab;
+            document.querySelectorAll('.tut-tab').forEach(function (b) { b.classList.remove('active'); });
+            document.querySelectorAll('.tut-panel').forEach(function (p) { p.classList.remove('active'); });
+            this.classList.add('active');
+            document.getElementById('panel-' + target).classList.add('active');
+        });
+    });
+})();
+</script>
+@endguest
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>

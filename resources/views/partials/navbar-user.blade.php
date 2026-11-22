@@ -341,7 +341,7 @@
     document.addEventListener('keydown', function(e) { if (e.key==='Escape') hideLogoutConfirm(); });
 
     // ── USER NOTIFIKASI BELL ──
-    const NOTIF_POLL_MS = 60000; // poll setiap 60 detik
+    const NOTIF_POLL_MS = 15000;
     const btnNotif      = document.getElementById('btnUserNotif');
     const badge         = document.getElementById('userNotifBadge');
     const dropdown      = document.getElementById('userNotifDropdown');
@@ -359,18 +359,25 @@
             listEl.innerHTML = '<div style="padding:28px;text-align:center;color:#94a3b8;font-size:13px">'
                 + '<div style="font-size:32px;margin-bottom:8px">🔔</div>'
                 + '<div style="font-weight:600">Tidak ada notifikasi</div>'
-                + '<div style="font-size:12px;margin-top:4px">Tidak ada surat yang siap diambil</div></div>';
+                + '<div style="font-size:12px;margin-top:4px">Semua permohonan Anda sudah diproses</div></div>';
             return;
         }
         listEl.innerHTML = items.map(function(n) {
-            return '<a href="' + escH(n.url) + '" style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #f8fafc;text-decoration:none;transition:background .12s" onmouseover="this.style.background=\'#fff7ed\'" onmouseout="this.style.background=\'\'">'
-                + '<div style="width:38px;height:38px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📦</div>'
+            var isCancelled = n.type === 'cancelled';
+            var hoverBg    = isCancelled ? '#f8fafc'  : '#fff7ed';
+            var iconBg     = isCancelled ? '#f1f5f9'  : '#fff7ed';
+            var icon       = isCancelled ? '🚫'       : '📦';
+            var label      = isCancelled ? 'Dibatalkan Otomatis' : 'Siap Diambil!';
+            var labelColor = isCancelled ? '#64748b'  : '#9a3412';
+            var dotColor   = isCancelled ? '#94a3b8'  : '#f97316';
+            return '<a href="' + escH(n.url) + '" style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #f8fafc;text-decoration:none;transition:background .12s" onmouseover="this.style.background=\'' + hoverBg + '\'" onmouseout="this.style.background=\'\'">'
+                + '<div style="width:38px;height:38px;border-radius:10px;background:' + iconBg + ';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">' + icon + '</div>'
                 + '<div style="flex:1;min-width:0">'
-                + '<div style="font-size:13px;font-weight:700;color:#9a3412;margin-bottom:2px">Siap Diambil!</div>'
+                + '<div style="font-size:13px;font-weight:700;color:' + labelColor + ';margin-bottom:2px">' + label + '</div>'
                 + '<div style="font-size:12px;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escH(n.surat) + '</div>'
                 + '<div style="font-size:11px;color:#94a3b8;margin-top:3px">' + escH(n.time) + '</div>'
                 + '</div>'
-                + '<div style="width:8px;height:8px;border-radius:50%;background:#f97316;flex-shrink:0;margin-top:4px;animation:notifPulse 1.5s infinite"></div>'
+                + '<div style="width:8px;height:8px;border-radius:50%;background:' + dotColor + ';flex-shrink:0;margin-top:4px;animation:notifPulse 1.5s infinite"></div>'
                 + '</a>';
         }).join('');
     }
