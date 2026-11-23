@@ -118,25 +118,25 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
             <div class="stat-icon blue">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             </div>
-            <div class="stat-info"><small>Total</small><strong>{{ $data->count() }}</strong></div>
+            <div class="stat-info"><small>Total</small><strong id="u-stat-total">{{ $data->count() }}</strong></div>
         </div>
         <div class="stat-card">
             <div class="stat-icon yellow">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
-            <div class="stat-info"><small>Pending</small><strong>{{ $data->filter(fn($d) => !$d->approval || $d->approval->status === 'pending')->count() }}</strong></div>
+            <div class="stat-info"><small>Pending</small><strong id="u-stat-pending">{{ $data->filter(fn($d) => !$d->approval || $d->approval->status === 'pending')->count() }}</strong></div>
         </div>
         <div class="stat-card">
             <div class="stat-icon green">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <div class="stat-info"><small>Disetujui</small><strong>{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'disetujui')->count() }}</strong></div>
+            <div class="stat-info"><small>Disetujui</small><strong id="u-stat-disetujui">{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'disetujui')->count() }}</strong></div>
         </div>
         <div class="stat-card" style="border:1.5px solid #fed7aa;position:relative;overflow:hidden">
             <div class="stat-icon" style="background:#fff7ed;color:#f97316">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
             </div>
-            <div class="stat-info"><small>Siap Diambil</small><strong style="color:#c2410c">{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'siap_diambil')->count() }}</strong></div>
+            <div class="stat-info"><small>Siap Diambil</small><strong id="u-stat-siap" style="color:#c2410c">{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'siap_diambil')->count() }}</strong></div>
             @if($data->filter(fn($d) => $d->approval && $d->approval->status === 'siap_diambil')->count() > 0)
             <div style="position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:#f97316;animation:pulse-orange 1.5s infinite"></div>
             @endif
@@ -145,14 +145,14 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
             <div class="stat-icon red">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
             </div>
-            <div class="stat-info"><small>Ditolak</small><strong>{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'ditolak')->count() }}</strong></div>
+            <div class="stat-info"><small>Ditolak</small><strong id="u-stat-ditolak">{{ $data->filter(fn($d) => $d->approval && $d->approval->status === 'ditolak')->count() }}</strong></div>
         </div>
     </div>
 
     {{-- Banner notifikasi siap diambil --}}
     @php $siapDiambilList = $data->filter(fn($d) => $d->approval && $d->approval->status === 'siap_diambil'); @endphp
     @if($siapDiambilList->count() > 0)
-    <div class="banner-siap">
+    <div class="banner-siap" id="banner-siap-wrap">
         <div class="banner-siap-ico">📦</div>
         <div class="banner-siap-body">
             <div class="banner-siap-title">🎉 Surat Anda Siap Diambil!</div>
@@ -197,9 +197,7 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
                     <th>Aksi</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($data as $d)
-                @php $status = optional($d->approval)->status ?? 'pending'; @endphp
+            <tbody id="u-permohonan-tbody">
                 <tr>
                     <td class="td-no">{{ $loop->iteration }}</td>
                     <td>
@@ -289,6 +287,106 @@ function showConfirm(message, onConfirm, { confirmText='Ya, Lanjutkan', cancelTe
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }});
 }
+
+// ── Polling Stats & Tabel Permohonan User (tiap 15 detik) ───────────────────
+(function () {
+    var POLL_MS = 15000;
+    var API     = '{{ route("user.permohonan.stats") }}';
+
+    var elTotal    = document.getElementById('u-stat-total');
+    var elPending  = document.getElementById('u-stat-pending');
+    var elDisetujui= document.getElementById('u-stat-disetujui');
+    var elSiap     = document.getElementById('u-stat-siap');
+    var elDitolak  = document.getElementById('u-stat-ditolak');
+    var tbody      = document.getElementById('u-permohonan-tbody');
+    var bannerWrap = document.getElementById('banner-siap-wrap');
+    var lastTotal  = -1;
+
+    function escH(s) {
+        return String(s ?? '').replace(/[&<>"]/g, function(c) {
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+        });
+    }
+
+    function flash(el) {
+        if (!el) return;
+        el.style.transition = 'color .3s';
+        el.style.color = '#1c64f2';
+        setTimeout(function () { el.style.color = ''; }, 600);
+    }
+
+    function pillHtml(status) {
+        var map = {
+            siap_diambil: '<span class="pill pill-siap_diambil" style="position:relative">📦 Siap Diambil<span style="position:absolute;width:7px;height:7px;border-radius:50%;background:#f97316;top:-3px;right:-3px;animation:pulse-orange 1.5s infinite;display:block"></span></span>',
+            selesai:      '<span class="pill pill-selesai">✅ Selesai</span>',
+            cancelled:    '<span class="pill pill-cancelled">🚫 Dibatalkan</span>',
+            ditolak:      '<span class="pill pill-ditolak">❌ Ditolak</span>',
+            disetujui:    '<span class="pill pill-disetujui">✔ Disetujui</span>',
+            pending:      '<span class="pill pill-pending">⏳ Menunggu</span>',
+        };
+        return map[status] || map['pending'];
+    }
+
+    function renderBanner(bannerSiap) {
+        if (!bannerWrap) return;
+        if (!bannerSiap || bannerSiap.length === 0) {
+            bannerWrap.style.display = 'none';
+            return;
+        }
+        bannerWrap.style.display = '';
+        var items = bannerSiap.map(function (s) {
+            return '<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>'
+                + '<span><strong>' + escH(s.jenis_surat) + '</strong> — silakan datang ke kantor kelurahan untuk mengambil surat. <a href="' + escH(s.url) + '">Lihat Detail →</a></span></li>';
+        }).join('');
+        bannerWrap.querySelector('.banner-siap-list').innerHTML = items;
+    }
+
+    function renderRows(rows) {
+        if (!tbody) return;
+        if (!rows || rows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:#94a3b8">Belum ada permohonan</td></tr>';
+            return;
+        }
+        tbody.innerHTML = rows.map(function (d, i) {
+            var canDelete = d.status === 'pending';
+            var hapusBtn  = canDelete
+                ? '<button type="button" class="btn-hapus" onclick="showConfirm(\'Hapus permohonan ini?\', function(){ document.getElementById(\'form-hapus-' + d.id + '\').submit(); }, {confirmText:\'Ya, Hapus\', type:\'danger\'})">🗑 Hapus</button>'
+                  + '<form id="form-hapus-' + d.id + '" method="POST" action="' + escH(d.url_hapus) + '" style="display:none">{{ csrf_field() }}{{ method_field("DELETE") }}</form>'
+                : '';
+            return '<tr>'
+                + '<td class="td-no">' + (i+1) + '</td>'
+                + '<td><div class="td-surat">' + escH(d.jenis_surat) + '<small>Diajukan ' + escH(d.diajukan) + '</small></div></td>'
+                + '<td style="max-width:220px;color:var(--muted)">' + escH(d.keperluan) + '</td>'
+                + '<td class="td-date">' + escH(d.tanggal) + '</td>'
+                + '<td>' + pillHtml(d.status) + '</td>'
+                + '<td><div style="display:flex;gap:6px;flex-wrap:wrap"><a href="' + escH(d.url) + '" class="btn-detail">Detail</a>' + hapusBtn + '</div></td>'
+                + '</tr>';
+        }).join('');
+    }
+
+    function fetchStats() {
+        fetch(API, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (elTotal     && elTotal.textContent     != d.total)        { flash(elTotal);      elTotal.textContent     = d.total; }
+                if (elPending   && elPending.textContent   != d.pending)      { flash(elPending);    elPending.textContent   = d.pending; }
+                if (elDisetujui && elDisetujui.textContent != d.disetujui)    { flash(elDisetujui);  elDisetujui.textContent = d.disetujui; }
+                if (elSiap      && elSiap.textContent      != d.siap_diambil) { flash(elSiap);       elSiap.textContent      = d.siap_diambil; }
+                if (elDitolak   && elDitolak.textContent   != d.ditolak)      { flash(elDitolak);    elDitolak.textContent   = d.ditolak; }
+
+                renderBanner(d.banner_siap);
+
+                if (d.total !== lastTotal) {
+                    lastTotal = d.total;
+                    renderRows(d.rows);
+                }
+            })
+            .catch(function () {});
+    }
+
+    fetchStats();
+    setInterval(fetchStats, POLL_MS);
+})();
 </script>
 </body>
 </html>

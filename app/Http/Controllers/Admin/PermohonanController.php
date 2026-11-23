@@ -11,6 +11,53 @@ use Illuminate\Support\Facades\DB;
 
 class PermohonanController extends Controller
 {
+    public function stats()
+    {
+        $data = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])
+            ->latest('tanggal_pengajuan')->get();
+
+        $rows = $data->map(function ($d) {
+            $approvalStatus = optional($d->approval)->status;
+            $rowStatus      = $approvalStatus ?? 'pending';
+            $namaPemohon    = $d->nama_pemohon ?? optional($d->user)->nama ?? '-';
+            $nikPemohon     = $d->nik_pemohon  ?? optional($d->user)->nik  ?? '-';
+            $isWakil        = $d->isPerwakilan();
+
+            $statusLabel = match($rowStatus) {
+                'disetujui'    => 'Disetujui',
+                'ditolak'      => 'Ditolak',
+                'siap_diambil' => 'Siap Diambil',
+                'selesai'      => 'Selesai',
+                'cancelled'    => 'Dibatalkan',
+                default        => 'Pending',
+            };
+
+            return [
+                'id'           => $d->id_permohonan,
+                'nama'         => $namaPemohon,
+                'nik'          => $nikPemohon,
+                'jenis_surat'  => $d->jenisSurat->nama_surat ?? '-',
+                'tanggal'      => \Carbon\Carbon::parse($d->tanggal_pengajuan)->format('d M Y'),
+                'status'       => $rowStatus,
+                'status_label' => $statusLabel,
+                'is_wakil'     => $isWakil,
+                'nama_user'    => optional($d->user)->nama ?? '-',
+                'url'          => route('permohonan.show', $d->id_permohonan),
+                'url_print'    => route('permohonan.print', $d->id_permohonan),
+                'no_hp'        => optional($d->user)->no_hp ?? '',
+            ];
+        });
+
+        return response()->json([
+            'total'       => $data->count(),
+            'pending'     => $data->filter(fn($d) => in_array(optional($d->approval)->status ?? 'pending', [null, 'pending']))->count(),
+            'disetujui'   => $data->filter(fn($d) => optional($d->approval)->status === 'disetujui')->count(),
+            'siap_diambil'=> $data->filter(fn($d) => optional($d->approval)->status === 'siap_diambil')->count(),
+            'ditolak'     => $data->filter(fn($d) => optional($d->approval)->status === 'ditolak')->count(),
+            'rows'        => $rows->values(),
+        ]);
+    }
+
     public function index()
     {
         $data = PermohonanSurat::with(['user', 'jenisSurat', 'approval', 'persyaratan'])

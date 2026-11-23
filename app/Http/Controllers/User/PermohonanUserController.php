@@ -83,6 +83,55 @@ class PermohonanUserController extends Controller
         }
     }
 
+    public function statsUser()
+    {
+        $userId = Auth::id();
+        $data   = PermohonanSurat::with(['jenisSurat', 'approval'])
+            ->where('id_user', $userId)
+            ->latest('tanggal_pengajuan')->get();
+
+        $siapDiambil = $data->filter(fn($d) => optional($d->approval)->status === 'siap_diambil');
+
+        $rows = $data->map(function ($d) {
+            $status = optional($d->approval)->status ?? 'pending';
+            $statusLabel = match($status) {
+                'siap_diambil' => 'Siap Diambil',
+                'selesai'      => 'Selesai',
+                'cancelled'    => 'Dibatalkan',
+                'ditolak'      => 'Ditolak',
+                'disetujui'    => 'Disetujui',
+                default        => 'Pending',
+            };
+            return [
+                'id'          => $d->id_permohonan,
+                'jenis_surat' => $d->jenisSurat->nama_surat ?? '-',
+                'keperluan'   => \Illuminate\Support\Str::limit($d->keperluan, 55),
+                'tanggal'     => \Carbon\Carbon::parse($d->tanggal_pengajuan)->format('d M Y'),
+                'diajukan'    => \Carbon\Carbon::parse($d->tanggal_pengajuan)->diffForHumans(),
+                'status'      => $status,
+                'status_label'=> $statusLabel,
+                'url'         => route('user.permohonan.show', $d->id_permohonan),
+                'url_hapus'   => route('user.permohonan.destroy', $d->id_permohonan),
+            ];
+        });
+
+        $bannerSiap = $siapDiambil->map(fn($d) => [
+            'id'          => $d->id_permohonan,
+            'jenis_surat' => $d->jenisSurat->nama_surat ?? 'Surat',
+            'url'         => route('user.permohonan.show', $d->id_permohonan),
+        ])->values();
+
+        return response()->json([
+            'total'        => $data->count(),
+            'pending'      => $data->filter(fn($d) => !$d->approval || $d->approval->status === 'pending')->count(),
+            'disetujui'    => $data->filter(fn($d) => optional($d->approval)->status === 'disetujui')->count(),
+            'siap_diambil' => $siapDiambil->count(),
+            'ditolak'      => $data->filter(fn($d) => optional($d->approval)->status === 'ditolak')->count(),
+            'banner_siap'  => $bannerSiap,
+            'rows'         => $rows->values(),
+        ]);
+    }
+
     public function index()
     {
         $data = PermohonanSurat::with(['jenisSurat', 'approval'])

@@ -297,7 +297,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <div class="stat-card">
                 <div>
                     <div class="stat-label">Total Warga</div>
-                    <div class="stat-value">{{ number_format($totalWarga) }}</div>
+                    <div class="stat-value" id="stat-total-warga">{{ number_format($totalWarga) }}</div>
                     <div class="stat-sub info"><i class="bi bi-people"></i> Terdaftar</div>
                 </div>
                 <div class="stat-icon icon-blue"><i class="bi bi-people-fill"></i></div>
@@ -307,8 +307,8 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <div class="stat-card">
                 <div>
                     <div class="stat-label">Perlu Verifikasi</div>
-                    <div class="stat-value">{{ number_format($perluVerifikasi) }}</div>
-                    <div class="stat-sub warn">
+                    <div class="stat-value" id="stat-perlu-verifikasi">{{ number_format($perluVerifikasi) }}</div>
+                    <div class="stat-sub warn" id="stat-perlu-verifikasi-sub">
                         <i class="bi bi-exclamation-circle"></i>
                         <span class="d-none d-sm-inline">{{ $perluVerifikasi > 0 ? 'Segera proses' : 'Sudah beres' }}</span>
                     </div>
@@ -320,7 +320,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <div class="stat-card">
                 <div>
                     <div class="stat-label">Surat Keluar</div>
-                    <div class="stat-value">{{ number_format($suratKeluar) }}</div>
+                    <div class="stat-value" id="stat-surat-keluar">{{ number_format($suratKeluar) }}</div>
                     <div class="stat-sub info"><i class="bi bi-envelope-check"></i> Disetujui</div>
                 </div>
                 <div class="stat-icon icon-green"><i class="bi bi-envelope-paper-fill"></i></div>
@@ -330,8 +330,8 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <div class="stat-card">
                 <div>
                     <div class="stat-label">Surat Hari Ini</div>
-                    <div class="stat-value">{{ number_format($suratHariIni ?? 0) }}</div>
-                    <div class="stat-sub {{ ($suratHariIni ?? 0) > 0 ? 'up' : 'info' }}">
+                    <div class="stat-value" id="stat-surat-hari-ini">{{ number_format($suratHariIni ?? 0) }}</div>
+                    <div class="stat-sub" id="stat-surat-hari-ini-sub" class="{{ ($suratHariIni ?? 0) > 0 ? 'up' : 'info' }}">
                         <i class="bi bi-{{ ($suratHariIni ?? 0) > 0 ? 'arrow-up-circle' : 'dash-circle' }}"></i>
                         <span class="d-none d-sm-inline">{{ ($suratHariIni ?? 0) > 0 ? 'Masuk hari ini' : 'Belum ada' }}</span>
                     </div>
@@ -476,7 +476,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                     </a>
                 </div>
                 <div class="table-responsive">
-                    <table class="aktivitas-tbl">
+                    <table class="aktivitas-tbl" id="aktivitas-tbl-body-wrap">
                         <thead>
                             <tr>
                                 <th>NAMA PEMOHON</th>
@@ -487,7 +487,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                                 <th>AKSI</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="aktivitas-tbody">
                             @forelse($permohonanTerbaru as $p)
                             @php
                                 $namaPemohon = $p->nama_pemohon ?? $p->user->nama ?? 'U';
@@ -936,6 +936,77 @@ function escHtml(s) {
     btnApply.addEventListener('click', loadData);
     btnPrint.addEventListener('click', cetakRekap);
     btnExcel.addEventListener('click', unduhExcel);
+})();
+
+// ── Polling Stats Dashboard (tiap 15 detik) ─────────────────────────────────
+(function () {
+    var POLL_MS  = 15000;
+    var API      = '{{ route("admin.dashboard.stats") }}';
+    var COLORS   = ['blue','green','purple','orange'];
+
+    var elWarga   = document.getElementById('stat-total-warga');
+    var elVerif   = document.getElementById('stat-perlu-verifikasi');
+    var elVerifSub= document.getElementById('stat-perlu-verifikasi-sub');
+    var elKeluar  = document.getElementById('stat-surat-keluar');
+    var elHariIni = document.getElementById('stat-surat-hari-ini');
+    var elHariIniSub = document.getElementById('stat-surat-hari-ini-sub');
+    var tbody     = document.getElementById('aktivitas-tbody');
+
+    function flash(el) {
+        if (!el) return;
+        el.style.transition = 'color .3s';
+        el.style.color = '#1c64f2';
+        setTimeout(function () { el.style.color = ''; }, 600);
+    }
+
+    function renderAktivitas(rows) {
+        if (!tbody || !rows) return;
+        var BADGE = {
+            pending:      '<span class="bdg bdg-pending">Pending</span>',
+            disetujui:    '<span class="bdg bdg-approved">Disetujui</span>',
+            ditolak:      '<span class="bdg bdg-rejected">Ditolak</span>',
+            siap_diambil: '<span class="bdg" style="background:#fff7ed;color:#c2410c">Siap Diambil</span>',
+            selesai:      '<span class="bdg bdg-approved">Selesai</span>',
+            cancelled:    '<span class="bdg" style="background:#f1f5f9;color:#64748b">Dibatalkan</span>',
+        };
+        tbody.innerHTML = rows.map(function (p, i) {
+            var init   = p.nama.split(' ').map(function(w){ return w[0]||''; }).slice(0,2).join('').toUpperCase();
+            var color  = COLORS[i % COLORS.length];
+            var badge  = BADGE[p.status] || BADGE['pending'];
+            return '<tr>'
+                + '<td><div class="user-cell">'
+                + '<div class="user-av ' + color + '">' + escHtml(init) + '</div>'
+                + '<div><span style="font-weight:600">' + escHtml(p.nama) + '</span></div>'
+                + '</div></td>'
+                + '<td>' + escHtml(p.jenis_surat) + '</td>'
+                + '<td>' + escHtml(p.tanggal) + '</td>'
+                + '<td>' + badge + '</td>'
+                + '<td><a href="' + escHtml(p.url) + '" class="btn-sm-act" style="font-size:11px;padding:4px 10px">Detail</a></td>'
+                + '</tr>';
+        }).join('');
+    }
+
+    function fetchStats() {
+        fetch(API, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (elWarga   && elWarga.textContent   !== d.total_warga)      { flash(elWarga);   elWarga.textContent   = d.total_warga; }
+                if (elVerif   && elVerif.textContent   !== d.perlu_verifikasi) { flash(elVerif);   elVerif.textContent   = d.perlu_verifikasi; }
+                if (elKeluar  && elKeluar.textContent  !== d.surat_keluar)     { flash(elKeluar);  elKeluar.textContent  = d.surat_keluar; }
+                if (elHariIni && elHariIni.textContent !== d.surat_hari_ini)   { flash(elHariIni); elHariIni.textContent = d.surat_hari_ini; }
+                if (elVerifSub) elVerifSub.innerHTML = '<i class="bi bi-exclamation-circle"></i><span class="d-none d-sm-inline">' + (d.perlu_verifikasi_raw > 0 ? 'Segera proses' : 'Sudah beres') + '</span>';
+                if (elHariIniSub) {
+                    var ada = d.surat_hari_ini_raw > 0;
+                    elHariIniSub.className = 'stat-sub ' + (ada ? 'up' : 'info');
+                    elHariIniSub.innerHTML = '<i class="bi bi-' + (ada ? 'arrow-up-circle' : 'dash-circle') + '"></i><span class="d-none d-sm-inline">' + (ada ? 'Masuk hari ini' : 'Belum ada') + '</span>';
+                }
+                renderAktivitas(d.permohonan_terbaru);
+            })
+            .catch(function () {});
+    }
+
+    fetchStats();
+    setInterval(fetchStats, POLL_MS);
 })();
 </script>
 @endpush

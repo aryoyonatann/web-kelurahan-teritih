@@ -50,6 +50,39 @@ class DashboardController extends Controller
         ));
     }
 
+    public function stats()
+    {
+        $totalWarga      = User::count();
+        $perluVerifikasi = PermohonanSurat::where(function ($q) {
+            $q->whereDoesntHave('approval')
+              ->orWhereHas('approval', fn($q2) => $q2->where('status', 'pending'));
+        })->count();
+        $suratKeluar  = Approval::where('status', 'disetujui')->count();
+        $suratHariIni = PermohonanSurat::whereDate('tanggal_pengajuan', today())->count();
+
+        // 6 permohonan terbaru untuk tabel aktivitas
+        $permohonanTerbaru = PermohonanSurat::with(['user', 'jenisSurat', 'approval'])
+            ->latest('tanggal_pengajuan')->take(6)->get()
+            ->map(fn($p) => [
+                'id'           => $p->id_permohonan,
+                'nama'         => $p->nama_pemohon ?? $p->user->nama ?? '-',
+                'jenis_surat'  => $p->jenisSurat->nama_surat ?? '-',
+                'tanggal'      => \Carbon\Carbon::parse($p->tanggal_pengajuan)->diffForHumans(),
+                'status'       => optional($p->approval)->status ?? 'pending',
+                'url'          => route('permohonan.show', $p->id_permohonan),
+            ]);
+
+        return response()->json([
+            'total_warga'      => number_format($totalWarga),
+            'perlu_verifikasi' => number_format($perluVerifikasi),
+            'perlu_verifikasi_raw' => $perluVerifikasi,
+            'surat_keluar'     => number_format($suratKeluar),
+            'surat_hari_ini'   => number_format($suratHariIni),
+            'surat_hari_ini_raw' => (int) $suratHariIni,
+            'permohonan_terbaru' => $permohonanTerbaru,
+        ]);
+    }
+
     public function permohonanBulan(Request $request)
     {
         $bulan = $request->bulan ?? now()->month;

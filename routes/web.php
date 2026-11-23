@@ -68,6 +68,7 @@ Route::prefix('admin')->group(function () {
 
         // Dashboard
         Route::get('/dashboard',                    [DashboardController::class, 'index'])           ->name('admin.dashboard');
+        Route::get('/dashboard/stats',              [DashboardController::class, 'stats'])           ->name('admin.dashboard.stats');
         Route::get('/dashboard/permohonan-bulan',   [DashboardController::class, 'permohonanBulan']) ->name('admin.dashboard.permohonan-bulan');
         Route::post('/logout',                      [AdminLoginController::class, 'logout'])          ->name('admin.logout');
         Route::get('/ganti-password',               [AdminLoginController::class, 'showChangePassword'])->name('admin.password.form');
@@ -77,6 +78,7 @@ Route::prefix('admin')->group(function () {
 
         // Permohonan Admin
         Route::get( 'permohonan',                     [PermohonanController::class, 'index'])           ->name('permohonan.index');
+        Route::get( 'permohonan/stats',               [PermohonanController::class, 'stats'])           ->name('permohonan.stats');
         Route::get( 'permohonan/{id}',                [PermohonanController::class, 'show'])            ->name('permohonan.show');
         Route::put( 'permohonan/{id}/approve',        [PermohonanController::class, 'approve'])         ->name('permohonan.approve');
         Route::put( 'permohonan/{id}/reject',         [PermohonanController::class, 'reject'])          ->name('permohonan.reject');
@@ -130,6 +132,7 @@ Route::middleware('auth')->group(function () {
 
     // Notifikasi user — dipanggil AJAX dari navbar (harus di luar prefix admin)
     Route::get('/user/notifikasi-status', [\App\Http\Controllers\User\PermohonanUserController::class, 'notifikasiStatus'])->name('user.notifikasi.status');
+    Route::get('/user/permohonan-stats',  [\App\Http\Controllers\User\PermohonanUserController::class, 'statsUser'])->name('user.permohonan.stats');
 
     Route::prefix('user')->name('user.')->group(function () {
 
