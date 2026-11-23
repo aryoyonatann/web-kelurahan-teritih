@@ -489,15 +489,6 @@
                             </button>
 
                             @if($rowStatus === 'disetujui')
-                                <a href="{{ route('permohonan.print', $d->id_permohonan) }}"
-                                   target="_blank" class="btn-act btn-print">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="6 9 6 2 18 2 18 9"/>
-                                        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
-                                        <rect x="6" y="14" width="12" height="8"/>
-                                    </svg>
-                                    Cetak
-                                </a>
                                 <form action="{{ route('permohonan.siapDiambil', $d->id_permohonan) }}" method="POST" style="display:inline;" id="form-siap-{{ $d->id_permohonan }}">
                                     @csrf @method('PUT')
                                     <button type="button" class="btn-act btn-siap"
@@ -935,6 +926,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalKi
         setTimeout(function () { el.style.color = ''; }, 600);
     }
 
+    var CSRF_TOKEN = '{{ csrf_token() }}';
+
     function statusPill(s) {
         var map = {
             disetujui:    '<span class="status-pill status-approved"><span class="status-dot"></span> Disetujui</span>',
@@ -960,15 +953,52 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalKi
 
             visible += hide ? 0 : 1;
 
-            var wakil = d.is_wakil ? '<span style="font-size:9px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:600">WAKIL</span>' : '';
+            var wakil   = d.is_wakil ? '<span style="font-size:9px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:600">WAKIL</span>' : '';
             var userAlt = d.is_wakil ? '<small style="color:#94a3b8">Pengaju: ' + escH(d.nama_user) + '</small>' : '';
 
-            var aksi = '<div class="action-group"><a href="' + escH(d.url) + '" class="btn-act btn-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Detail</a>';
+            // ── Tombol aksi sesuai status ──
+            var aksi = '<a href="' + escH(d.url) + '" class="btn-act btn-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Detail</a>';
 
-            if (rowStatus === 'siap_diambil' && d.no_hp) {
-                aksi += '<a href="' + escH(d.url) + '" class="btn-act btn-kirim-wa" onclick="event.preventDefault();openModalKirimWa(' + d.id + ',\'' + escH(d.nama) + '\',\'' + escH(d.no_hp) + '\')"><svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Kirim WA</a>';
+            // Tombol dokumen persyaratan
+            if (d.persyaratan && d.persyaratan.length > 0) {
+                var dokId = 'dok-' + d.id;
+                window['_dok_' + d.id] = {nama: d.nama, jenis: d.jenis_surat, files: d.persyaratan};
+                aksi += '<button type="button" class="btn-act btn-dok" onclick="openDokModal(window[\'_dok_' + d.id + '\'])" title="Dokumen Persyaratan (' + d.persyaratan.length + ')">'
+                      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>'
+                      + '</button>';
             }
-            aksi += '</div>';
+
+            // Tombol cetak dihapus sesuai permintaan
+
+            if (rowStatus === 'disetujui') {
+                aksi += '<form action="/admin/permohonan/' + d.id + '/siap-diambil" method="POST" style="display:inline" id="form-siap-' + d.id + '">'
+                      + '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '"><input type="hidden" name="_method" value="PUT">'
+                      + '<button type="button" class="btn-act btn-siap" onclick="showConfirm(\'Tandai siap diambil?\',function(){document.getElementById(\'form-siap-' + d.id + '\').submit()},{confirmText:\'Ya\',type:\'info\'})">'
+                      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>Siap Diambil</button></form>';
+            }
+
+            if (rowStatus === 'siap_diambil') {
+                if (d.no_hp) {
+                    aksi += '<button type="button" class="btn-act btn-wa" onclick="openModalKirimWa(' + d.id + ',\'' + escH(d.nama) + '\',\'' + escH(d.no_hp) + '\')">'
+                          + '<svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Kirim WA</button>';
+                }
+                aksi += '<form action="/admin/permohonan/' + d.id + '/selesai" method="POST" style="display:inline" id="form-selesai-' + d.id + '">'
+                      + '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '"><input type="hidden" name="_method" value="PUT">'
+                      + '<button type="button" class="btn-act btn-selesai" onclick="showConfirm(\'Konfirmasi surat sudah diambil?\',function(){document.getElementById(\'form-selesai-' + d.id + '\').submit()},{confirmText:\'Ya, Sudah Diambil\',type:\'success\'})">'
+                      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Selesai</button></form>';
+            }
+
+            if (rowStatus === 'pending') {
+                aksi += '<form action="/admin/permohonan/' + d.id + '/approve" method="POST" style="display:inline" id="form-approve-' + d.id + '">'
+                      + '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '"><input type="hidden" name="_method" value="PUT">'
+                      + '<button type="button" class="btn-act btn-approve" onclick="showConfirm(\'Setujui permohonan dari <strong>' + escH(d.nama) + '</strong>?\',function(){document.getElementById(\'form-approve-' + d.id + '\').submit()},{confirmText:\'Ya, Setujui\',type:\'success\'})">'
+                      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Setujui</button></form>';
+                aksi += '<form action="/admin/permohonan/' + d.id + '/reject" method="POST" style="display:inline" id="form-reject-' + d.id + '">'
+                      + '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '"><input type="hidden" name="_method" value="PUT">'
+                      + '<input type="hidden" name="catatan" id="catatan-' + d.id + '">'
+                      + '<button type="button" class="btn-act btn-reject" onclick="showModalTolakIndex(\'' + d.id + '\',\'' + escH(d.nama) + '\')">'
+                      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Tolak</button></form>';
+            }
 
             return '<tr data-status="' + rowStatus + '" data-name="' + escH(d.nama.toLowerCase()) + '" data-surat="' + escH(d.jenis_surat.toLowerCase()) + '" style="' + (hide ? 'display:none' : '') + '">'
                 + '<td class="td-no">' + String(i+1).padStart(2,'0') + '</td>'
@@ -976,7 +1006,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalKi
                 + '<td class="td-surat">' + escH(d.jenis_surat) + '</td>'
                 + '<td class="td-date">' + escH(d.tanggal) + '</td>'
                 + '<td>' + statusPill(rowStatus) + '</td>'
-                + '<td>' + aksi + '</td>'
+                + '<td><div class="action-group">' + aksi + '</div></td>'
                 + '</tr>';
         }).join('');
 
@@ -996,6 +1026,13 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalKi
                 if (d.total !== lastTotal) {
                     lastTotal = d.total;
                     renderRows(d.rows);
+                } else {
+                    // Update juga saat counter status berubah (misal pending→disetujui)
+                    var sig = d.total + '|' + d.pending + '|' + d.disetujui + '|' + d.siap_diambil + '|' + d.ditolak;
+                    if (sig !== lastTotal) {
+                        lastTotal = sig;
+                        renderRows(d.rows);
+                    }
                 }
             })
             .catch(function () {});

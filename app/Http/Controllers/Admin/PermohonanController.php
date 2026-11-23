@@ -32,6 +32,13 @@ class PermohonanController extends Controller
                 default        => 'Pending',
             };
 
+            $persyaratan = $d->persyaratan->map(fn($p) => [
+                'nama' => $p->nama_file,
+                'url'  => asset('storage/' . $p->path_file),
+                'ext'  => strtolower(pathinfo($p->nama_file, PATHINFO_EXTENSION)),
+                'tgl'  => $p->uploaded_at ? \Carbon\Carbon::parse($p->uploaded_at)->format('d M Y, H:i') : '-',
+            ])->values();
+
             return [
                 'id'           => $d->id_permohonan,
                 'nama'         => $namaPemohon,
@@ -45,6 +52,8 @@ class PermohonanController extends Controller
                 'url'          => route('permohonan.show', $d->id_permohonan),
                 'url_print'    => route('permohonan.print', $d->id_permohonan),
                 'no_hp'        => optional($d->user)->no_hp ?? '',
+                'persyaratan'  => $persyaratan,
+                'jenis_surat_nama' => $d->jenisSurat->nama_surat ?? '-',
             ];
         });
 

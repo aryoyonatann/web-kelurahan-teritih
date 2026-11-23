@@ -198,59 +198,6 @@ tbody td{padding:14px 16px;font-size:13px;color:var(--slate);vertical-align:midd
                 </tr>
             </thead>
             <tbody id="u-permohonan-tbody">
-                <tr>
-                    <td class="td-no">{{ $loop->iteration }}</td>
-                    <td>
-                        <div class="td-surat">
-                            {{ $d->jenisSurat->nama_surat ?? '-' }}
-                            <small>Diajukan {{ \Carbon\Carbon::parse($d->tanggal_pengajuan)->diffForHumans() }}</small>
-                        </div>
-                    </td>
-                    <td style="max-width:220px;color:var(--muted)">{{ Str::limit($d->keperluan, 55) }}</td>
-                    <td class="td-date">{{ \Carbon\Carbon::parse($d->tanggal_pengajuan)->format('d M Y') }}</td>
-                    <td>
-                        @if($status === 'siap_diambil')
-                        <span class="pill pill-siap_diambil" style="position:relative">
-                            📦 Siap Diambil
-                            <span style="position:absolute;-top:3px;-right:3px;width:7px;height:7px;border-radius:50%;background:#f97316;top:-3px;right:-3px;animation:pulse-orange 1.5s infinite;display:block"></span>
-                        </span>
-                        @elseif($status === 'selesai')
-                        <span class="pill pill-selesai">✅ Selesai</span>
-                        @elseif($status === 'cancelled')
-                        <span class="pill pill-cancelled">🚫 Dibatalkan</span>
-                        @elseif($status === 'ditolak')
-                        <span class="pill pill-ditolak">❌ Ditolak</span>
-                        @elseif($status === 'disetujui')
-                        <span class="pill pill-disetujui">✔ Disetujui</span>
-                        @else
-                        <span class="pill pill-pending">⏳ Pending</span>
-                        @endif
-                    </td>
-                    <td>
-                        <div class="action-group">
-                            <a href="{{ route('user.permohonan.show', $d->id_permohonan) }}" class="btn-sm btn-detail">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                                </svg>
-                                Detail
-                            </a>
-                            @if(!$d->approval || $d->approval->status === 'pending')
-                            <form action="{{ route('user.permohonan.destroy', $d->id_permohonan) }}" method="POST" style="display:inline" id="form-del-{{ $d->id_permohonan }}">
-                                @csrf @method('DELETE')
-                                <button type="button" class="btn-sm btn-delete" onclick="showConfirm('Hapus permohonan ini? Tindakan tidak dapat dibatalkan.', () => document.getElementById('form-del-{{ $d->id_permohonan }}').submit(), {confirmText:'Ya, Hapus', type:'danger'})">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="3 6 5 6 21 6"/>
-                                        <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
-                                        <path d="M10 11v6M14 11v6"/>
-                                    </svg>
-                                    Hapus
-                                </button>
-                            </form>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
             </tbody>
         </table>
         </div>
@@ -350,7 +297,7 @@ function showConfirm(message, onConfirm, { confirmText='Ya, Lanjutkan', cancelTe
         tbody.innerHTML = rows.map(function (d, i) {
             var canDelete = d.status === 'pending';
             var hapusBtn  = canDelete
-                ? '<button type="button" class="btn-hapus" onclick="showConfirm(\'Hapus permohonan ini?\', function(){ document.getElementById(\'form-hapus-' + d.id + '\').submit(); }, {confirmText:\'Ya, Hapus\', type:\'danger\'})">🗑 Hapus</button>'
+                ? '<button type="button" class="btn-sm btn-delete" onclick="showConfirm(\'Hapus permohonan ini?\', function(){ document.getElementById(\'form-hapus-' + d.id + '\').submit(); }, {confirmText:\'Ya, Hapus\', type:\'danger\'})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>Hapus</button>'
                   + '<form id="form-hapus-' + d.id + '" method="POST" action="' + escH(d.url_hapus) + '" style="display:none">{{ csrf_field() }}{{ method_field("DELETE") }}</form>'
                 : '';
             return '<tr>'
@@ -359,7 +306,7 @@ function showConfirm(message, onConfirm, { confirmText='Ya, Lanjutkan', cancelTe
                 + '<td style="max-width:220px;color:var(--muted)">' + escH(d.keperluan) + '</td>'
                 + '<td class="td-date">' + escH(d.tanggal) + '</td>'
                 + '<td>' + pillHtml(d.status) + '</td>'
-                + '<td><div style="display:flex;gap:6px;flex-wrap:wrap"><a href="' + escH(d.url) + '" class="btn-detail">Detail</a>' + hapusBtn + '</div></td>'
+                + '<td><div class="action-group"><a href="' + escH(d.url) + '" class="btn-sm btn-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Detail</a>' + hapusBtn + '</div></td>'
                 + '</tr>';
         }).join('');
     }
@@ -379,6 +326,12 @@ function showConfirm(message, onConfirm, { confirmText='Ya, Lanjutkan', cancelTe
                 if (d.total !== lastTotal) {
                     lastTotal = d.total;
                     renderRows(d.rows);
+                } else {
+                    var sig = d.total + '|' + d.pending + '|' + d.disetujui + '|' + d.siap_diambil + '|' + d.ditolak;
+                    if (sig !== lastTotal) {
+                        lastTotal = sig;
+                        renderRows(d.rows);
+                    }
                 }
             })
             .catch(function () {});
