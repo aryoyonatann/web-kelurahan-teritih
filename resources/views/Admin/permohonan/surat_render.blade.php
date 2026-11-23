@@ -28,8 +28,8 @@ body{background:white}
 .keterangan.indented{text-indent:36px}
 .ttd-box{text-align:center;min-width:200px;font-size:12pt;margin-top:24pt}
 .ttd-kota{margin-bottom:2px}
-.ttd-ruang{height:70px;display:flex;align-items:center;justify-content:center}
-.ttd-ruang img{height:70px;width:auto;max-width:200px}
+.ttd-ruang{height:110px;display:flex;align-items:center;justify-content:center;margin:6px 0}
+.ttd-ruang img{height:110px;width:auto}
 .ttd-nama{font-weight:bold;text-decoration:underline;margin-bottom:0;line-height:1.3}
 .ttd-nip{font-weight:bold;font-size:12pt;margin-top:1px;line-height:1.3}
 .keperluan-center{text-align:center;font-weight:bold;text-decoration:underline;margin:8px 0;font-size:12pt}
@@ -81,25 +81,30 @@ body{background:white}
     $nomorFormatted = $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
         . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year;
 
-    // ── Logo (base64 agar tidak butuh HTTP request dari Puppeteer) ───────
+    // ── Logo (base64) + QR Code verifikasi + logo di tengah QR ──────────
     $logoPath = public_path('images/lambang_kota_serang.jpg');
     $logoSrc  = '';
     if (file_exists($logoPath)) {
         $logoSrc = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath));
     }
 
-    // ── TTD image (base64) ────────────────────────────────────────────────
-    $ttdImgSrc = '';
-    if (!empty($ttd->ttd_data)) {
-        $ttdImgSrc = $ttd->ttd_data; // sudah base64 data URI
-    } elseif (!empty($ttd->ttd_path)) {
-        $ttdFile = storage_path('app/public/' . $ttd->ttd_path);
-        if (file_exists($ttdFile)) {
-            $ext = strtolower(pathinfo($ttdFile, PATHINFO_EXTENSION));
-            $mime = $ext === 'png' ? 'image/png' : 'image/jpeg';
-            $ttdImgSrc = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($ttdFile));
-        }
+    $qrText = url('/verifikasi-surat/' . urlencode($nomorFormatted));
+    $qrSvg  = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+        ->size(250)->margin(1)->errorCorrection('H')->generate($qrText);
+
+    // Inject logo ke tengah SVG
+    if ($logoSrc) {
+        preg_match('/viewBox="0 0 (\d+) (\d+)"/', $qrSvg, $vbM);
+        $svgW   = isset($vbM[1]) ? (int)$vbM[1] : 250;
+        $svgH   = isset($vbM[2]) ? (int)$vbM[2] : 250;
+        $lgSize = round($svgW * 0.22);
+        $lgX    = round(($svgW - $lgSize) / 2);
+        $lgY    = round(($svgH - $lgSize) / 2);
+        $inject = '<rect x="' . ($lgX-2) . '" y="' . ($lgY-2) . '" width="' . ($lgSize+4) . '" height="' . ($lgSize+4) . '" fill="white"/>'
+                . '<image href="' . $logoSrc . '" x="' . $lgX . '" y="' . $lgY . '" width="' . $lgSize . '" height="' . $lgSize . '" preserveAspectRatio="xMidYMid meet"/>';
+        $qrSvg = str_replace('</svg>', $inject . '</svg>', $qrSvg);
     }
+    $qrSrc = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
 
     // ── Tanggal ───────────────────────────────────────────────────────────
     $tglCetak = 'Serang, ' . \Carbon\Carbon::now()->locale('id')->isoFormat('D MMMM Y');
@@ -218,15 +223,13 @@ body{background:white}
 {{-- ═══ PENUTUP ═══ --}}
 <p class="penutup">{{ $templatePenutup }}</p>
 
-{{-- ═══ TTD (kanan, sama seperti print.blade.php) + TTD Digital ═══ --}}
+{{-- ═══ TTD + QR Code Verifikasi ═══ --}}
 <div style="display:flex;justify-content:flex-end;margin-top:14px">
     <div class="ttd-box">
         <p class="ttd-kota">{{ $tglCetak }}</p>
         <p>{{ $ttd->jabatan }}</p>
         <div class="ttd-ruang">
-            @if($ttdImgSrc)
-                <img src="{{ $ttdImgSrc }}" alt="TTD Digital">
-            @endif
+            <img src="{{ $qrSrc }}" alt="QR Verifikasi">
         </div>
         <p class="ttd-nama">{{ $ttd->nama }}</p>
         @if($ttd->nip)

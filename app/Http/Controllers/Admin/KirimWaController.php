@@ -48,16 +48,32 @@ class KirimWaController extends Controller
 
         $tahun       = now()->year;
         $bulanRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now()->month - 1];
-        $nomorUrut   = DB::transaction(function () use ($permohonan, $tahun) {
-            $max = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
-                ->whereYear('tanggal_pengajuan', $tahun)
-                ->whereNotNull('nomor_surat')
-                ->lockForUpdate()
-                ->get('nomor_surat')
-                ->map(fn($p) => (int) (explode(' / ', $p->nomor_surat)[1] ?? 0))
-                ->max() ?? 0;
-            return $max + 1;
-        });
+
+        // Jika sudah punya nomor surat, pakai yang lama — jangan generate baru
+        if ($permohonan->nomor_surat) {
+            $nomorFormatted = $permohonan->nomor_surat;
+            // Ekstrak nomorUrut dari nomor yang sudah ada untuk dikirim ke view
+            $parts     = explode(' / ', $nomorFormatted);
+            $nomorUrut = (int) ($parts[1] ?? 1);
+        } else {
+            $nomorUrut = DB::transaction(function () use ($permohonan, $tahun) {
+                $max = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
+                    ->whereYear('tanggal_pengajuan', $tahun)
+                    ->whereNotNull('nomor_surat')
+                    ->lockForUpdate()
+                    ->get('nomor_surat')
+                    ->map(fn($p) => (int) (explode(' / ', $p->nomor_surat)[1] ?? 0))
+                    ->max() ?? 0;
+                return $max + 1;
+            });
+
+            // Build nomor surat formatted (sama dengan yang ada di surat_render.blade.php)
+            $js             = $permohonan->jenisSurat;
+            $prefix         = optional($js)->kode_klasifikasi ?? '470';
+            $kode           = optional($js)->kode_surat ?? 'SK';
+            $nomorFormatted = $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
+                            . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . $tahun;
+        }
 
         try {
             $waStatus = Http::timeout(3)->get(self::WA_SERVER . '/status')->json();
@@ -109,6 +125,9 @@ class KirimWaController extends Controller
             $result = $response->json();
 
             if ($result['success'] ?? false) {
+                // Simpan nomor surat ke database agar QR code bisa diverifikasi
+                $permohonan->update(['nomor_surat' => $nomorFormatted]);
+
                 return response()->json(['success' => true, 'message' => 'Surat berhasil dikirim ke WhatsApp ' . $noHp]);
             }
 

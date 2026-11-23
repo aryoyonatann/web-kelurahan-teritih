@@ -33,6 +33,9 @@ Route::get('/berita/{slug}',    [PublicController::class, 'detailBerita'])->name
 Route::redirect('/informasi',         '/demografi', 301);
 Route::redirect('/informasi/berita',  '/berita',    301);
 
+// Verifikasi keaslian surat via QR Code — publik, tanpa login
+Route::get('/verifikasi-surat/{nomor}', [PublicController::class, 'verifikasiSurat'])->name('surat.verifikasi')->where('nomor', '.*');
+
 // Chatbot AI — tersedia untuk semua pengunjung (tanpa login)
 Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 

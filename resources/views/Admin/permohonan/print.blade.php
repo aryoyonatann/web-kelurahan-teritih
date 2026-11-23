@@ -200,19 +200,27 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
         return preg_replace('/\*\*(.+?)\*\*/', '<strong style="text-decoration:underline">$1</strong>', $html);
     }
 
-    // TTD image (embed base64)
-    $ttdImgTag = '';
-    if (!empty($ttd->ttd_data)) {
-        $ttdImgTag = '<img src="' . $ttd->ttd_data . '" style="height:70px;width:auto;max-width:200px" alt="TTD">';
-    } elseif (!empty($ttd->ttd_path)) {
-        $ttdFile = storage_path('app/public/' . $ttd->ttd_path);
-        if (file_exists($ttdFile)) {
-            $ttdExt  = strtolower(pathinfo($ttdFile, PATHINFO_EXTENSION));
-            $ttdMime = $ttdExt === 'png' ? 'image/png' : 'image/jpeg';
-            $ttdB64  = 'data:' . $ttdMime . ';base64,' . base64_encode(file_get_contents($ttdFile));
-            $ttdImgTag = '<img src="' . $ttdB64 . '" style="height:70px;width:auto;max-width:200px" alt="TTD">';
-        }
+    // QR Code verifikasi + logo di tengah (ganti TTD gambar)
+    $nomorFormattedPdf = $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
+        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year;
+
+    $qrTextPdf = url('/verifikasi-surat/' . urlencode($nomorFormattedPdf));
+    $qrSvgPdf  = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+        ->size(250)->margin(1)->errorCorrection('H')->generate($qrTextPdf);
+
+    if ($logoData) {
+        preg_match('/viewBox="0 0 (\d+) (\d+)"/', $qrSvgPdf, $vbM);
+        $svgW2    = isset($vbM[1]) ? (int)$vbM[1] : 250;
+        $svgH2    = isset($vbM[2]) ? (int)$vbM[2] : 250;
+        $lgSize   = round($svgW2 * 0.22);
+        $lgX      = round(($svgW2 - $lgSize) / 2);
+        $lgY      = round(($svgH2 - $lgSize) / 2);
+        $lgInject = '<rect x="' . ($lgX-2) . '" y="' . ($lgY-2) . '" width="' . ($lgSize+4) . '" height="' . ($lgSize+4) . '" fill="white"/>'
+                  . '<image href="' . $logoData . '" x="' . $lgX . '" y="' . $lgY . '" width="' . $lgSize . '" height="' . $lgSize . '" preserveAspectRatio="xMidYMid meet"/>';
+        $qrSvgPdf = str_replace('</svg>', $lgInject . '</svg>', $qrSvgPdf);
     }
+
+    $ttdImgTag = '<img src="data:image/svg+xml;base64,' . base64_encode($qrSvgPdf) . '" style="height:110px;width:auto" alt="QR Verifikasi">';
 @endphp
 <div class="pdf-surat">
 
@@ -329,7 +337,7 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
         <td class="pdf-ttd-right">
             <div>{{ $tglSurat }}</div>
             <div>{{ $ttd->jabatan }}</div>
-            <div style="height:70px;margin:6px 0;text-align:center">{!! $ttdImgTag !!}</div>
+            <div style="height:110px;margin:6px 0;text-align:center">{!! $ttdImgTag !!}</div>
             <div class="pdf-ttd-nama">{{ $ttd->nama }}</div>
             @if($ttd->nip)<div class="pdf-ttd-nip">NIP. {{ $ttd->nip }}</div>@endif
         </td>

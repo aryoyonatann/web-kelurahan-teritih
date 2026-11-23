@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Berita;
 use App\Models\Pengaturan;
+use App\Models\PermohonanSurat;
 use Illuminate\Http\Request;
 
 class PublicController extends Controller
@@ -89,5 +90,16 @@ class PublicController extends Controller
             ->get();
 
         return view('berita-detail', compact('berita', 'beritaLainnya'));
+    }
+
+    public function verifikasiSurat($nomor)
+    {
+        $nomor = urldecode($nomor);
+
+        $permohonan = PermohonanSurat::with(['jenisSurat', 'approval', 'user'])
+            ->where('nomor_surat', $nomor)
+            ->first();
+
+        return view('verifikasi-surat', compact('permohonan', 'nomor'));
     }
 }
