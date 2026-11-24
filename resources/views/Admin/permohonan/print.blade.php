@@ -349,30 +349,6 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
 {{-- ══════════════════════════════════════════════════════════════════
      MODE NORMAL (browser) — form + cetak manual seperti biasa
      ═══════════════════════════════════════════════════════════════════ --}}
-@php
-    $nomorFormattedPrint = $permohonan->nomor_surat ?? ($prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
-        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year);
-
-    $baseUrlPrint = rtrim(config('app.url') ?: url('/'), '/');
-    $qrTextPrint  = $baseUrlPrint . '/verifikasi-surat/' . urlencode($nomorFormattedPrint);
-    $qrSvgPrint   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
-        ->size(250)->margin(1)->errorCorrection('H')->generate($qrTextPrint);
-
-    $logoPathPrint = public_path('images/lambang_kota_serang.jpg');
-    if (file_exists($logoPathPrint)) {
-        $logoSrcPrint = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPathPrint));
-        preg_match('/viewBox="0 0 (\d+) (\d+)"/', $qrSvgPrint, $vbM);
-        $svgW3   = isset($vbM[1]) ? (int)$vbM[1] : 250;
-        $svgH3   = isset($vbM[2]) ? (int)$vbM[2] : 250;
-        $lgSize3 = round($svgW3 * 0.22);
-        $lgX3    = round(($svgW3 - $lgSize3) / 2);
-        $lgY3    = round(($svgH3 - $lgSize3) / 2);
-        $inject3 = '<rect x="' . ($lgX3-2) . '" y="' . ($lgY3-2) . '" width="' . ($lgSize3+4) . '" height="' . ($lgSize3+4) . '" fill="white"/>'
-                 . '<image href="' . $logoSrcPrint . '" x="' . $lgX3 . '" y="' . $lgY3 . '" width="' . $lgSize3 . '" height="' . $lgSize3 . '" preserveAspectRatio="xMidYMid meet"/>';
-        $qrSvgPrint = str_replace('</svg>', $inject3 . '</svg>', $qrSvgPrint);
-    }
-    $qrSrcPrint = 'data:image/svg+xml;base64,' . base64_encode($qrSvgPrint);
-@endphp
 
 {{-- ═══ FORM INPUT ADMIN ═══ --}}
 <div id="formPanel" class="panel-wrap">
@@ -583,14 +559,6 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
         </div>
         <button type="button" class="btn-tambah-ttd" onclick="tambahTTD()">➕ Tambah Penandatangan</button>
 
-        <div style="margin-top:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 16px">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;font-weight:600;color:#374151;user-select:none">
-                <input type="checkbox" id="chk_qr_ttd" checked style="width:16px;height:16px;accent-color:#1c64f2;cursor:pointer">
-                <span>Gunakan TTD Digital (QR Code Verifikasi)</span>
-            </label>
-            <div style="font-size:11px;color:#059669;margin-top:3px;margin-left:26px">✓ QR Code verifikasi surat akan disisipkan di kolom tanda tangan</div>
-        </div>
-
         <hr class="divider">
 
         {{-- SAKSI --}}
@@ -754,18 +722,7 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
     <p class="penutup">{{ $templatePenutup }}</p>
 
     {{-- TTD --}}
-    <div id="pr_ttd_wrap" style="margin-top:14px">
-        <div style="display:flex;justify-content:flex-end">
-            <div class="ttd-box">
-                <p class="ttd-kota">Teritih, {{ \Carbon\Carbon::now()->locale('id')->isoFormat('D MMMM Y') }}</p>
-                <p>Kepala Kelurahan Teritih</p>
-                <div class="ttd-ruang" style="height:100px;display:flex;align-items:center;justify-content:center;margin:4px 0">
-                    <img src="{{ $qrSrcPrint }}" style="height:100px;width:auto" alt="QR Verifikasi">
-                </div>
-                <p class="ttd-nama">{{ $namaLurah }}</p>
-            </div>
-        </div>
-    </div>
+    <div id="pr_ttd_wrap" style="margin-top:14px"></div>
 
 </div>
 </div>
@@ -989,15 +946,11 @@ function cetakSurat() {
     // TTD layout
     const ttds = collectTTDs();
     const wrap = document.getElementById('pr_ttd_wrap');
-    const pakaiQr = document.getElementById('chk_qr_ttd')?.checked ?? true;
-    const ttdRuangContent = pakaiQr 
-        ? `<div class="ttd-ruang" style="height:100px;display:flex;align-items:center;justify-content:center;margin:4px 0"><img src="{{ $qrSrcPrint }}" style="height:100px;width:auto" alt="QR Verifikasi"></div>`
-        : `<div class="ttd-ruang"></div>`;
 
     const ttdBoxHtml = (t) => `<div class="ttd-box">
         <p class="ttd-kota">${tgl}</p>
         <p>${t.jab1}</p>${t.jab2 ? `<p>${t.jab2}</p>` : ''}
-        ${ttdRuangContent}
+        <div class="ttd-ruang"></div>
         <p class="ttd-nama">${t.nama}</p>
         ${t.nip ? `<p class="ttd-nip">NIP. ${t.nip}</p>` : ''}
     </div>`;
