@@ -233,7 +233,6 @@ body{background:white}
         <div class="ttd-ruang">
             <img src="{{ $qrSrc }}" alt="QR Verifikasi">
         </div>
-        <p style="font-size:8pt;color:#64748b;margin:2px 0 4px;font-style:italic">Ditandatangani secara elektronik</p>
         <p class="ttd-nama">{{ $ttd->nama }}</p>
         @if($ttd->nip)
         <p class="ttd-nip">NIP. {{ $ttd->nip }}</p>
