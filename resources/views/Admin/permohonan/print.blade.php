@@ -353,8 +353,9 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
     $nomorFormattedPrint = $permohonan->nomor_surat ?? ($prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
         . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year);
 
-    $qrTextPrint = url('/verifikasi-surat/' . urlencode($nomorFormattedPrint));
-    $qrSvgPrint  = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+    $baseUrlPrint = rtrim(config('app.url') ?: url('/'), '/');
+    $qrTextPrint  = $baseUrlPrint . '/verifikasi-surat/' . urlencode($nomorFormattedPrint);
+    $qrSvgPrint   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
         ->size(250)->margin(1)->errorCorrection('H')->generate($qrTextPrint);
 
     $logoPathPrint = public_path('images/lambang_kota_serang.jpg');

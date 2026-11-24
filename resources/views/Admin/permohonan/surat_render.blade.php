@@ -90,8 +90,9 @@ body{background:white}
         $logoSrc = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath));
     }
 
-    $qrText = url('/verifikasi-surat/' . urlencode($nomorFormatted));
-    $qrSvg  = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+    $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
+    $qrText  = $baseUrl . '/verifikasi-surat/' . urlencode($nomorFormatted);
+    $qrSvg   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
         ->size(250)->margin(1)->errorCorrection('H')->generate($qrText);
 
     // Inject logo ke tengah SVG
