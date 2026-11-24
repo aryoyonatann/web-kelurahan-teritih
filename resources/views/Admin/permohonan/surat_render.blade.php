@@ -78,8 +78,10 @@ body{background:white}
     $isiReplaced = str_replace(array_keys($replacements), array_values($replacements), $templateIsi);
 
     // ── Nomor surat ───────────────────────────────────────────────────────
-    $nomorFormatted = $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
-        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year;
+    $nomorFormatted = $nomorFormatted ?? ($permohonan->nomor_surat ?? (
+        $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
+        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year
+    ));
 
     // ── Logo (base64) + QR Code verifikasi + logo di tengah QR ──────────
     $logoPath = public_path('images/lambang_kota_serang.jpg');
@@ -231,6 +233,7 @@ body{background:white}
         <div class="ttd-ruang">
             <img src="{{ $qrSrc }}" alt="QR Verifikasi">
         </div>
+        <p style="font-size:8pt;color:#64748b;margin:2px 0 4px;font-style:italic">Ditandatangani secara elektronik</p>
         <p class="ttd-nama">{{ $ttd->nama }}</p>
         @if($ttd->nip)
         <p class="ttd-nip">NIP. {{ $ttd->nip }}</p>

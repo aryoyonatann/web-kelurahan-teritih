@@ -201,8 +201,8 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
     }
 
     // QR Code verifikasi + logo di tengah (ganti TTD gambar)
-    $nomorFormattedPdf = $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
-        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year;
+    $nomorFormattedPdf = $permohonan->nomor_surat ?? ($prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
+        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year);
 
     $qrTextPdf = url('/verifikasi-surat/' . urlencode($nomorFormattedPdf));
     $qrSvgPdf  = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
