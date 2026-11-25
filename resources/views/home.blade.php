@@ -583,12 +583,7 @@
                 {{-- Video --}}
                 <div class="tut-video-wrap">
                     {{-- Ganti src di bawah dengan link YouTube embed atau path video lokal --}}
-                    {{-- YouTube  : src="https://www.youtube.com/embed/VIDEO_ID?rel=0" --}}
-                    {{-- Video lokal : <video controls src="{{ asset('videos/tutorial-daftar.mp4') }}"></video> --}}
-                    <div class="tut-video-placeholder">
-                        <i class="bi bi-camera-video-off"></i>
-                        <p>Video tutorial pendaftaran akan ditampilkan di sini</p>
-                    </div>
+                    <video controls style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000" src="{{ asset('videos/tutorial-daftar.mp4') }}"></video>
                 </div>
 
                 {{-- Langkah-langkah --}}
@@ -619,7 +614,7 @@
                     <div class="tut-step-num">4</div>
                     <div class="tut-step-body">
                         <div class="tut-step-title">Login ke akun Anda</div>
-                        <p class="tut-step-desc">Setelah berhasil mendaftar, Anda akan diarahkan ke halaman login. Masukkan email dan password, lalu klik <strong>Masuk</strong>.</p>
+                        <p class="tut-step-desc">Setelah berhasil mendaftar, Anda akan diarahkan ke halaman login. Masukkan <strong>NIK</strong> atau <strong>email</strong> dan password, lalu klik <strong>Masuk</strong>.</p>
                     </div>
                 </div>
             </div>
@@ -629,10 +624,7 @@
 
                 {{-- Video --}}
                 <div class="tut-video-wrap">
-                    <div class="tut-video-placeholder">
-                        <i class="bi bi-camera-video-off"></i>
-                        <p>Video tutorial pengajuan surat akan ditampilkan di sini</p>
-                    </div>
+                    <video controls style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000" src="{{ asset('videos/tutorial-permohonan.mp4') }}"></video>
                 </div>
 
                 {{-- Langkah-langkah --}}
