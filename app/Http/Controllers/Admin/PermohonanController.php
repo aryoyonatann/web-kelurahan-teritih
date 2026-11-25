@@ -175,22 +175,28 @@ class PermohonanController extends Controller
 
         $tahun = now()->year;
 
-        // Hitung nomor urut dengan locking untuk mencegah race condition
-        $nomorUrut = DB::transaction(function () use ($permohonan, $tahun) {
-            // lockForUpdate() mencegah dua proses membaca nilai yang sama bersamaan
-            $nomorUrutTertinggi = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
-                ->whereYear('tanggal_pengajuan', $tahun)
-                ->whereNotNull('nomor_surat')
-                ->lockForUpdate()
-                ->get('nomor_surat')
-                ->map(function ($p) {
-                    $parts = explode(' / ', $p->nomor_surat);
-                    return isset($parts[1]) ? (int) trim($parts[1]) : 0;
-                })
-                ->max() ?? 0;
+        // Jika permohonan sudah punya nomor surat di DB, pakai nomor tersebut
+        if ($permohonan->nomor_surat) {
+            $parts = explode(' / ', $permohonan->nomor_surat);
+            $nomorUrut = (int) ($parts[1] ?? 1);
+        } else {
+            // Hitung nomor urut dengan locking untuk mencegah race condition
+            $nomorUrut = DB::transaction(function () use ($permohonan, $tahun) {
+                // lockForUpdate() mencegah dua proses membaca nilai yang sama bersamaan
+                $nomorUrutTertinggi = PermohonanSurat::where('id_jenis_surat', $permohonan->id_jenis_surat)
+                    ->whereYear('tanggal_pengajuan', $tahun)
+                    ->whereNotNull('nomor_surat')
+                    ->lockForUpdate()
+                    ->get('nomor_surat')
+                    ->map(function ($p) {
+                        $parts = explode(' / ', $p->nomor_surat);
+                        return isset($parts[1]) ? (int) trim($parts[1]) : 0;
+                    })
+                    ->max() ?? 0;
 
-            return $nomorUrutTertinggi + 1;
-        });
+                return $nomorUrutTertinggi + 1;
+            });
+        }
 
         $bulanRomawi = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now()->month - 1];
 

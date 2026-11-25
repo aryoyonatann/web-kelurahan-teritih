@@ -84,7 +84,7 @@ class KirimWaController extends Controller
             return response()->json(['success' => false, 'message' => 'WA Server tidak aktif. Jalankan: cd D:\wa-server && node server.js'], 503);
         }
 
-        $htmlContent  = view('Admin.permohonan.surat_render', compact('permohonan', 'ttd', 'nomorUrut', 'bulanRomawi'))->render();
+        $htmlContent  = view('Admin.permohonan.surat_render', compact('permohonan', 'ttd', 'nomorUrut', 'bulanRomawi', 'nomorFormatted'))->render();
         $tempHtmlPath = storage_path('app/temp_surat_' . $id . '_' . time() . '.html');
         file_put_contents($tempHtmlPath, $htmlContent);
 

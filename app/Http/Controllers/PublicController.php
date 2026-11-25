@@ -100,6 +100,16 @@ class PublicController extends Controller
             ->where('nomor_surat', $nomor)
             ->first();
 
-        return view('verifikasi-surat', compact('permohonan', 'nomor'));
+        // Fallback jika ada perbedaan spasi
+        if (!$permohonan) {
+            $permohonan = PermohonanSurat::with(['jenisSurat', 'approval', 'user'])
+                ->whereRaw("REPLACE(nomor_surat, ' ', '') = ?", [str_replace(' ', '', $nomor)])
+                ->first();
+        }
+
+        $namaLurah  = Pengaturan::getValue('nama_lurah', 'Jupran, SE, MM');
+        $jabatLurah = Pengaturan::getValue('jabat_lurah', 'Kepala Kelurahan Teritih');
+
+        return view('verifikasi-surat', compact('permohonan', 'nomor', 'namaLurah', 'jabatLurah'));
     }
 }

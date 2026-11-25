@@ -78,8 +78,10 @@ body{background:white}
     $isiReplaced = str_replace(array_keys($replacements), array_values($replacements), $templateIsi);
 
     // ── Nomor surat ───────────────────────────────────────────────────────
-    $nomorFormatted = $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
-        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year;
+    $nomorFormatted = $nomorFormatted ?? ($permohonan->nomor_surat ?? (
+        $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
+        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year
+    ));
 
     // ── Logo (base64) + QR Code verifikasi + logo di tengah QR ──────────
     $logoPath = public_path('images/lambang_kota_serang.jpg');
@@ -88,8 +90,9 @@ body{background:white}
         $logoSrc = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath));
     }
 
-    $qrText = url('/verifikasi-surat/' . urlencode($nomorFormatted));
-    $qrSvg  = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+    $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
+    $qrText  = $baseUrl . '/verifikasi-surat/' . urlencode($nomorFormatted);
+    $qrSvg   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
         ->size(250)->margin(1)->errorCorrection('H')->generate($qrText);
 
     // Inject logo ke tengah SVG

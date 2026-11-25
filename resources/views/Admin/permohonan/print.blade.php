@@ -201,8 +201,8 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
     }
 
     // QR Code verifikasi + logo di tengah (ganti TTD gambar)
-    $nomorFormattedPdf = $prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
-        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year;
+    $nomorFormattedPdf = $permohonan->nomor_surat ?? ($prefix . ' / ' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT)
+        . ' / Kel.1010/' . $kode . '/ ' . $bulanRomawi . ' /' . now()->year);
 
     $qrTextPdf = url('/verifikasi-surat/' . urlencode($nomorFormattedPdf));
     $qrSvgPdf  = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
@@ -430,7 +430,10 @@ html,body{font-family:'Times New Roman',Times,serif !important;font-size:12pt !i
             const num    = String(document.getElementById('inp_nomor_urut').value||'').padStart(3,'0');
             const prefix = document.getElementById('inp_prefix').value.trim() || '{{ $prefix }}';
             const kode   = document.getElementById('inp_kode').value.trim()   || '{{ $kode }}';
-            document.getElementById('preview_nomor').textContent = prefix + ' / ' + num + ' / Kel.1010/' + kode + '/ {{ $bulanRomawi }} /{{ now()->format("Y") }}';
+            const fullNomor = prefix + ' / ' + num + ' / Kel.1010/' + kode + '/ {{ $bulanRomawi }} /{{ now()->format("Y") }}';
+            document.getElementById('preview_nomor').textContent = fullNomor;
+            const prNomor = document.getElementById('pr_nomor');
+            if (prNomor) prNomor.textContent = fullNomor;
         }
         </script>
 

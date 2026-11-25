@@ -23,8 +23,11 @@
         .info-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;min-width:140px;flex-shrink:0}
         .info-value{font-size:14px;font-weight:600;color:#0d1b3e}
         .status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700}
+        .status-disetujui{background:#dcfce7;color:#15803d}
         .status-selesai{background:#d1fae5;color:#065f46}
         .status-siap{background:#fef3c7;color:#92400e}
+        .status-ditolak{background:#fee2e2;color:#b91c1c}
+        .status-cancelled{background:#f1f5f9;color:#64748b}
         .status-lain{background:#e0e7ff;color:#3730a3}
         .footer-note{text-align:center;padding:16px 32px 24px;font-size:12px;color:#94a3b8;line-height:1.6}
         .btn-home{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:#1c64f2;color:white;font-size:13px;font-weight:700;text-decoration:none;margin-top:12px}
@@ -43,14 +46,17 @@
     @php
         $status     = $permohonan->approval->status ?? '-';
         $badgeClass = match($status) {
+            'disetujui'    => 'status-disetujui',
             'selesai'      => 'status-selesai',
             'siap_diambil' => 'status-siap',
+            'ditolak'      => 'status-ditolak',
+            'cancelled'    => 'status-cancelled',
             default        => 'status-lain',
         };
         $statusLabel = match($status) {
+            'disetujui'    => 'Disetujui',
             'selesai'      => 'Selesai',
             'siap_diambil' => 'Siap Diambil',
-            'disetujui'    => 'Disetujui',
             'ditolak'      => 'Ditolak',
             'cancelled'    => 'Dibatalkan',
             'pending'      => 'Menunggu',
@@ -92,6 +98,10 @@
             <div class="info-row">
                 <span class="info-label">Tanggal Diproses</span>
                 <span class="info-value">{{ $tglApproval }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Penandatangan</span>
+                <span class="info-value">{{ $namaLurah ?? 'Kepala Kelurahan Teritih' }}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Status</span>
